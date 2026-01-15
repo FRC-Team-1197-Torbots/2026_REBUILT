@@ -80,10 +80,10 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        joystick.rightBumper().onTrue(Commands.runOnce(() -> intakeMotor.set(-0.5f)));
+        joystick.rightBumper().onTrue(Commands.runOnce(() -> intakeMotor.set(-0.75f)));
         joystick.rightBumper().onFalse(Commands.runOnce(() -> intakeMotor.set(0.0f)));
 
-        joystick.x().onTrue(new TurretTurnToAngle(90, m_turret));
+        joystick.x().onTrue(new TurretTurnToAngle(m_turret.target, m_turret));
 
         //m_turret.setDefaultCommand(m_turret.TrackDefaultCommand());
     }

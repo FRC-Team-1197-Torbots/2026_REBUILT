@@ -17,6 +17,7 @@ public class Turret extends SubsystemBase {
     private SwerveDrivetrain DriveTrain;
     private Pose2d turretPose;
     private double ratio = 24.0f / 240.0f;
+    public double target;
 
     // y in inches: 159.1
     // x in inches: 182.1
@@ -48,10 +49,12 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putNumber("Turret Angle", turretangle);
 
         turretPose = new Pose2d(state.Pose.getX(), state.Pose.getY(), new Rotation2d(turretangle));
+
+        
     }
 
     public void setPower(float speed) {
-        runOnce(() -> TurrentMotor.set(speed));
+        TurrentMotor.set(speed);
     }
 
     public Command ManualTurnLeft() {
