@@ -21,12 +21,11 @@ public class Turret extends SubsystemBase {
     // y in inches: 159.1
     // x in inches: 182.1
 
-    // 240 to 24
-
     private Pose2d RedTarget = new Pose2d(TurretCANID, TurretCANID, null);
 
     public Turret(SwerveDrivetrain drivetrain) {
         TurrentMotor = new TalonFX(TurretCANID);
+        TurrentMotor.setPosition(0);
 
         DriveTrain = drivetrain;
         turretPose = new Pose2d();
@@ -45,10 +44,14 @@ public class Turret extends SubsystemBase {
     @Override
     public void periodic() {
         SwerveDriveState state = DriveTrain.getState();
-        double turretangle = TurrentMotor.getPosition().getValueAsDouble() * ratio * 180;
+        double turretangle = TurrentMotor.getPosition().getValueAsDouble() * ratio * 360.0f;
         SmartDashboard.putNumber("Turret Angle", turretangle);
 
         turretPose = new Pose2d(state.Pose.getX(), state.Pose.getY(), new Rotation2d(turretangle));
+    }
+
+    public void setPower(float speed) {
+        runOnce(() -> TurrentMotor.set(speed));
     }
 
     public Command ManualTurnLeft() {
@@ -61,5 +64,9 @@ public class Turret extends SubsystemBase {
 
     public Command StopTurret() {
         return runOnce(() -> TurrentMotor.set(0));
+    }
+
+    public double GetCurrentAngle() {
+        return TurrentMotor.getPosition().getValueAsDouble() * ratio * 360.0f;
     }
 }

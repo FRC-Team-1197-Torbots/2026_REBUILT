@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.Commands.TurretTurnToAngle;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Turret;
@@ -82,10 +83,7 @@ public class RobotContainer {
         joystick.rightBumper().onTrue(Commands.runOnce(() -> intakeMotor.set(-0.5f)));
         joystick.rightBumper().onFalse(Commands.runOnce(() -> intakeMotor.set(0.0f)));
 
-        joystick.x().onTrue(m_turret.ManualTurnLeft());
-        joystick.b().onTrue(m_turret.ManualTurnRight());
-        joystick.x().onFalse(m_turret.StopTurret());
-        joystick.b().onFalse(m_turret.StopTurret());
+        joystick.x().onTrue(new TurretTurnToAngle(90, m_turret));
 
         //m_turret.setDefaultCommand(m_turret.TrackDefaultCommand());
     }
