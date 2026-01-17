@@ -8,8 +8,7 @@ public class TurretTurnToAngle extends Command {
 
     private double targetAngle;
     private Turret m_turret;
-    private final double err = 0.05f;
-    private final double p = 0.003d;
+    private final double p = 0.001d;
 
     public TurretTurnToAngle(double angle, Turret turret) {
         targetAngle = angle;
@@ -20,8 +19,9 @@ public class TurretTurnToAngle extends Command {
     public void execute() {
         double currentdelta = targetAngle - m_turret.GetCurrentAngle();
 
-        double dir = currentdelta * p;
-        SmartDashboard.putNumber("Turret Power", dir);
+        double dir = currentdelta * p;  
+        
+        dir = Math.max(0.1d, dir);
 
         m_turret.setPower((float)dir);
     }

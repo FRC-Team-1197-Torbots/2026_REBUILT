@@ -7,7 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.revrobotics.spark.SparkFlex;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -83,7 +82,7 @@ public class RobotContainer {
         joystick.rightBumper().onTrue(Commands.runOnce(() -> intakeMotor.set(-0.75f)));
         joystick.rightBumper().onFalse(Commands.runOnce(() -> intakeMotor.set(0.0f)));
 
-        joystick.x().onTrue(new TurretTurnToAngle(m_turret.target, m_turret));
+        //joystick.x().onTrue(new TurretTurnToAngle(m_turret.CalculateAngleToTarget(), m_turret));
 
         //m_turret.setDefaultCommand(m_turret.TrackDefaultCommand());
     }
