@@ -6,6 +6,7 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,63 +14,74 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Turret extends SubsystemBase {
 
     private final int TurretCANID = 20;
-    private TalonFX TurrentMotor;
+    private TalonFX TurretMotor;
     private SwerveDrivetrain DriveTrain;
-    private Pose2d turretPose;
     private double ratio = 24.0f / 240.0f;
     public double target;
 
-    // y in inches: 159.1
-    // x in inches: 182.1
+    private final double p = 0.0012d;
 
-    private Pose2d RedTarget = new Pose2d(TurretCANID, TurretCANID, null);
+    // y in inches: 159.1 = 4.0386 m
+    // x in inches: 182.1 = 4.6228 m
 
+    private Pose2d RedTarget = new Pose2d(4.0386, 4.6228, Rotation2d.kZero);
+
+    @SuppressWarnings("rawtypes")
     public Turret(SwerveDrivetrain drivetrain) {
-        TurrentMotor = new TalonFX(TurretCANID);
-        TurrentMotor.setPosition(0);
+        TurretMotor = new TalonFX(TurretCANID);
+        TurretMotor.setPosition(0);
 
         DriveTrain = drivetrain;
-        turretPose = new Pose2d();
     }
-
-    /*public Command TrackDefaultCommand() {
-        if (turretPose != null) {
-            //calculate the vector between the robot and the target
-
-            //calculate teh angle between the turret and the 
-        } else {
-            System.err.println("Turret Pose is null");
-        }
-    }*/
 
     @Override
     public void periodic() {
-        SwerveDriveState state = DriveTrain.getState();
-        double turretangle = TurrentMotor.getPosition().getValueAsDouble() * ratio * 360.0f;
-        SmartDashboard.putNumber("Turret Angle", turretangle);
+        //Convert the kracken encoder ticks to degrees
+        double turretangle = TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f;             
+        double robotAngle = DriveTrain.getState().Pose.getRotation().getDegrees();
 
-        turretPose = new Pose2d(state.Pose.getX(), state.Pose.getY(), new Rotation2d(turretangle));
-
+        //combine the robot rotation and the turrets rotation to get a heading 
+        //TODO :: Need to consider if the rotation exceeds 360 or 180
+        double fieldTurretAngle = robotAngle + turretangle;
+        SmartDashboard.putNumber("Field Turret Angle", fieldTurretAngle);
         
+        //Calculate the field space delta in turret angle
+        double angleToTarget = CalculateAngleToTarget();
+        SmartDashboard.putNumber("Angle to Target", angleToTarget);
+
+        //Calculate error for turret
+        double err = angleToTarget - fieldTurretAngle;
+        SmartDashboard.putNumber("Turret Error", err);
+
+        double power = err * p;          
+        TurretMotor.set(power);
     }
 
     public void setPower(float speed) {
-        TurrentMotor.set(speed);
+        TurretMotor.set(speed);
     }
 
     public Command ManualTurnLeft() {
-        return runOnce(() -> TurrentMotor.set(0.1f));
+        return runOnce(() -> TurretMotor.set(0.1f));
     }
 
     public Command ManualTurnRight() {
-        return runOnce(() -> TurrentMotor.set(-0.1f));
+        return runOnce(() -> TurretMotor.set(-0.1f));
     }
 
     public Command StopTurret() {
-        return runOnce(() -> TurrentMotor.set(0));
+        return runOnce(() -> TurretMotor.set(0));
     }
 
     public double GetCurrentAngle() {
-        return TurrentMotor.getPosition().getValueAsDouble() * ratio * 360.0f;
+        return TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f;
+    }
+
+    public double CalculateAngleToTarget() {
+        Translation2d deltaVector = RedTarget.getTranslation().minus(DriveTrain.getState().Pose.getTranslation());
+
+        Rotation2d angleToTarget = deltaVector.getAngle();
+
+        return angleToTarget.getDegrees();
     }
 }
