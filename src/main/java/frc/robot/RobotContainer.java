@@ -76,6 +76,14 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        //return autoChooser.getSelected();
+
+        final var idle = new SwerveRequest.Idle();
+
+        return Commands.sequence(
+            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
+            drivetrain.applyRequest(() -> drive.withVelocityX(0.5).withVelocityY(0).withRotationalRate(0.0))
+            .withTimeout(2),
+            drivetrain.applyRequest(() -> idle));
     }
 }
