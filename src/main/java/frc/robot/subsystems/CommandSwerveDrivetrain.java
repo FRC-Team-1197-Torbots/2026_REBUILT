@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -23,6 +24,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -57,6 +59,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /** Swerve request to apply during robot-centric path following */
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
+
+    private final Pigeon2 pigeon = new Pigeon2(2);
 
     /*
      * SysId routine for characterizing translation. This is used to find PID gains
@@ -271,6 +275,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
+
+        SmartDashboard.putNumber("Yaw", pigeon.getYaw().getValueAsDouble());
+        SmartDashboard.putNumber("Pitch", pigeon.getPitch().getValueAsDouble());
+        SmartDashboard.putNumber("Roll", pigeon.getRoll().getValueAsDouble());
+        SmartDashboard.putNumber("Accel", pigeon.getAccelerationX().getValueAsDouble());
+        SmartDashboard.putNumber("AccelY", pigeon.getAccelerationY().getValueAsDouble());
+        SmartDashboard.putNumber("AccelZ", pigeon.getAccelerationZ().getValueAsDouble());
         /*
          * Periodically try to apply the operator perspective.
          * If we haven't applied the operator perspective before, then we should apply

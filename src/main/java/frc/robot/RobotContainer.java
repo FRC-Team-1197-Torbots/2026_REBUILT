@@ -38,8 +38,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    private final SparkFlex intakeMotor = new SparkFlex(21, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    private final Turret m_turret = new Turret(drivetrain);
+    //private final Turret m_turret = new Turret(drivetrain);
     //private final ZoneDetection zone = new ZoneDetection(drivetrain);
 
     private final SendableChooser<Command> autoChooser;
@@ -74,16 +73,17 @@ public class RobotContainer {
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
-
-        joystick.rightBumper().onTrue(Commands.runOnce(() -> intakeMotor.set(-0.75f)));
-        joystick.rightBumper().onFalse(Commands.runOnce(() -> intakeMotor.set(0.0f)));
-
-        //joystick.x().onTrue(new TurretTurnToAngle(m_turret.CalculateAngleToTarget(), m_turret));
-
-        //m_turret.setDefaultCommand(m_turret.TrackDefaultCommand());
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        //return autoChooser.getSelected();
+
+        final var idle = new SwerveRequest.Idle();
+
+        return Commands.sequence(
+            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
+            drivetrain.applyRequest(() -> drive.withVelocityX(0.5).withVelocityY(0).withRotationalRate(0.0))
+            .withTimeout(2),
+            drivetrain.applyRequest(() -> idle));
     }
 }
