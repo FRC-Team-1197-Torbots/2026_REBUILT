@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.revrobotics.spark.SparkFlex;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Turret;
+import frc.robot.subsystems.Shooter;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
@@ -34,8 +33,9 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    private final SparkFlex intakeMotor = new SparkFlex(21, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    private final Turret m_turret = new Turret(drivetrain);
+    /***************************TORBOTS SPECIFIC VARIABLES ******************************/
+    private final Shooter m_shooter = new Shooter(joystick);
+
 
     public RobotContainer() {
         configureBindings();
@@ -78,8 +78,9 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        joystick.rightBumper().onTrue(Commands.runOnce(() -> intakeMotor.set(-0.75f)));
-        joystick.rightBumper().onFalse(Commands.runOnce(() -> intakeMotor.set(0.0f)));
+        joystick.a().onTrue(Commands.runOnce(() -> m_shooter.Spin()));
+        joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
+        joystick.b().onTrue(Commands.runOnce(() -> m_shooter.GoToAngle()));
 
         //joystick.x().onTrue(new TurretTurnToAngle(m_turret.CalculateAngleToTarget(), m_turret));
 
