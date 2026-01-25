@@ -2,8 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,6 +19,7 @@ public class Turret extends SubsystemBase {
     private SwerveDrivetrain DriveTrain;
     private double ratio = 24.0f / 240.0f;
     public double target;
+    public double p;
 
     // y in inches: 159.1 = 4.0386 m
     // x in inches: 182.1 = 4.6228 m
@@ -36,7 +37,7 @@ public class Turret extends SubsystemBase {
     @Override
     public void periodic() {
         //Convert the kracken encoder ticks to degrees
-        /*double turretangle = TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f;             
+        double turretangle = TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f;             
         double robotAngle = DriveTrain.getState().Pose.getRotation().getDegrees();
 
         //combine the robot rotation and the turrets rotation to get a heading 
@@ -50,10 +51,11 @@ public class Turret extends SubsystemBase {
 
         //Calculate error for turret
         double err = angleToTarget - fieldTurretAngle;
+        err = MathUtil.inputModulus(err, -180d, 180d);
         SmartDashboard.putNumber("Turret Error", err);
 
-        double power = err * p;          
-        TurretMotor.set(power);*/
+        //double power = err * p;          
+        //TurretMotor.set(power);
     }
 
     public void setPower(float speed) {
