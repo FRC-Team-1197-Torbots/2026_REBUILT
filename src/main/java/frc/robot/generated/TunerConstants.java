@@ -66,7 +66,7 @@ public class TunerConstants {
         );
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
-    private static final Pigeon2Configuration pigeonConfigs = null;
+    private static final Pigeon2Configuration pigeonConfigs = new Pigeon2Configuration();
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
@@ -196,9 +196,12 @@ public class TunerConstants {
      * This should only be called once in your robot program,.
      */
     public static CommandSwerveDrivetrain createDrivetrain() {
+        //MountPose.MountPoseYaw = -90d;
+        //pigeonConfigs.MountPose.MountPoseRoll = -90d;
+
         return new CommandSwerveDrivetrain(
             DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight
-        );
+        );        
     }
 
 
@@ -283,4 +286,4 @@ public class TunerConstants {
             );
         }
     }
-}
+}

@@ -36,7 +36,7 @@ public class Turret extends SubsystemBase {
     @Override
     public void periodic() {
         //Convert the kracken encoder ticks to degrees
-        double turretangle = TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f;             
+        /*double turretangle = TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f;             
         double robotAngle = DriveTrain.getState().Pose.getRotation().getDegrees();
 
         //combine the robot rotation and the turrets rotation to get a heading 
@@ -52,8 +52,8 @@ public class Turret extends SubsystemBase {
         double err = angleToTarget - fieldTurretAngle;
         SmartDashboard.putNumber("Turret Error", err);
 
-        double power = err * TurretConstants.p;          
-        TurretMotor.set(power);
+        double power = err * p;          
+        TurretMotor.set(power);*/
     }
 
     public void setPower(float speed) {
