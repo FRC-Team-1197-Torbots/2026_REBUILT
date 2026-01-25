@@ -56,25 +56,13 @@ public class Shooter extends SubsystemBase {
         hoodController.setSetpoint(ticks, ControlType.kPosition);
     }
 
-
-
     @Override
     public void periodic() {
         // TODO Auto-generated method stub
         super.periodic();
 
         shooterspeed = SmartDashboard.getNumber("Shooter Speed", 0);
-        hoodangle = SmartDashboard.getNumber("Hood Angle", 0);
-        
-
-        /*if (m_controller.getLeftTriggerAxis() >= 0.5f) {
-            hood.set(0.2);
-        } else if (m_controller.getRightTriggerAxis() >= 0.5f) {
-            hood.set(-0.2);
-        } else {
-            hood.set(0);
-        }*/
-        
+        hoodangle = SmartDashboard.getNumber("Hood Angle", 0);       
 
         SmartDashboard.putNumber("Actual Shooter Speed", shooterWheel1.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Actual Hood Angle", hood.getEncoder().getPosition() * ratio);
