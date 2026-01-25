@@ -15,7 +15,7 @@ public class Hooper extends SubsystemBase {
 
     
     public Hooper() {
-        hopperMotor = new SparkFlex(HopperConstants.kHopperCanId, SparkLowLevel.MotorType.kBrushless);
+        hopperMotor = new SparkFlex(HopperConstants.HopperCanId, SparkLowLevel.MotorType.kBrushless);
     }
     
     @Override
