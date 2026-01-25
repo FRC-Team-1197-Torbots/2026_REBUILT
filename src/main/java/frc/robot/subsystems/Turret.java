@@ -11,15 +11,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import frc.robot.Constants.TurretConstants;
+
 public class Turret extends SubsystemBase {
 
-    private final int TurretCANID = 20;
     private TalonFX TurretMotor;
     private SwerveDrivetrain DriveTrain;
     private double ratio = 24.0f / 240.0f;
     public double target;
-
-    private final double p = 0.0012d;
 
     // y in inches: 159.1 = 4.0386 m
     // x in inches: 182.1 = 4.6228 m
@@ -28,7 +27,7 @@ public class Turret extends SubsystemBase {
 
     @SuppressWarnings("rawtypes")
     public Turret(SwerveDrivetrain drivetrain) {
-        TurretMotor = new TalonFX(TurretCANID);
+        TurretMotor = new TalonFX(TurretConstants.TurretCanId);
         TurretMotor.setPosition(0);
 
         DriveTrain = drivetrain;
@@ -37,7 +36,7 @@ public class Turret extends SubsystemBase {
     @Override
     public void periodic() {
         //Convert the kracken encoder ticks to degrees
-        double turretangle = TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f;             
+        /*double turretangle = TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f;             
         double robotAngle = DriveTrain.getState().Pose.getRotation().getDegrees();
 
         //combine the robot rotation and the turrets rotation to get a heading 
@@ -54,7 +53,7 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putNumber("Turret Error", err);
 
         double power = err * p;          
-        TurretMotor.set(power);
+        TurretMotor.set(power);*/
     }
 
     public void setPower(float speed) {
