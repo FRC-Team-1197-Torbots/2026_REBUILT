@@ -275,13 +275,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-
-        SmartDashboard.putNumber("Yaw", pigeon.getYaw().getValueAsDouble());
-        SmartDashboard.putNumber("Pitch", pigeon.getPitch().getValueAsDouble());
-        SmartDashboard.putNumber("Roll", pigeon.getRoll().getValueAsDouble());
-        SmartDashboard.putNumber("Accel", pigeon.getAccelerationX().getValueAsDouble());
-        SmartDashboard.putNumber("AccelY", pigeon.getAccelerationY().getValueAsDouble());
-        SmartDashboard.putNumber("AccelZ", pigeon.getAccelerationZ().getValueAsDouble());
         /*
          * Periodically try to apply the operator perspective.
          * If we haven't applied the operator perspective before, then we should apply
