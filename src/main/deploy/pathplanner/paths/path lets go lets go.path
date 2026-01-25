@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.237095491565904,
-        "y": 7.2583354778386475
+        "x": 5.518775654422598,
+        "y": 7.216827075651445
       },
       "isLocked": true,
       "linkedName": null
@@ -20,72 +20,40 @@
         "y": 7.029192771084337
       },
       "prevControl": {
-        "x": 7.00709847587931,
-        "y": 7.672339072922257
+        "x": 7.018126890882208,
+        "y": 7.661190440925223
       },
       "nextControl": {
-        "x": 7.891454237746371,
-        "y": 6.7007192979281
+        "x": 7.868160123802324,
+        "y": 6.7258473377130645
       },
       "isLocked": true,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.774,
-        "y": 5.346325301204819
+        "x": 7.592481927710843,
+        "y": 0.8506547619047615
       },
       "prevControl": {
-        "x": 7.767325301204817,
-        "y": 6.329819277108434
+        "x": 7.673401360544219,
+        "y": 1.5069132653061228
       },
       "nextControl": {
-        "x": 7.78027639082901,
-        "y": 4.421520638078597
-      },
-      "isLocked": true,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 6.11724096385542,
-        "y": 0.7020481927710842
-      },
-      "prevControl": {
-        "x": 7.0460963855421666,
-        "y": 0.8659638554216871
-      },
-      "nextControl": {
-        "x": 5.493825122075661,
-        "y": 0.5920336324570086
+        "x": 7.510042270377788,
+        "y": 0.18206720205724647
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.4399518072289146,
-        "y": 0.8659638554216871
+        "x": 3.1690816326530613,
+        "y": 0.5896428571428578
       },
       "prevControl": {
-        "x": 4.311997063680189,
-        "y": 0.7413859616429342
-      },
-      "nextControl": {
-        "x": 2.5985180722891563,
-        "y": 0.9861686746987948
-      },
-      "isLocked": true,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.67501204819277,
-        "y": 1.3249277108433728
-      },
-      "prevControl": {
-        "x": 2.56320864931778,
-        "y": 1.5485345085933515
+        "x": 3.0366456494183387,
+        "y": 0.8016822646704498
       },
       "nextControl": null,
       "isLocked": false,
@@ -98,7 +66,7 @@
       "rotationDegrees": -90.0
     },
     {
-      "waypointRelativePos": 2,
+      "waypointRelativePos": 1.5,
       "rotationDegrees": -90.0
     }
   ],
@@ -134,19 +102,19 @@
     },
     {
       "name": "intake on",
-      "waypointRelativePos": 1.1761786600496187,
+      "waypointRelativePos": 1.1,
       "endWaypointRelativePos": 2.7940446650124025,
       "command": null
     },
     {
       "name": "turret shuttling on",
-      "waypointRelativePos": 1.831265508684857,
+      "waypointRelativePos": 1.4,
       "endWaypointRelativePos": 3.188089330024803,
       "command": null
     },
     {
       "name": "score all",
-      "waypointRelativePos": 5.0,
+      "waypointRelativePos": 3.0,
       "endWaypointRelativePos": null,
       "command": null
     }
