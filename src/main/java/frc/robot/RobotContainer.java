@@ -11,10 +11,13 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
@@ -33,7 +36,9 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    //private final Turret m_turret = new Turret(drivetrain);
+    /***************************TORBOTS SPECIFIC VARIABLES ******************************/
+    private final Shooter m_shooter = new Shooter(joystick);
+    private final Turret m_turret = new Turret(drivetrain);
     //private final ZoneDetection zone = new ZoneDetection(drivetrain);
 
     private final SendableChooser<Command> autoChooser;
@@ -68,6 +73,14 @@ public class RobotContainer {
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        joystick.a().onTrue(Commands.runOnce(() -> m_shooter.Spin()));
+        joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
+        joystick.b().onTrue(Commands.runOnce(() -> m_shooter.GoToAngle()));
+
+        //joystick.x().onTrue(new TurretTurnToAngle(m_turret.CalculateAngleToTarget(), m_turret));
+
+        //m_turret.setDefaultCommand(m_turret.TrackDefaultCommand());
     }
 
     public Command getAutonomousCommand() {
