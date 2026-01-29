@@ -108,9 +108,22 @@
   ],
   "constraintZones": [
     {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0,
+      "name": "Constraints Zone balls",
+      "minWaypointRelativePos": 1.1166253101736974,
+      "maxWaypointRelativePos": 2.367245657568232,
+      "constraints": {
+        "maxVelocity": 5.0,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 720.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone ramp",
+      "minWaypointRelativePos": 4.024813895781611,
+      "maxWaypointRelativePos": 4.779156327543439,
       "constraints": {
         "maxVelocity": 5.0,
         "maxAcceleration": 5.0,
