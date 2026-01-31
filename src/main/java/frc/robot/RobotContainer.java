@@ -37,8 +37,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     /***************************TORBOTS SPECIFIC VARIABLES ******************************/
-    private final Shooter m_shooter = new Shooter(joystick);
-    private final Turret m_turret = new Turret(drivetrain);
+    //private final Shooter m_shooter = new Shooter(joystick);
+    //private final Turret m_turret = new Turret(drivetrain);
     //private final ZoneDetection zone = new ZoneDetection(drivetrain);
 
     private final SendableChooser<Command> autoChooser;
@@ -74,9 +74,9 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        joystick.a().onTrue(Commands.runOnce(() -> m_shooter.Spin()));
-        joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
-        joystick.b().onTrue(Commands.runOnce(() -> m_shooter.GoToAngle()));
+        //joystick.a().onTrue(Commands.runOnce(() -> m_shooter.Spin()));
+        //joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
+        //joystick.b().onTrue(Commands.runOnce(() -> m_shooter.GoToAngle()));
 
         //joystick.x().onTrue(new TurretTurnToAngle(m_turret.CalculateAngleToTarget(), m_turret));
 
