@@ -1,7 +1,8 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
+
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -10,6 +11,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.PoseEstimate;
 
 public class ZoneDetection extends SubsystemBase {
 
@@ -18,11 +21,13 @@ public class ZoneDetection extends SubsystemBase {
 
     public enum ZONE {RED, NEUTRAL, BULE};
     private ZONE myZone;
+    private Pigeon2 m_gyro;
 
-    public ZoneDetection(CommandSwerveDrivetrain drivetrain) {
+    public ZoneDetection(CommandSwerveDrivetrain drivetrain, Pigeon2 gyro) {
         this.drivetrain = drivetrain;
+        m_gyro = gyro;
 
-        limelightTable = NetworkTableInstance.getDefault().getTable("limelight-four");
+        limelightTable = NetworkTableInstance.getDefault().getTable("limelight-alpha");
     }
 
     @Override
@@ -36,6 +41,9 @@ public class ZoneDetection extends SubsystemBase {
         if (!hasTarget) {
             return;
         }
+
+        LimelightHelpers.SetRobotOrientation("limelight-alpha", m_gyro.getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
+        PoseEstimate MegaTag2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-alpha");
 
         double[] botpose = limelightTable.getEntry("botpose_wpiblue").getDoubleArray(new double[0]);
 
@@ -58,10 +66,10 @@ public class ZoneDetection extends SubsystemBase {
         double xyStdDev = 0.5;
         double degStdDev = 10.0;
 
-        if(avgDistToTag > 4.0) {
-            xyStdDev = 3.0;
+        if(avgDistToTag > 5.0) {
+            xyStdDev = 5.0;
         } else if(avgDistToTag > 2.0) {
-            xyStdDev = 1.0;
+            xyStdDev = 3.0;
         } else {
             xyStdDev = 0.1;
         }
@@ -69,8 +77,7 @@ public class ZoneDetection extends SubsystemBase {
         drivetrain.addVisionMeasurement(visionPose, timestamp,
             VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(degStdDev)));
 
-        SmartDashboard.putNumber("LM-X", x);
-        SmartDashboard.putNumber("LM-Y", y);
+        SmartDashboard.putNumber("Average Distance To Tag", avgDistToTag);
     }
 
     public ZONE getZone() {
