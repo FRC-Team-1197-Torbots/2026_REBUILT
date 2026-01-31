@@ -38,7 +38,7 @@ public class RobotContainer {
 
     /***************************TORBOTS SPECIFIC VARIABLES ******************************/
     private final Shooter m_shooter = new Shooter(joystick);
-    private final Turret m_turret = new Turret(drivetrain);
+    //private final Turret m_turret = new Turret(drivetrain);
     //private final ZoneDetection zone = new ZoneDetection(drivetrain);
 
     private final SendableChooser<Command> autoChooser;
