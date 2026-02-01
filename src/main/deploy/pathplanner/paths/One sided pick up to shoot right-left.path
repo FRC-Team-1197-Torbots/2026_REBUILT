@@ -1,0 +1,122 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.5383012048192777,
+        "y": 0.680192771084337
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.381320007840002,
+        "y": 0.7748884634366725
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.712686746987952,
+        "y": 1.7948192771084335
+      },
+      "prevControl": {
+        "x": 7.465635776936306,
+        "y": 0.18172176677122387
+      },
+      "nextControl": {
+        "x": 7.898457831325302,
+        "y": 3.0077951807228906
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.9314698795180725,
+        "y": 5.007566265060241
+      },
+      "prevControl": {
+        "x": 6.599860911693174,
+        "y": 4.551824323163878
+      },
+      "nextControl": {
+        "x": 5.079411248634554,
+        "y": 5.588541826304279
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.407168674698795,
+        "y": 5.717867469879518
+      },
+      "prevControl": {
+        "x": 3.158942613575687,
+        "y": 5.747596623572603
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.8639004149377653,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 1.361825726141073,
+      "rotationDegrees": 110.0
+    },
+    {
+      "waypointRelativePos": 1.9742738589211515,
+      "rotationDegrees": 135.0
+    },
+    {
+      "waypointRelativePos": 3.0,
+      "rotationDegrees": 135.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "shuttle pre-loaded",
+      "waypointRelativePos": 0.014888337468981782,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "intake on",
+      "waypointRelativePos": 0.8784119106699717,
+      "endWaypointRelativePos": 1.557320099255583,
+      "command": null
+    },
+    {
+      "name": "shoot balls",
+      "waypointRelativePos": 3.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
