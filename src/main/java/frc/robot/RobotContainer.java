@@ -88,7 +88,7 @@ public class RobotContainer {
         joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
         joystick.b().onTrue(Commands.runOnce(() -> m_shooter.GoToAngle()));
 
-        limelight.setDefaultCommand(updateVisionCommand());
+        //limelight.setDefaultCommand(updateVisionCommand());
         // joystick.x().onTrue(new TurretTurnToAngle(m_turret.CalculateAngleToTarget(),
         // m_turret));
 
