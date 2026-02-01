@@ -60,8 +60,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /** Swerve request to apply during robot-centric path following */
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
 
-    private final Pigeon2 pigeon = new Pigeon2(2);
-
     /*
      * SysId routine for characterizing translation. This is used to find PID gains
      * for the drive motors.
@@ -292,6 +290,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         allianceColor == Alliance.Red
                                 ? kRedAlliancePerspectiveRotation
                                 : kBlueAlliancePerspectiveRotation);
+
+                if(m_hasAppliedOperatorPerspective) {
+                    seedFieldCentric();
+                }
+                
                 m_hasAppliedOperatorPerspective = true;
             });
         }
