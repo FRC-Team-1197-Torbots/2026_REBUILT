@@ -47,7 +47,8 @@ public class RobotContainer {
      * TORBOTS SPECIFIC VARIABLES
      ******************************/
     private final Shooter m_shooter = new Shooter(joystick);
-    private final Limelight limelight = new Limelight(Constants.LimeLightConstants.limelightname);
+    private final Limelight limelightalpha = new Limelight(Constants.LimeLightConstants.alphalimelightname);
+    private final Limelight limelightbeta = new Limelight(Constants.LimeLightConstants.betalimelightname);
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -85,14 +86,15 @@ public class RobotContainer {
         joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
         joystick.b().onTrue(Commands.runOnce(() -> m_shooter.GoToAngle()));
 
-        limelight.setDefaultCommand(updateVisionCommand());
+        limelightalpha.setDefaultCommand(updateVisionCommand(limelightalpha));
+        limelightbeta.setDefaultCommand(updateVisionCommand(limelightbeta));
     }
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }
 
-    private Command updateVisionCommand() {
+    private Command updateVisionCommand(Limelight limelight) {
         if (Math.abs(drivetrain.getPigeon2().getAngularVelocityYWorld().getValueAsDouble()) > 360d) {
             return null;
         } else {
