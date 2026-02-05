@@ -10,7 +10,11 @@ public final class Constants {
     public static final class HopperConstants {
         public static final int HopperCanId = 24;
     }
-    public static final class IntakeConstants {}
+    public static final class IntakeConstants {
+        public static final int IntakeCanId = 25;
+        public static final double IntakeSpeed = 0.6;
+        public static final double OuttakeSpeed = -0.4;
+    }
     public static final class ShooterConstants {
         public static final int ShooterCanId1 = 21;
         public static final int ShooterCanId2 = 22;

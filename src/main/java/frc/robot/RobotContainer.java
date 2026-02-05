@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
 
@@ -37,6 +38,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     /***************************TORBOTS SPECIFIC VARIABLES ******************************/
+    private final Intake m_intake = new Intake();
     //private final Shooter m_shooter = new Shooter(joystick);
     //private final Turret m_turret = new Turret(drivetrain);
     //private final ZoneDetection zone = new ZoneDetection(drivetrain);
@@ -73,6 +75,8 @@ public class RobotContainer {
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        joystick.a().whileTrue(m_intake.runIntakeCommand());
 
         //joystick.a().onTrue(Commands.runOnce(() -> m_shooter.Spin()));
         //joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
