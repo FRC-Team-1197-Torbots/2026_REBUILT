@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Hooper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
@@ -39,6 +40,7 @@ public class RobotContainer {
 
     /***************************TORBOTS SPECIFIC VARIABLES ******************************/
     private final Intake m_intake = new Intake();
+    private final Hooper m_hopper = new Hooper();
     //private final Shooter m_shooter = new Shooter(joystick);
     //private final Turret m_turret = new Turret(drivetrain);
     //private final ZoneDetection zone = new ZoneDetection(drivetrain);
@@ -78,9 +80,11 @@ public class RobotContainer {
 
         joystick.a().whileTrue(m_intake.runIntakeCommand());
 
+        // Hopper: hold B to run both hopper motors, release to stop
+        joystick.b().whileTrue(m_hopper.runHopperCommand());
+
         //joystick.a().onTrue(Commands.runOnce(() -> m_shooter.Spin()));
         //joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
-        //joystick.b().onTrue(Commands.runOnce(() -> m_shooter.GoToAngle()));
 
         //joystick.x().onTrue(new TurretTurnToAngle(m_turret.CalculateAngleToTarget(), m_turret));
 

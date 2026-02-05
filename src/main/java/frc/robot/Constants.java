@@ -8,7 +8,9 @@ public final class Constants {
     public static final class AutoConstants {}
     public static final class ClimberConstants {}
     public static final class HopperConstants {
-        public static final int HopperCanId = 24;
+        public static final int HopperCanId1 = 5;
+        public static final int HopperCanId2 = 6;
+        public static final double HopperFeedSpeed = 0.6;
     }
     public static final class IntakeConstants {
         public static final int IntakeCanId = 25;
