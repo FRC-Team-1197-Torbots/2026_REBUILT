@@ -1,8 +1,9 @@
 package frc.robot;
 
-
-
 public final class Constants {
+    public static final class LimeLightConstants{
+        public static final String limelightname = "limelight-alpha"; 
+    }
     public static final class DriveConstants {}
     public static final class ModuleConstants {}
     public static final class AutoConstants {}
