@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "all balls to ramp right-left"
+            "pathName": "all balls to ramp left-right"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "right ramp to human balls"
           }
         }
       ]
