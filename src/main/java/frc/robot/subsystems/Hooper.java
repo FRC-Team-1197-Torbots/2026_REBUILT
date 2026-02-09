@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,12 +12,14 @@ import frc.robot.Constants.HopperConstants;
 public class Hooper extends SubsystemBase {
     private final SparkFlex hopperMotor1;
     private final SparkFlex hopperMotor2;
+    private final TalonFX hopperSplitterMotor;
 
     private double hopperSpeed = 0.0;
 
     public Hooper() {
         hopperMotor1 = new SparkFlex(HopperConstants.HopperCanId1, SparkLowLevel.MotorType.kBrushless);
         hopperMotor2 = new SparkFlex(HopperConstants.HopperCanId2, SparkLowLevel.MotorType.kBrushless);
+        hopperSplitterMotor = new TalonFX(HopperConstants.HooperSplitterCanID);
     }
 
     @Override
@@ -32,6 +35,7 @@ public class Hooper extends SubsystemBase {
         hopperSpeed = speed;
         hopperMotor1.set(speed);
         hopperMotor2.set(speed);
+        hopperSplitterMotor.set(speed);
     }
 
     public void stop() {
