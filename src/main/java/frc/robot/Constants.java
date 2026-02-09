@@ -27,5 +27,8 @@ public final class Constants {
         public static final int TurretCanId = 20;
         public static final double p = 0.0012d;
     }
+    public static final class BallTunnelConstants {
+    
+    }
 }
 
