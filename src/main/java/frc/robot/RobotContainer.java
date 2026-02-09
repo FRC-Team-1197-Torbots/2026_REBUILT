@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -78,7 +79,7 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        joystick.a().whileTrue(m_intake.runIntakeCommand());
+        joystick.a().whileTrue(m_intake.runIntakeCommand(drivetrain.getState().Speeds));
 
         // Hopper: hold B to run both hopper motors, release to stop
         joystick.b().whileTrue(m_hopper.runHopperCommand());

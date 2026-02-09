@@ -15,7 +15,8 @@ public final class Constants {
     }
     public static final class IntakeConstants {
         public static final int IntakeCanId = 25;
-        public static final double IntakeSpeed = 0.6;
+        public static final double Min_Intake_Speed = 0.4;
+        public static final double RobotSpeedMultiplier = 1.5d;
         public static final double OuttakeSpeed = -0.4;
     }
     public static final class ShooterConstants {

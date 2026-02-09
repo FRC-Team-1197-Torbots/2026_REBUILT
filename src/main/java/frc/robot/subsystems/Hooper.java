@@ -19,7 +19,7 @@ public class Hooper extends SubsystemBase {
     public Hooper() {
         hopperMotor1 = new SparkFlex(HopperConstants.HopperCanId1, SparkLowLevel.MotorType.kBrushless);
         hopperMotor2 = new SparkFlex(HopperConstants.HopperCanId2, SparkLowLevel.MotorType.kBrushless);
-        hopperSplitterMotor = new TalonFX(HopperConstants.HooperSplitterCanID);
+        hopperSplitterMotor = new TalonFX(HopperConstants.HooperSplitterCanID, "rio");
     }
 
     @Override
@@ -34,7 +34,7 @@ public class Hooper extends SubsystemBase {
     public void setSpeed(double speed) {
         hopperSpeed = speed;
         hopperMotor1.set(speed);
-        hopperMotor2.set(speed);
+        hopperMotor2.set(-speed);
         hopperSplitterMotor.set(speed);
     }
 
