@@ -17,18 +17,32 @@ public class Turret extends SubsystemBase {
 
     private TalonFX TurretMotor;
     private SwerveDrivetrain DriveTrain;
-    private double ratio = 24.0f / 240.0f;
+    // private double ratio = 24.0f / 240.0f; // Moved to Constants
     public double target;
-    public double p;
+    // public double p; // Use Constants
 
     // y in inches: 159.1 = 4.0386 m
     // x in inches: 182.1 = 4.6228 m
 
-    private Pose2d RedTarget = new Pose2d(4.0386, 4.6228, Rotation2d.kZero);
-
     @SuppressWarnings("rawtypes")
     public Turret(SwerveDrivetrain drivetrain) {
         TurretMotor = new TalonFX(TurretConstants.TurretCanId);
+
+        // Configure Soft Limits
+        var turretConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
+        
+        // Forward Limit: 270 degrees. Converted to Rotations:
+        // 270 deg / 360 deg/rot = 0.75 turret rotations.
+        // Motor Rotations = Turret Rotations / GearRatio
+        turretConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (TurretConstants.MaxAngle / 360.0) / TurretConstants.TurretGearRatio;
+        turretConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+
+        // Reverse Limit: -90 degrees.
+        turretConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = (TurretConstants.MinAngle / 360.0) / TurretConstants.TurretGearRatio;
+        turretConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+
+        TurretMotor.getConfigurator().apply(turretConfig);
+        
         TurretMotor.setPosition(0);
 
         DriveTrain = drivetrain;
@@ -36,26 +50,44 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-        //Convert the kracken encoder ticks to degrees
-        double turretangle = MathUtil.inputModulus(TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f, -180d, 180d);             
-        double robotAngle = DriveTrain.getState().Pose.getRotation().getDegrees();
-
-        //combine the robot rotation and the turrets rotation to get a heading 
-        //TODO :: Need to consider if the rotation exceeds 360 or 180
-        double fieldTurretAngle = robotAngle + turretangle;
-        SmartDashboard.putNumber("Field Turret Angle", fieldTurretAngle);
+        // Convert the Kraken encoder ticks to degrees
+        // MotorRotations * GearRatio * 360 = Degrees
+        double currentTurretDegrees = TurretMotor.getPosition().getValueAsDouble() * TurretConstants.TurretGearRatio * 360.0;
         
-        //Calculate the field space delta in turret angle
-        double angleToTarget = CalculateAngleToTarget();
-        SmartDashboard.putNumber("Angle to Target", angleToTarget);
+        // This is the robot's heading in field space (0 to 360 typically, or continuous)
+        double robotHeadingDegrees = DriveTrain.getState().Pose.getRotation().getDegrees();
 
-        //Calculate error for turret
-        double err = angleToTarget - fieldTurretAngle;
-        err = MathUtil.inputModulus(err, -180d, 180d);
-        SmartDashboard.putNumber("Turret Error", err);
+        // Calculate the turret's actual angle in field space
+        // Example: Robot at 90, Turret at 0 (relative) -> Turret is pointing at 90 (field)
+        double currentTurretFieldDegrees = robotHeadingDegrees + currentTurretDegrees;
+        
+        SmartDashboard.putNumber("Turret/Field Angle", currentTurretFieldDegrees);
+        SmartDashboard.putNumber("Turret/Relative Angle", currentTurretDegrees);
 
-        //double power = err * p;          
-        //TurretMotor.set(power);
+        // Calculate the angle we WANT to be at in field space
+        double targetFieldDegrees = CalculateAngleToTarget();
+        SmartDashboard.putNumber("Turret/Target Field Angle", targetFieldDegrees);
+
+        // Calculate the relative angle we need to move to
+        // TargetRelative = TargetField - RobotHeading
+        double targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees;
+
+        // Normalize the target relative angle to be within valid range logic if needed, 
+        // but for a limited turret, we usually want to find the nearest solution that is within limits.
+        // However, since we have hard stops, we can't just wrap 180 to -180 arbitrarily if it crosses the "dead zone".
+        
+        // For now, let's keep the error calculation simple but robust:
+        double error = targetRelativeDegrees - currentTurretDegrees;
+        
+        // Normalize error to shortest path (-180 to 180)
+        // This allows the turret to cross 0 efficiently
+        error = MathUtil.inputModulus(error, -180.0, 180.0);
+
+        SmartDashboard.putNumber("Turret/Error", error);
+
+        // Simple P control (ensure kP is tuned!)
+        // double power = error * TurretConstants.kP;          
+        // TurretMotor.set(power);
     }
 
     public void setPower(float speed) {
@@ -75,12 +107,26 @@ public class Turret extends SubsystemBase {
     }
 
     public double GetCurrentAngle() {
-        return TurretMotor.getPosition().getValueAsDouble() * ratio * 360.0f;
+        return TurretMotor.getPosition().getValueAsDouble() * TurretConstants.TurretGearRatio * 360.0f;
     }
 
     public double CalculateAngleToTarget() {
-        Translation2d deltaVector = RedTarget.getTranslation().minus(DriveTrain.getState().Pose.getTranslation());
+        Pose2d robotPose = DriveTrain.getState().Pose;
+        
+        // Default to "Red" logic (or whatever was hardcoded) if no alliance, 
+        // but ideally we check DriverStation.
+        Pose2d targetPose = Constants.FieldConstants.BlueTargetPose; // Default to Blue (original coords seemed to be Blue side)
 
+        var alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+            if (alliance.get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
+                targetPose = Constants.FieldConstants.RedTargetPose;
+            } else {
+                targetPose = Constants.FieldConstants.BlueTargetPose;
+            }
+        }
+
+        Translation2d deltaVector = targetPose.getTranslation().minus(robotPose.getTranslation());
         Rotation2d angleToTarget = deltaVector.getAngle();
 
         return angleToTarget.getDegrees();
