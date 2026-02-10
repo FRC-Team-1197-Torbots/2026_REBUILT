@@ -20,6 +20,9 @@ public final class Constants {
     public static final class TurretConstants {
         public static final int TurretCanId = 20;
         public static final double kP = 0.0012d;
+        public static final double kI = 0.0d;
+        public static final double kD = 0.0d;
+        public static final double kTolerance = 1.0; // Degrees
         
         // Gear Ratio: 240/24 = 10:1 reduction
         public static final double TurretGearRatio = 24.0 / 240.0;
@@ -33,6 +36,22 @@ public final class Constants {
         // 2026 Manual: 156.61 inches
         public static final double BlueAllianceLineX = edu.wpi.first.math.util.Units.inchesToMeters(156.61); 
         public static final double RedAllianceLineX = FieldLength - BlueAllianceLineX;
+        
+        // Passing Targets (Aim Points near Feeder Station / Corners)
+        // Offset by ~1.5m to ensure we don't shoot off the field
+        public static final double PassingMargin = 1.5;
+        
+        // Blue Passing (Aiming at Blue Wall X=0)
+        public static final edu.wpi.first.math.geometry.Pose2d BluePassingCornerRight = 
+            new edu.wpi.first.math.geometry.Pose2d(PassingMargin, PassingMargin, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(0));
+        public static final edu.wpi.first.math.geometry.Pose2d BluePassingCornerLeft = 
+            new edu.wpi.first.math.geometry.Pose2d(PassingMargin, FieldWidth - PassingMargin, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(0));
+            
+        // Red Passing (Aiming at Red Wall X=Length)
+        public static final edu.wpi.first.math.geometry.Pose2d RedPassingCornerRight = 
+            new edu.wpi.first.math.geometry.Pose2d(FieldLength - PassingMargin, PassingMargin, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(180));
+        public static final edu.wpi.first.math.geometry.Pose2d RedPassingCornerLeft = 
+            new edu.wpi.first.math.geometry.Pose2d(FieldLength - PassingMargin, FieldWidth - PassingMargin, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(180));
     }
 
     public static final class FieldConstants {
