@@ -5,15 +5,10 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-
-import java.util.Optional;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,10 +17,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Hooper;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
-import frc.robot.subsystems.ZoneDetection;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
@@ -41,13 +36,16 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    /***************************
-     * TORBOTS SPECIFIC VARIABLES
-     ******************************/
-    private final Shooter m_shooter = new Shooter(joystick);
-    private final Limelight limelight = new Limelight(Constants.LimeLightConstants.limelightname);
+    /***************************TORBOTS SPECIFIC VARIABLES ******************************/
+    private final Intake m_intake = new Intake();
+    private final Hooper m_hopper = new Hooper();
+    //private final Shooter m_shooter = new Shooter(joystick);
+    //private final Turret m_turret = new Turret(drivetrain);
+    //private final ZoneDetection zone = new ZoneDetection(drivetrain);
+
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -81,29 +79,20 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        joystick.a().onTrue(Commands.runOnce(() -> m_shooter.Spin()));
-        joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
-        joystick.b().onTrue(Commands.runOnce(() -> m_shooter.GoToAngle()));
+        joystick.a().whileTrue(m_intake.runIntakeCommand(drivetrain.getState().Speeds));
 
-        limelight.setDefaultCommand(updateVisionCommand());
+        // Hopper: hold B to run both hopper motors, release to stop
+        joystick.b().whileTrue(m_hopper.runHopperCommand());
+
+        //joystick.a().onTrue(Commands.runOnce(() -> m_shooter.Spin()));
+        //joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
+
+        //joystick.x().onTrue(new TurretTurnToAngle(m_turret.CalculateAngleToTarget(), m_turret));
+
+        //m_turret.setDefaultCommand(m_turret.TrackDefaultCommand());
     }
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
-    }
-
-    private Command updateVisionCommand() {
-        if (Math.abs(drivetrain.getPigeon2().getAngularVelocityYWorld().getValueAsDouble()) > 360d) {
-            return null;
-        } else {
-            return limelight.run(() -> {
-                final Pose2d currentRobotPose = drivetrain.getState().Pose;
-                final Optional<Limelight.Measurement> measurement = limelight.getMeasurement(currentRobotPose);
-                measurement.ifPresent(m -> {
-                    drivetrain.addVisionMeasurement(m.poseEstimate.pose, m.poseEstimate.timestampSeconds,
-                            m.standardDeviations);
-                });
-            }).unless(() -> DriverStation.isAutonomousEnabled()).ignoringDisable(true);
-        }
     }
 }
