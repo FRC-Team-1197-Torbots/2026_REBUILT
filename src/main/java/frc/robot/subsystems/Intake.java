@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -17,6 +18,16 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         intakeMotor = new TalonFX(IntakeConstants.IntakeCanId, "rio");
+
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.Slot0.kP = IntakeConstants.kP;
+        config.Slot0.kI = IntakeConstants.kI;
+        config.Slot0.kD = IntakeConstants.kD;
+        config.Slot0.kV = IntakeConstants.kV;
+
+        intakeMotor.getConfigurator().apply(config);
+
+        SmartDashboard.setDefaultBoolean("Intake/UseVariableSpeed", true);
     }
 
     @Override
@@ -34,11 +45,21 @@ public class Intake extends SubsystemBase {
     }
 
     public void runIntake(ChassisSpeeds speed) {
-        double robotVelocity = Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond);
+        if (SmartDashboard.getBoolean("Intake/UseVariableSpeed", true)) {
+            double robotVelocity = Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond);
 
-        double targetSpeed = Math.max(Constants.IntakeConstants.Min_Intake_Speed, robotVelocity * Constants.IntakeConstants.RobotSpeedMultiplier);
+            // Calculate target speed in Meters Per Second
+            // Start at Min_Surface_Speed, bump up based on robot velocity
+            double targetSpeed = Math.max(
+                Constants.IntakeConstants.Min_Surface_Speed, 
+                robotVelocity * Constants.IntakeConstants.RobotSpeedMultiplier
+            );
 
-        setSpeed(Constants.IntakeConstants.Min_Intake_Speed);
+            setSurfaceSpeed(targetSpeed);
+        } else {
+            // Constant Speed: Runs at fixed Duty Cycle
+            setSpeed(Constants.IntakeConstants.IntakeDutyCycle);
+        }
     }
 
     public void runOuttake() {
@@ -62,6 +83,6 @@ public class Intake extends SubsystemBase {
 
         double targetRPS = (mps / wheelCircumferenceMeters) * Constants.IntakeConstants.gearratio;
 
-        //intakeMotor.setControl()
+        intakeMotor.setControl(m_VelocityRequest.withVelocity(targetRPS));
     }
 }

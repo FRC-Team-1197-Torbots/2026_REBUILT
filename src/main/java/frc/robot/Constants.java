@@ -15,12 +15,21 @@ public final class Constants {
     }
     public static final class IntakeConstants {
         public static final int IntakeCanId = 25;
-        public static final double Min_Intake_Speed = 0.8;
-        public static final double RobotSpeedMultiplier = 1.5d;
+        // Speeds
+        public static final double IntakeDutyCycle = 0.8; // 80% Power
+        public static final double Min_Surface_Speed = 4.0; // 4.0 meters/second (approx 50-60% power)
+        public static final double RobotSpeedMultiplier = 1.5d; // Surface speed = Robot Speed * 1.5
         public static final double OuttakeSpeed = -0.4;
 
         public static final double wheelDiameter = 0.75;
-        public static final double gearratio = 1;
+        public static final double gearratio = 1; // Direct drive
+
+        // Kraken X44 Constants
+        // Free speed ~7400 RPM => ~123 RPS. kV = 12V / 123RPS ≈ 0.097
+        public static final double kP = 0.08; // Starting value for velocity control
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kV = 0.10; // ~0.1V per RPS
     }
     public static final class ShooterConstants {
         public static final int ShooterCanId1 = 21;
