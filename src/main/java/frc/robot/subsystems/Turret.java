@@ -135,18 +135,19 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putNumber("Turret/Target Relative", targetRelativeDegrees);
 
         // --- 4. Closed Loop Control ---
-        double errorDegrees = targetRelativeDegrees - currentTurretDegrees;
         
-        // Shortest path wrapping (-180 to 180)
-        errorDegrees = MathUtil.inputModulus(errorDegrees, -180.0, 180.0);
-        SmartDashboard.putNumber("Turret/Error", errorDegrees);
+        // Optimize the target angle to fit within the valid range of the Turret (-90 to 270)
+        // Since the turret has a 360 degree total range (but hard stops), there is only ONE valid physical angle
+        // for any given direction. We force the target into that range manually.
+        double constrainedTargetDegrees = MathUtil.inputModulus(targetRelativeDegrees, TurretConstants.MinAngle, TurretConstants.MaxAngle);
+        
+        SmartDashboard.putNumber("Turret/Target Constrained", constrainedTargetDegrees);
+        SmartDashboard.putNumber("Turret/Error", constrainedTargetDegrees - currentTurretDegrees);
 
-        // Convert Error to Motor Rotations
-        // Degrees -> Turret Rotations -> Motor Rotations
-        double errorRotations = (errorDegrees / 360.0) / TurretConstants.TurretGearRatio;
-        
-        // Target Position = Current Position + Error
-        double targetRotations = currentMotorRotations + errorRotations;
+        // Convert Target Degrees -> Motor Rotations
+        // Rotations = Degrees / 360
+        // Motor Rotations = Turret Rotations / Gear Ratio
+        double targetRotations = (constrainedTargetDegrees / 360.0) / TurretConstants.TurretGearRatio;
         
         // Apply to Motor
         TurretMotor.setControl(m_request.withPosition(targetRotations));
