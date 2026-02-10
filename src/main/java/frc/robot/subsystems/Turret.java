@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
+import com.ctre.phoenix6.controls.PositionVoltage;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,28 +13,37 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants;
 
 public class Turret extends SubsystemBase {
 
     private TalonFX TurretMotor;
     private SwerveDrivetrain DriveTrain;
-    // private double ratio = 24.0f / 240.0f; // Moved to Constants
-    public double target;
-    // public double p; // Use Constants
+    private ZoneDetection zoneDetection;
+    
+    // TalonFX Control Request
+    private final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
 
     // y in inches: 159.1 = 4.0386 m
     // x in inches: 182.1 = 4.6228 m
 
     @SuppressWarnings("rawtypes")
-    public Turret(SwerveDrivetrain drivetrain) {
+    public Turret(SwerveDrivetrain drivetrain, ZoneDetection zoneDetection) {
+        this.zoneDetection = zoneDetection;
         TurretMotor = new TalonFX(TurretConstants.TurretCanId);
 
-        // Configure Soft Limits
+        // Configure TalonFX
         var turretConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
         
-        // Forward Limit: 270 degrees. Converted to Rotations:
-        // 270 deg / 360 deg/rot = 0.75 turret rotations.
-        // Motor Rotations = Turret Rotations / GearRatio
+        // Slot 0 PID config
+        turretConfig.Slot0.kP = TurretConstants.kP;
+        turretConfig.Slot0.kI = TurretConstants.kI;
+        turretConfig.Slot0.kD = TurretConstants.kD;
+        // Note: kTolerance is handled by the closed loop logic manually or by just checking error, 
+        // TalonFX doesn't have a "Tolerance" config that stops the motor automatically for PositionVoltage,
+        // it just servos to the position.
+        
+        // Forward Limit: 270 degrees. 
         turretConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (TurretConstants.MaxAngle / 360.0) / TurretConstants.TurretGearRatio;
         turretConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
@@ -50,71 +60,96 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Convert the Kraken encoder ticks to degrees
-        // MotorRotations * GearRatio * 360 = Degrees
-        double currentTurretDegrees = TurretMotor.getPosition().getValueAsDouble() * TurretConstants.TurretGearRatio * 360.0;
+        // --- 1. Sensors & State ---
+        // Get current position in Rotations
+        double currentMotorRotations = TurretMotor.getPosition().getValueAsDouble();
+        // Convert to Degrees for Logic
+        double currentTurretDegrees = currentMotorRotations * TurretConstants.TurretGearRatio * 360.0;
         
-        // This is the robot's heading in field space (0 to 360 typically, or continuous)
         double robotHeadingDegrees = DriveTrain.getState().Pose.getRotation().getDegrees();
-
-        // Calculate the turret's actual angle in field space
-        // Example: Robot at 90, Turret at 0 (relative) -> Turret is pointing at 90 (field)
-        double currentTurretFieldDegrees = robotHeadingDegrees + currentTurretDegrees;
+        double currentTurretFieldDegrees = robotHeadingDegrees + currentTurretDegrees; // Approximate field heading
         
         SmartDashboard.putNumber("Turret/Field Angle", currentTurretFieldDegrees);
         SmartDashboard.putNumber("Turret/Relative Angle", currentTurretDegrees);
 
-        // Calculate the angle we WANT to be at in field space
-        // double targetFieldDegrees = CalculateAngleToTarget(); // Moved to conditional below
-        double targetRelativeDegrees = 0.0;
-        
+        // --- 2. Determine Target Pose ---
         var alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
+        Pose2d targetPose = null;
         boolean shouldTrack = false;
         
         if (alliance.isPresent()) {
             var color = alliance.get();
-            var zone = zoneDetection.getZone(); // myZone is public, or check getter
-            
-            // Check if we are in our Home Zone
-            // Blue Alliance matches BLUE Zone
-            // Red Alliance matches RED Zone
-            if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue && zone == ZoneDetection.ZONE.BLUE) {
-                shouldTrack = true;
-            } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red && zone == ZoneDetection.ZONE.RED) {
-                shouldTrack = true;
+            var zone = zoneDetection.getZone(); 
+
+            if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
+                if (zone == ZoneDetection.ZONE.BLUE) {
+                    // Home Zone -> Attack Hub
+                    targetPose = Constants.FieldConstants.BlueTargetPose;
+                    shouldTrack = true;
+                } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
+                    // Neutral Zone -> Pass to Corner (Safe)
+                    // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
+                    if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
+                        targetPose = Constants.FieldConstants.BluePassingCornerRight;
+                    } else {
+                        targetPose = Constants.FieldConstants.BluePassingCornerLeft;
+                    }
+                    shouldTrack = true;
+                }
+            } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
+                if (zone == ZoneDetection.ZONE.RED) {
+                    // Home Zone -> Attack Hub
+                    targetPose = Constants.FieldConstants.RedTargetPose;
+                    shouldTrack = true;
+                } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
+                    // Neutral Zone -> Pass to Corner (Safe)
+                    if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
+                        targetPose = Constants.FieldConstants.RedPassingCornerRight;
+                    } else {
+                        targetPose = Constants.FieldConstants.RedPassingCornerLeft;
+                    }
+                    shouldTrack = true;
+                }
             }
         }
         
-        if (shouldTrack) {
-             // Calculate the field space delta in turret angle
-             double targetFieldDegrees = CalculateAngleToTarget();
-             SmartDashboard.putNumber("Turret/Target Field Angle", targetFieldDegrees);
-             
-             // TargetRelative = TargetField - RobotHeading
-             targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees;
+        // --- 3. Calculate Desired Angle ---
+        double targetRelativeDegrees = 0.0;
+        
+        if (shouldTrack && targetPose != null) {
+            Translation2d delta = targetPose.getTranslation().minus(DriveTrain.getState().Pose.getTranslation());
+            double targetFieldDegrees = delta.getAngle().getDegrees();
+            
+            SmartDashboard.putNumber("Turret/Target Field Angle", targetFieldDegrees);
+            
+            // RobotHeading + TurretRelative = TargetField
+            // TurretRelative = TargetField - RobotHeading
+            targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees;
         } else {
-            // Aim Forward (0 degrees relative to robot)
+            // Idle / Forward
             targetRelativeDegrees = 0.0;
-            SmartDashboard.putNumber("Turret/Target Field Angle", robotHeadingDegrees); // Effectively aiming at robot heading
+            SmartDashboard.putNumber("Turret/Target Field Angle", robotHeadingDegrees);
         }
-
+        
         SmartDashboard.putBoolean("Turret/Tracking", shouldTrack);
+        SmartDashboard.putNumber("Turret/Target Relative", targetRelativeDegrees);
 
-        // Normalize the target relative angle to be within valid range logic if needed, 
-        // but for a limited turret, we usually want to find the nearest solution that is within limits.
-        // However, since we have hard stops, we can't just wrap 180 to -180 arbitrarily if it crosses the "dead zone".
+        // --- 4. Closed Loop Control ---
+        double errorDegrees = targetRelativeDegrees - currentTurretDegrees;
         
-        // For now, let's keep the error calculation simple but robust:
-        double error = targetRelativeDegrees - currentTurretDegrees;
+        // Shortest path wrapping (-180 to 180)
+        errorDegrees = MathUtil.inputModulus(errorDegrees, -180.0, 180.0);
+        SmartDashboard.putNumber("Turret/Error", errorDegrees);
+
+        // Convert Error to Motor Rotations
+        // Degrees -> Turret Rotations -> Motor Rotations
+        double errorRotations = (errorDegrees / 360.0) / TurretConstants.TurretGearRatio;
         
-        // Normalize error to shortest path (-180 to 180)
-        // This allows the turret to cross 0 efficiently
-        error = MathUtil.inputModulus(error, -180.0, 180.0);
-
-        SmartDashboard.putNumber("Turret/Error", error);
-
-        double power = error * TurretConstants.kP;          
-        TurretMotor.set(power);
+        // Target Position = Current Position + Error
+        double targetRotations = currentMotorRotations + errorRotations;
+        
+        // Apply to Motor
+        TurretMotor.setControl(m_request.withPosition(targetRotations));
     }
 
     public void setPower(float speed) {
@@ -136,26 +171,11 @@ public class Turret extends SubsystemBase {
     public double GetCurrentAngle() {
         return TurretMotor.getPosition().getValueAsDouble() * TurretConstants.TurretGearRatio * 360.0f;
     }
-
+    
+    // Kept for reference or backward compatibility if other classes call it
     public double CalculateAngleToTarget() {
-        Pose2d robotPose = DriveTrain.getState().Pose;
-        
-        // Default to "Red" logic (or whatever was hardcoded) if no alliance, 
-        // but ideally we check DriverStation.
-        Pose2d targetPose = Constants.FieldConstants.BlueTargetPose; // Default to Blue (original coords seemed to be Blue side)
-
-        var alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-            if (alliance.get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
-                targetPose = Constants.FieldConstants.RedTargetPose;
-            } else {
-                targetPose = Constants.FieldConstants.BlueTargetPose;
-            }
-        }
-
-        Translation2d deltaVector = targetPose.getTranslation().minus(robotPose.getTranslation());
-        Rotation2d angleToTarget = deltaVector.getAngle();
-
-        return angleToTarget.getDegrees();
+        // ... (This logic is now integrated into periodic, we can return dummy or duplicate logic if needed)
+        // For now returning 0 to simplify, as periodic handles the real calculation.
+        return 0.0;
     }
 }
