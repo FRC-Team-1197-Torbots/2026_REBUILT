@@ -65,12 +65,40 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putNumber("Turret/Relative Angle", currentTurretDegrees);
 
         // Calculate the angle we WANT to be at in field space
-        double targetFieldDegrees = CalculateAngleToTarget();
-        SmartDashboard.putNumber("Turret/Target Field Angle", targetFieldDegrees);
+        // double targetFieldDegrees = CalculateAngleToTarget(); // Moved to conditional below
+        double targetRelativeDegrees = 0.0;
+        
+        var alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
+        boolean shouldTrack = false;
+        
+        if (alliance.isPresent()) {
+            var color = alliance.get();
+            var zone = zoneDetection.getZone(); // myZone is public, or check getter
+            
+            // Check if we are in our Home Zone
+            // Blue Alliance matches BLUE Zone
+            // Red Alliance matches RED Zone
+            if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue && zone == ZoneDetection.ZONE.BLUE) {
+                shouldTrack = true;
+            } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red && zone == ZoneDetection.ZONE.RED) {
+                shouldTrack = true;
+            }
+        }
+        
+        if (shouldTrack) {
+             // Calculate the field space delta in turret angle
+             double targetFieldDegrees = CalculateAngleToTarget();
+             SmartDashboard.putNumber("Turret/Target Field Angle", targetFieldDegrees);
+             
+             // TargetRelative = TargetField - RobotHeading
+             targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees;
+        } else {
+            // Aim Forward (0 degrees relative to robot)
+            targetRelativeDegrees = 0.0;
+            SmartDashboard.putNumber("Turret/Target Field Angle", robotHeadingDegrees); // Effectively aiming at robot heading
+        }
 
-        // Calculate the relative angle we need to move to
-        // TargetRelative = TargetField - RobotHeading
-        double targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees;
+        SmartDashboard.putBoolean("Turret/Tracking", shouldTrack);
 
         // Normalize the target relative angle to be within valid range logic if needed, 
         // but for a limited turret, we usually want to find the nearest solution that is within limits.
@@ -85,9 +113,8 @@ public class Turret extends SubsystemBase {
 
         SmartDashboard.putNumber("Turret/Error", error);
 
-        // Simple P control (ensure kP is tuned!)
-        // double power = error * TurretConstants.kP;          
-        // TurretMotor.set(power);
+        double power = error * TurretConstants.kP;          
+        TurretMotor.set(power);
     }
 
     public void setPower(float speed) {

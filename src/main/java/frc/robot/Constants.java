@@ -26,12 +26,18 @@ public final class Constants {
         
         public static final double MinAngle = -90.0;
         public static final double MaxAngle = 270.0;
+
+        public static final double FieldLength = 16.541;
+        public static final double FieldWidth = 8.211;
+        
+        // 2026 Manual: 156.61 inches
+        public static final double BlueAllianceLineX = edu.wpi.first.math.util.Units.inchesToMeters(156.61); 
+        public static final double RedAllianceLineX = FieldLength - BlueAllianceLineX;
     }
 
     public static final class FieldConstants {
         // Based on analysis: Original code had X/Y swapped relative to comments.
         // Comment: X=182.1" (4.62m), Y=159.1" (4.04m).
-        // X=4.62m is on the BLUE side (Origin 0,0 is Blue Wall).
         // Y=4.04m is roughly CENTER field width (8.2m total width).
         
         // Blue Target (The one on the Blue Side)

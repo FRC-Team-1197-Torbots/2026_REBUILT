@@ -20,7 +20,7 @@ public class ZoneDetection extends SubsystemBase {
     private final CommandSwerveDrivetrain drivetrain;
 
     public enum ZONE {RED, NEUTRAL, BULE};
-    private ZONE myZone;
+    public ZONE myZone;
     private Pigeon2 m_gyro;
 
     private final String[] limelightNames = {"limelight-front", "limelight-left", "limelight-right"};
@@ -30,11 +30,15 @@ public class ZoneDetection extends SubsystemBase {
         m_gyro = gyro;
         
         // No need to store NetworkTables, LimelightHelpers handles it by name
+        
+        // Default to Blue if unknown
+        myZone = ZONE.BLUE;
     }
 
     @Override
     public void periodic() {
         updatePoseEstimation();
+        updateZone();
     }
 
     private void updatePoseEstimation() {
@@ -43,6 +47,38 @@ public class ZoneDetection extends SubsystemBase {
         }
     }
 
+    private void updateZone() {
+        // Get current robot X position (Blue Alliance Origin)
+        double botX = drivetrain.getState().Pose.getX();
+
+        // Initialization Check: If we are at 0,0 (likely uninitialized), try to guess based on Alliance
+        if (botX == 0.0 && drivetrain.getState().Pose.getY() == 0.0) {
+            var alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+                if (alliance.get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
+                    myZone = ZONE.RED;
+                } else {
+                    myZone = ZONE.BLUE;
+                }
+            }
+            // Don't run the coordinate check if we are uninitialized
+            SmartDashboard.putString("Zone", myZone.toString());
+            return;
+        }
+        
+        double blueLine = frc.robot.Constants.FieldConstants.BlueAllianceLineX;
+        double redLine = frc.robot.Constants.FieldConstants.RedAllianceLineX;
+
+        if (botX < blueLine) {
+            myZone = ZONE.BLUE;
+        } else if (botX > redLine) {
+            myZone = ZONE.RED;
+        } else {
+            myZone = ZONE.NEUTRAL;
+        }
+        
+        SmartDashboard.putString("Zone", myZone.toString());
+    }
     private void processLimelight(String name) {
         // Update orientation for MegaTag2 for THIS camera
         LimelightHelpers.SetRobotOrientation(name, m_gyro.getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
