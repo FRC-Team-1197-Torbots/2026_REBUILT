@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Hooper;
+import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
@@ -33,6 +33,8 @@ public class RobotContainer {
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
+    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
@@ -41,10 +43,9 @@ public class RobotContainer {
 
     /***************************TORBOTS SPECIFIC VARIABLES ******************************/
     private final Intake m_intake = new Intake();
-    private final Hooper m_hopper = new Hooper();
-    //private final Shooter m_shooter = new Shooter(joystick);
-    //private final Turret m_turret = new Turret(drivetrain);
-    //private final ZoneDetection zone = new ZoneDetection(drivetrain);
+    private final Hopper m_hopper = new Hopper();
+    // Use the drivetrain's Pigeon2 for ZoneDetection
+    private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain, drivetrain.getPigeon2());
 
     private final SendableChooser<Command> autoChooser;
 
@@ -72,24 +73,17 @@ public class RobotContainer {
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
-                drivetrain.applyRequest(() -> idle).ignoringDisable(true));
-
-        // Reset the field-centric heading on left bumper press.
-        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+                drivetrain.applyRequest(() -> idle).ignoringDisable(true));        
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
         joystick.a().whileTrue(m_intake.runIntakeCommand(drivetrain.getState().Speeds));
-
-        // Hopper: hold B to run both hopper motors, release to stop
         joystick.b().whileTrue(m_hopper.runHopperCommand());
 
-        //joystick.a().onTrue(Commands.runOnce(() -> m_shooter.Spin()));
-        //joystick.a().onFalse(Commands.runOnce(() -> m_shooter.Stop()));
-
-        //joystick.x().onTrue(new TurretTurnToAngle(m_turret.CalculateAngleToTarget(), m_turret));
-
-        //m_turret.setDefaultCommand(m_turret.TrackDefaultCommand());
+        // Brake (X-Stance): hold Right Bumper
+        joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
+        // Reset the field-centric heading on left bumper press.
+        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
     }
 
     public Command getAutonomousCommand() {
