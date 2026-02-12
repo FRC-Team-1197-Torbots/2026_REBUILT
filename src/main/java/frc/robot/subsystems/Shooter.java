@@ -49,6 +49,10 @@ public class Shooter extends SubsystemBase {
         shooterWheel2.set(0);
     }
 
+    public Command runShooterCommand() {
+        return run(this::Spin).finallyDo(interrupted -> Stop());
+    }
+
     public void GoToAngle() {
         double ticks = ConvertDegreesToTicks(hoodangle);
         SmartDashboard.putNumber("Requested Ticks", ticks);

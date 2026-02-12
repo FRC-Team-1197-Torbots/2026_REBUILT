@@ -45,6 +45,7 @@ public class RobotContainer {
     /***************************TORBOTS SPECIFIC VARIABLES ******************************/
     private final Intake m_intake = new Intake();
     private final Hopper m_hopper = new Hopper();
+    private final Shooter m_shooter = new Shooter(joystick);
     // Use the drivetrain's Pigeon2 for ZoneDetection
     //private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain, drivetrain.getPigeon2());
 
@@ -78,13 +79,28 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        joystick.a().whileTrue(m_intake.runIntakeCommand(drivetrain.getState().Speeds));
-        joystick.b().whileTrue(m_hopper.runHopperCommand());
+        joystick.a().whileTrue(
+            Commands.parallel(
+                m_intake.runIntakeCommand(drivetrain.getState().Speeds),
+                m_hopper.runIndexCommand()
+            )
+        );     
+        
+        // Run Shooter and Hopper. Stop both when Hopper is empty for a set time (Deadline).
+        joystick.rightTrigger().whileTrue(
+            Commands.deadline(
+                m_hopper.runShootFeedCommand(), 
+                m_shooter.runShooterCommand()
+            )
+        );
 
         // Brake (X-Stance): hold Right Bumper
         joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
         // Reset the field-centric heading on left bumper press.
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+
+        // TODO: Remove this manual binding in the future.
+        joystick.b().whileTrue(m_hopper.runHopperCommand());
     }
 
     public Command getAutonomousCommand() {
