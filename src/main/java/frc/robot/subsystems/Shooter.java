@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
@@ -8,8 +11,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
     private final int ShooterCANID1 = 21;
@@ -21,12 +26,26 @@ public class Shooter extends SubsystemBase {
     private SparkClosedLoopController hoodController;
     private CommandXboxController m_controller;
 
-    private double shooterspeed = 0.5f, hoodangle;
+    // Closed-loop control request
+    private final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
+
+    private double shooterspeed = 60.0f, hoodangle; // Default to 60 RPS (3600 RPM)
     private double ratio = (1d / 18d) * 360d;
 
     public Shooter(CommandXboxController controller) {
         shooterWheel1 = new TalonFX(ShooterCANID1);
         shooterWheel2 = new TalonFX(ShooterCANID2);
+
+        // Configure PID and Feedforward for Slot 0
+        TalonFXConfiguration configs = new TalonFXConfiguration();
+        Slot0Configs slot0 = configs.Slot0;
+        slot0.kP = 0.11;
+        slot0.kI = 0.0;
+        slot0.kD = 0.0;
+        slot0.kV = 0.12;
+        
+        shooterWheel1.getConfigurator().apply(configs);
+        shooterWheel2.getConfigurator().apply(configs);
 
         hood = new SparkFlex(HoodCANDID, MotorType.kBrushless);
         hoodController = hood.getClosedLoopController();
@@ -35,18 +54,19 @@ public class Shooter extends SubsystemBase {
 
         hood.getEncoder().setPosition(0);
 
-        SmartDashboard.putNumber("Shooter Speed", 0);
+        SmartDashboard.putNumber("Shooter Speed", 60.0);
         SmartDashboard.putNumber("Hood Angle", 0);
     }
 
     public void Spin() {
-        shooterWheel1.set(shooterspeed);
-        shooterWheel2.set(shooterspeed);
+        // Use VelocityVoltage control
+        shooterWheel1.setControl(m_request.withVelocity(shooterspeed));
+        shooterWheel2.setControl(m_request.withVelocity(shooterspeed));
     }
 
     public void Stop() {
-        shooterWheel1.set(0);
-        shooterWheel2.set(0);
+        shooterWheel1.stopMotor();
+        shooterWheel2.stopMotor();
     }
 
     public Command runShooterCommand() {
@@ -55,8 +75,8 @@ public class Shooter extends SubsystemBase {
 
     public Command runIdleCommand() {
         return run(() -> {
-            shooterWheel1.set(Constants.ShooterConstants.IdleSpeed);
-            shooterWheel2.set(Constants.ShooterConstants.IdleSpeed);
+            shooterWheel1.setControl(m_request.withVelocity(Constants.ShooterConstants.IdleSpeed));
+            shooterWheel2.setControl(m_request.withVelocity(Constants.ShooterConstants.IdleSpeed));
         });
     }
 
