@@ -27,6 +27,8 @@ public class Hopper extends SubsystemBase {
 
     //references
     private final Intake m_intake;
+    
+    private LaserCan.Measurement m_latestMeasurement;
 
     public Hopper(CommandXboxController controller, Intake intake) {
         hopperMotor1 = new SparkFlex(HopperConstants.HopperCanId1, SparkLowLevel.MotorType.kBrushless);
@@ -41,8 +43,11 @@ public class Hopper extends SubsystemBase {
     @Override
     public void periodic() {
         super.periodic();
-
-        //
+        m_latestMeasurement = turrent1LaserCan.getMeasurement();
+        if (m_latestMeasurement != null) {
+            SmartDashboard.putNumber("Hopper/LaserDistance", m_latestMeasurement.distance_mm);
+            SmartDashboard.putBoolean("Hopper/LaserValid", m_latestMeasurement.status == LaserCan.Status.VALID_MEASUREMENT);
+        }
     }
 
     /** Sets both hopper motors to the same speed. */
@@ -70,7 +75,16 @@ public class Hopper extends SubsystemBase {
 
     /** Runs both hoppers at default feed speed; stops when command ends (e.g. button released). */
     public Command runHopperCommand() {
-        return run(() -> feed(HopperConstants.HopperFeedSpeed)).finallyDo(interrupted -> stop());
+        return run(() -> {
+            // Use cached measurement from periodic()
+            // Check for valid measurement and distance threshold
+            if (m_latestMeasurement != null && m_latestMeasurement.status == LaserCan.Status.VALID_MEASUREMENT && 
+                m_latestMeasurement.distance_mm < HopperConstants.LaserMinDistance) {
+                feed(HopperConstants.HopperFeedSpeed);
+            } else {
+                stop();
+            }
+        }).finallyDo(interrupted -> stop());
     }
 
     public Command feedCommand(double speed) {

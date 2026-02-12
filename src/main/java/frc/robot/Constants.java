@@ -23,7 +23,8 @@ public final class Constants {
         public static final int HooperSplitterCanID = 7;
         
         public static final int HooperLaserCANID = 8;
-        public static final double LaserMinDistance = 2.0;
+        // Interior space is ~10.25 inches (260mm).
+        public static final double LaserMinDistance = 200.0;
 
         public static final double HopperFeedSpeed = 0.6;
     }

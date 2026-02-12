@@ -32,7 +32,6 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.getBoolean("Intake/UseVariableSpeed", true);
         super.periodic();
     }
 

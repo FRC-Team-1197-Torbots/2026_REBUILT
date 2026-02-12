@@ -43,8 +43,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     /***************************TORBOTS SPECIFIC VARIABLES ******************************/
-    //private final Intake m_intake = new Intake();
-    //private final Hopper m_hopper = new Hopper();
+    private final Intake m_intake = new Intake();
+    private final Hopper m_hopper = new Hopper();
     // Use the drivetrain's Pigeon2 for ZoneDetection
     //private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain, drivetrain.getPigeon2());
 
@@ -78,8 +78,8 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        //joystick.a().whileTrue(m_intake.runIntakeCommand(drivetrain.getState().Speeds));
-        //joystick.b().whileTrue(m_hopper.runHopperCommand());
+        joystick.a().whileTrue(m_intake.runIntakeCommand(drivetrain.getState().Speeds));
+        joystick.b().whileTrue(m_hopper.runHopperCommand());
 
         // Brake (X-Stance): hold Right Bumper
         joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
