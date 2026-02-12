@@ -71,6 +71,8 @@ public class RobotContainer {
                                                                                     // negative X (left)
                 ));
 
+        m_shooter.setDefaultCommand(m_shooter.runIdleCommand());
+
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
@@ -86,11 +88,16 @@ public class RobotContainer {
             )
         );     
         
-        // Run Shooter and Hopper. Stop both when Hopper is empty for a set time (Deadline).
+        // Run Shooter, wait for speed, then run Hopper (Machine Gun).
+        // The parallel group keeps the Shooter running. 
+        // The sequence waits for speed, then runs the Hopper feed command.
         joystick.rightTrigger().whileTrue(
-            Commands.deadline(
-                m_hopper.runShootFeedCommand(), 
-                m_shooter.runShooterCommand()
+            Commands.parallel(
+                m_shooter.runShooterCommand(),
+                Commands.sequence(
+                    Commands.waitUntil(m_shooter::isAtSpeed),
+                    m_hopper.runShootFeedCommand()
+                )
             )
         );
 
@@ -105,5 +112,10 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
+    }
+
+    public void testPeriodic() {
+        m_shooter.Spin();
+        m_shooter.GoToAngle();
     }
 }

@@ -53,6 +53,19 @@ public class Shooter extends SubsystemBase {
         return run(this::Spin).finallyDo(interrupted -> Stop());
     }
 
+    public Command runIdleCommand() {
+        return run(() -> {
+            shooterWheel1.set(Constants.ShooterConstants.IdleSpeed);
+            shooterWheel2.set(Constants.ShooterConstants.IdleSpeed);
+        });
+    }
+
+    public boolean isAtSpeed() {
+        // Check if actual speed is within 5% of target speed
+        double currentSpeed = shooterWheel1.getVelocity().getValueAsDouble();
+        return Math.abs(currentSpeed - shooterspeed) <= (Math.abs(shooterspeed) * 0.05);
+    }
+
     public void GoToAngle() {
         double ticks = ConvertDegreesToTicks(hoodangle);
         SmartDashboard.putNumber("Requested Ticks", ticks);
@@ -69,8 +82,7 @@ public class Shooter extends SubsystemBase {
         hoodangle = SmartDashboard.getNumber("Hood Angle", 0);       
 
         SmartDashboard.putNumber("Actual Shooter Speed", shooterWheel1.getVelocity().getValueAsDouble());
-        SmartDashboard.putNumber("Actual Hood Angle", hood.getEncoder().getPosition() * ratio);
-     
+        SmartDashboard.putNumber("Actual Hood Angle", hood.getEncoder().getPosition() * ratio);     
     }
 
     private double ConvertTicksToAngle(double ticks) {

@@ -52,6 +52,8 @@ public final class Constants {
         public static final int ShooterCanId1 = 21;
         public static final int ShooterCanId2 = 22;
         public static final int HoodCanId = 23;
+
+        public static final double IdleSpeed = 15.0; // RPS (~900 RPM)
     }
 
     public static final class TurretConstants {
