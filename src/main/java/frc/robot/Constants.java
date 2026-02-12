@@ -113,7 +113,4 @@ public final class Constants {
                 edu.wpi.first.math.geometry.Rotation2d.fromDegrees(180));
     }
 
-    public static final class BallTunnelConstants {
-
-    }
 }
