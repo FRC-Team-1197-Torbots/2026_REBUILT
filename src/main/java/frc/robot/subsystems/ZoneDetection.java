@@ -19,7 +19,7 @@ public class ZoneDetection extends SubsystemBase {
     // private final NetworkTable limelightTable; // No longer holding a single table
     private final CommandSwerveDrivetrain drivetrain;
 
-    public enum ZONE {RED, NEUTRAL, BULE};
+    public enum ZONE {RED, NEUTRAL, BLUE};
     public ZONE myZone;
     private Pigeon2 m_gyro;
 

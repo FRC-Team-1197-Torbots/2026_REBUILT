@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Intake Speed", intakeMotor.getVelocity().getValueAsDouble());
+        SmartDashboard.getBoolean("Intake/UseVariableSpeed", true);
         super.periodic();
     }
 
