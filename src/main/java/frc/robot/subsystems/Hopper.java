@@ -1,38 +1,52 @@
 package frc.robot.subsystems;
 
+import java.lang.constant.Constable;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
+
+import au.grapplerobotics.LaserCan;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants;
 import frc.robot.Constants.HopperConstants;
 
 public class Hopper extends SubsystemBase {
+    private final CommandXboxController m_controller;
+    
+    //motors
     private final SparkFlex hopperMotor1;
     private final SparkFlex hopperMotor2;
     private final TalonFX hopperSplitterMotor;
 
-    private double hopperSpeed = 0.0;
+    //sensors
+    private final LaserCan turrent1LaserCan;
 
-    public Hopper() {
+    //references
+    private final Intake m_intake;
+
+    public Hopper(CommandXboxController controller, Intake intake) {
         hopperMotor1 = new SparkFlex(HopperConstants.HopperCanId1, SparkLowLevel.MotorType.kBrushless);
         hopperMotor2 = new SparkFlex(HopperConstants.HopperCanId2, SparkLowLevel.MotorType.kBrushless);
         hopperSplitterMotor = new TalonFX(HopperConstants.HooperSplitterCanID, "rio");
+        turrent1LaserCan = new LaserCan(Constants.HopperConstants.HooperLaserCANID);
+
+        m_controller = controller;
+        m_intake = intake;
     }
 
     @Override
     public void periodic() {
         super.periodic();
-        SmartDashboard.putNumber("Hopper Set Speed", hopperSpeed);
-        SmartDashboard.putNumber("Hopper Motor 1 Output", hopperMotor1.getAppliedOutput());
-        SmartDashboard.putNumber("Hopper Motor 2 Output", hopperMotor2.getAppliedOutput());
+
+        //
     }
 
     /** Sets both hopper motors to the same speed. */
     public void setSpeed(double speed) {
-        hopperSpeed = speed;
         hopperMotor1.set(speed);
         hopperMotor2.set(-speed);
         hopperSplitterMotor.set(speed);

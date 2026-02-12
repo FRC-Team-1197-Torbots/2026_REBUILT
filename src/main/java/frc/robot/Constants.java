@@ -21,7 +21,10 @@ public final class Constants {
         public static final int HopperCanId1 = 5;
         public static final int HopperCanId2 = 6;
         public static final int HooperSplitterCanID = 7;
+        
         public static final int HooperLaserCANID = 8;
+        public static final double LaserMinDistance = 2.0;
+
         public static final double HopperFeedSpeed = 0.6;
     }
 
