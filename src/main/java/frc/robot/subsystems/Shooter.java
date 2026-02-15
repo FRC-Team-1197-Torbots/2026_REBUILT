@@ -17,9 +17,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
-    private final int ShooterCANID1 = 21;
+    private final int ShooterCANID1 = 21; //change to Neo 2.0
     private final int ShooterCANID2 = 22;
-    private final int HoodCANDID = 23;
+    private final int HoodCANDID = 23; //change to X44
     
     private TalonFX shooterWheel1, shooterWheel2;
     private SparkFlex hood;

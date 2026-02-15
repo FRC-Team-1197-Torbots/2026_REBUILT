@@ -46,7 +46,7 @@ public class Hopper extends SubsystemBase {
         m_latestMeasurement = turrent1LaserCan.getMeasurement();
         if (m_latestMeasurement != null) {
             SmartDashboard.putNumber("Hopper/LaserDistance", m_latestMeasurement.distance_mm);
-            SmartDashboard.putBoolean("Hopper/LaserValid", m_latestMeasurement.status == LaserCan.Status.VALID_MEASUREMENT);
+            SmartDashboard.putBoolean("Hopper/LaserValid", m_latestMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT);
         }
     }
 
@@ -78,7 +78,7 @@ public class Hopper extends SubsystemBase {
         return run(() -> {
             // Use cached measurement from periodic()
             // Check for valid measurement and distance threshold
-            if (m_latestMeasurement != null && m_latestMeasurement.status == LaserCan.Status.VALID_MEASUREMENT && 
+            if (m_latestMeasurement != null && m_latestMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && 
                 m_latestMeasurement.distance_mm < HopperConstants.LaserMinDistance) {
                 feed(HopperConstants.HopperFeedSpeed);
             } else {
@@ -101,7 +101,7 @@ public class Hopper extends SubsystemBase {
      */
     public boolean hasBall() {
         return m_latestMeasurement != null && 
-               m_latestMeasurement.status == LaserCan.Status.VALID_MEASUREMENT && 
+               m_latestMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && 
                m_latestMeasurement.distance_mm < HopperConstants.LaserMinDistance;
     }
 

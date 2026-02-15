@@ -44,7 +44,7 @@ public class RobotContainer {
 
     /***************************TORBOTS SPECIFIC VARIABLES ******************************/
     private final Intake m_intake = new Intake();
-    private final Hopper m_hopper = new Hopper();
+    private final Hopper m_hopper = new Hopper(joystick, m_intake);
     private final Shooter m_shooter = new Shooter(joystick);
     // Use the drivetrain's Pigeon2 for ZoneDetection
     //private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain, drivetrain.getPigeon2());
