@@ -1,5 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 public final class Constants {
     public static final class LimeLightConstants {
         public static final String limelightname = "limelight-alpha";
@@ -15,6 +19,7 @@ public final class Constants {
     }
 
     public static final class ClimberConstants {
+        public static final Pose2d lowerClimbPosition = new Pose2d(1.081, 2.611, Rotation2d.fromDegrees(90));
     }
 
     public static final class HopperConstants {
