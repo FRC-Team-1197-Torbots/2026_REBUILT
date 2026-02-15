@@ -24,7 +24,6 @@ public class Shooter extends SubsystemBase {
     private TalonFX shooterWheel1, shooterWheel2;
     private SparkFlex hood;
     private SparkClosedLoopController hoodController;
-    private CommandXboxController m_controller;
 
     // Closed-loop control request
     private final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
@@ -32,7 +31,7 @@ public class Shooter extends SubsystemBase {
     private double shooterspeed = 60.0f, hoodangle; // Default to 60 RPS (3600 RPM)
     private double ratio = (1d / 18d) * 360d;
 
-    public Shooter(CommandXboxController controller) {
+    public Shooter() {
         shooterWheel1 = new TalonFX(ShooterCANID1);
         shooterWheel2 = new TalonFX(ShooterCANID2);
 
@@ -49,8 +48,6 @@ public class Shooter extends SubsystemBase {
 
         hood = new SparkFlex(HoodCANDID, MotorType.kBrushless);
         hoodController = hood.getClosedLoopController();
-
-        m_controller = controller;
 
         hood.getEncoder().setPosition(0);
 
