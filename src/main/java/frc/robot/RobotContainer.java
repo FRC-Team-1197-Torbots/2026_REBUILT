@@ -20,6 +20,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.Commands.Climb;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -52,6 +53,7 @@ public class RobotContainer {
     private final Hopper m_hopper = new Hopper(joystick, m_intake);
     private final Shooter m_shooter = new Shooter();
     private final Climber m_climber = new Climber();
+    private final Hood m_hood = new Hood();
     // Use the drivetrain's Pigeon2 for ZoneDetection
     // private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain,
     // drivetrain.getPigeon2());
@@ -160,7 +162,13 @@ public class RobotContainer {
     }
 
     public void testPeriodic() {
-        m_shooter.Spin();
-        m_shooter.GoToAngle();
+        // Safety: Require Left Bumper to spin shooter in test mode
+        if (joystick.getHID().getLeftBumper()) {
+            m_shooter.Spin();
+        } else {
+            m_shooter.Stop();
+        }
+
+        m_hood.GoToAngle();
     }
 }

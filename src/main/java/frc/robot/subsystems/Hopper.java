@@ -38,6 +38,18 @@ public class Hopper extends SubsystemBase {
 
         m_controller = controller;
         m_intake = intake;
+        
+        // Safety: Current Limits
+        com.revrobotics.spark.config.SparkFlexConfig flexConfig = new com.revrobotics.spark.config.SparkFlexConfig();
+        flexConfig.smartCurrentLimit(HopperConstants.HopperCurrentLimit);
+        
+        hopperMotor1.configure(flexConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, com.revrobotics.spark.SparkBase.PersistMode.kPersistParameters);
+        hopperMotor2.configure(flexConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, com.revrobotics.spark.SparkBase.PersistMode.kPersistParameters);
+
+        var splitterConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
+        splitterConfig.CurrentLimits.StatorCurrentLimit = HopperConstants.SplitterCurrentLimit;
+        splitterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        hopperSplitterMotor.getConfigurator().apply(splitterConfig);
     }
 
     @Override
