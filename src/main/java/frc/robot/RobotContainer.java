@@ -162,7 +162,6 @@ public class RobotContainer {
     }
 
     public void testPeriodic() {
-        // Safety: Require Left Bumper to spin shooter in test mode
         if (joystick.getHID().getLeftBumper()) {
             m_shooter.Spin();
         } else {
@@ -170,5 +169,6 @@ public class RobotContainer {
         }
 
         m_hood.GoToAngle();
+        m_zoneDetection.publishRawDistance();
     }
 }
