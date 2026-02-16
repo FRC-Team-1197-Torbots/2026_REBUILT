@@ -1,5 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 public final class Constants {
     public static final class LimeLightConstants {
         public static final String limelightname = "limelight-alpha";
@@ -15,6 +19,25 @@ public final class Constants {
     }
 
     public static final class ClimberConstants {
+        public static final Pose2d lowerClimbPosition = new Pose2d(1.066, 2.782, Rotation2d.fromDegrees(90));
+        
+        public static final int ClimberCanId = 30;
+        public static final int ClimberDateId = 31; // CANrange
+
+        public static final double kP = 0.1; 
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        
+        // Mechanical Constants
+        public static final double ClimberGearRatio = 12.0; // Example: 12:1
+        public static final double ClimberSpoolDiameter = 0.0508; // Example: 2 inches in meters
+        
+        // Climber Heights in Meters
+        public static final double L0 = 0.0;
+        public static final double L1 = 0.30; // ~1 foot
+        public static final double L2 = 0.60; // ~2 feet
+        public static final double L3 = 1.0;  // ~3.3 feet
+        public static final double Tolerance = 0.02; // 2cm tolerance
     }
 
     public static final class HopperConstants {
@@ -46,12 +69,25 @@ public final class Constants {
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kV = 0.10; // ~0.1V per RPS
+
+        // Intake Deploy (Rack & Pinion)
+        public static final int IntakeDeployCanId = 26;
+        public static final double kDeployP = 0.1;
+        public static final double kDeployI = 0.0;
+        public static final double kDeployD = 0.0;
+        
+        // Deploy Positions in Rotations (Placeholder)
+        public static final double DeployPosition = 10.0; // Fully Extended
+        public static final double RetractPosition = 0.0;  // Fully Retracted (Home)
+        public static final double DeployTolerance = 0.5;
     }
 
     public static final class ShooterConstants {
         public static final int ShooterCanId1 = 21;
         public static final int ShooterCanId2 = 22;
         public static final int HoodCanId = 23;
+
+        public static final double IdleSpeed = 15.0; // RPS (~900 RPM)
     }
 
     public static final class TurretConstants {

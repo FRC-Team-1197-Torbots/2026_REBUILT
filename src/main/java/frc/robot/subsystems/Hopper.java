@@ -46,7 +46,7 @@ public class Hopper extends SubsystemBase {
         m_latestMeasurement = turrent1LaserCan.getMeasurement();
         if (m_latestMeasurement != null) {
             SmartDashboard.putNumber("Hopper/LaserDistance", m_latestMeasurement.distance_mm);
-            SmartDashboard.putBoolean("Hopper/LaserValid", m_latestMeasurement.status == LaserCan.Status.VALID_MEASUREMENT);
+            SmartDashboard.putBoolean("Hopper/LaserValid", m_latestMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT);
         }
     }
 
@@ -78,7 +78,7 @@ public class Hopper extends SubsystemBase {
         return run(() -> {
             // Use cached measurement from periodic()
             // Check for valid measurement and distance threshold
-            if (m_latestMeasurement != null && m_latestMeasurement.status == LaserCan.Status.VALID_MEASUREMENT && 
+            if (m_latestMeasurement != null && m_latestMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && 
                 m_latestMeasurement.distance_mm < HopperConstants.LaserMinDistance) {
                 feed(HopperConstants.HopperFeedSpeed);
             } else {
@@ -93,5 +93,41 @@ public class Hopper extends SubsystemBase {
 
     public Command stopCommand() {
         return runOnce(this::stop);
+    }
+    
+    /**
+     * Checks if a ball is detected by the LaserCan.
+     * @return true if ball is present (distance < Threshold), false otherwise.
+     */
+    public boolean hasBall() {
+        return m_latestMeasurement != null && 
+               m_latestMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && 
+               m_latestMeasurement.distance_mm < HopperConstants.LaserMinDistance;
+    }
+
+    /**
+     * Runs Hopper to index balls. Stops if a ball is at the top (hasBall() is true).
+     */
+    public Command runIndexCommand() {
+        return run(() -> {
+            if (hasBall()) {
+                stop();
+            } else {
+                feed(HopperConstants.HopperFeedSpeed);
+            }
+        }).finallyDo(interrupted -> stop());
+    }
+
+    /**
+     * Runs Hopper to feed the shooter. 
+     * Ends when the hopper has been empty (no ball detected) for a set duration.
+     */
+    public Command runShootFeedCommand() {
+        // Debounce the "empty" signal for 1 second to ensure we don't stop prematurely between balls.
+        edu.wpi.first.math.filter.Debouncer debouncer = new edu.wpi.first.math.filter.Debouncer(1.0, edu.wpi.first.math.filter.Debouncer.DebounceType.kBoth);
+        
+        return run(() -> feed(HopperConstants.HopperFeedSpeed))
+            .until(() -> debouncer.calculate(!hasBall()))
+            .finallyDo(interrupted -> stop());
     }
 }
