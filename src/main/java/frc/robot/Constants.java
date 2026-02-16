@@ -19,7 +19,7 @@ public final class Constants {
     }
 
     public static final class ClimberConstants {
-        public static final Pose2d lowerClimbPosition = new Pose2d(1.081, 2.611, Rotation2d.fromDegrees(90));
+        public static final Pose2d lowerClimbPosition = new Pose2d(1.066, 2.782, Rotation2d.fromDegrees(90));
     }
 
     public static final class HopperConstants {

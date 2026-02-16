@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
@@ -42,12 +43,16 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    /***************************TORBOTS SPECIFIC VARIABLES ******************************/
+    /***************************
+     * TORBOTS SPECIFIC VARIABLES
+     ******************************/
     private final Intake m_intake = new Intake();
     private final Hopper m_hopper = new Hopper(joystick, m_intake);
     private final Shooter m_shooter = new Shooter();
+    private final Climber m_climber = new Climber();
     // Use the drivetrain's Pigeon2 for ZoneDetection
-    //private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain, drivetrain.getPigeon2());
+    // private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain,
+    // drivetrain.getPigeon2());
 
     private final SendableChooser<Command> autoChooser;
 
@@ -77,37 +82,38 @@ public class RobotContainer {
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
-                drivetrain.applyRequest(() -> idle).ignoringDisable(true));        
+                drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
+        //********************WORKING FUNCTIONS *****************************/
+
         joystick.a().whileTrue(
-            Commands.parallel(
-                m_intake.runIntakeCommand(drivetrain.getState().Speeds),
-                m_hopper.runIndexCommand()
-            )
-        );     
-        
-        // Run Shooter, wait for speed, then run Hopper (Machine Gun).
-        // The parallel group keeps the Shooter running. 
-        // The sequence waits for speed, then runs the Hopper feed command.
-        joystick.rightTrigger().whileTrue(
-            Commands.parallel(
-                m_shooter.runShooterCommand(),
-                Commands.sequence(
-                    Commands.waitUntil(m_shooter::isAtSpeed),
-                    m_hopper.runShootFeedCommand()
-                )
-            )
-        );
+                Commands.parallel(
+                        m_intake.runIntakeCommand(drivetrain.getState().Speeds),
+                        m_hopper.runIndexCommand()));
 
         // Brake (X-Stance): hold Right Bumper
         joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
         // Reset the field-centric heading on left bumper press.
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
+        //********************FUNCTIONS For Testing*****************************/
+
         // TODO: Remove this manual binding in the future.
         joystick.b().whileTrue(m_hopper.runHopperCommand());
+
+        joystick.x().whileTrue(m_climber.getAlignToClimbCommand());
+
+        // Run Shooter, wait for speed, then run Hopper (Machine Gun).
+        // The parallel group keeps the Shooter running.
+        // The sequence waits for speed, then runs the Hopper feed command.
+        joystick.rightTrigger().whileTrue(
+                Commands.parallel(
+                        m_shooter.runShooterCommand(),
+                        Commands.sequence(
+                                Commands.waitUntil(m_shooter::isAtSpeed),
+                                m_hopper.runShootFeedCommand())));
     }
 
     public Command getAutonomousCommand() {
