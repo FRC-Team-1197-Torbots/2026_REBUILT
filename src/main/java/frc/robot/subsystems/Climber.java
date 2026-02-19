@@ -10,7 +10,7 @@ import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -32,6 +32,13 @@ public class Climber extends SubsystemBase {
 
         climbMotor.getConfigurator().apply(slot0Configs);
         climbMotor.setNeutralMode(NeutralModeValue.Brake);
+    }
+
+    @Override
+    public void periodic() {
+        super.periodic();
+        SmartDashboard.putNumber("Climber Height (m)", getHeight());
+        SmartDashboard.putNumber("Climber Range", getRange());
     }
 
     public double metersToRotations(double meters) {
@@ -66,11 +73,38 @@ public class Climber extends SubsystemBase {
     public Command getAlignToClimbCommand() {
         Pose2d targetClimbPose = Constants.ClimberConstants.lowerClimbPosition;
 
-        PathConstraints constraints = new PathConstraints(3.5, 
+        PathConstraints constraints = new PathConstraints(3.5,
             3.5, Units.degreesToRadians(540),
             Units.degreesToRadians(360));
 
-        return AutoBuilder.pathfindToPose(targetClimbPose, constraints,0.0f);
+        return AutoBuilder.pathfindToPose(targetClimbPose, constraints, 0.0);
     }
 
+    /** Returns true when climber is within Tolerance of the target height. */
+    public boolean atHeight(double targetMeters) {
+        return Math.abs(getHeight() - targetMeters) < Constants.ClimberConstants.Tolerance;
+    }
+
+    /** Command to climb one level (L1). */
+    public Command climbOneLevelCommand() {
+        return run(() -> moveToPosition(Constants.ClimberConstants.L1))
+                .until(() -> atHeight(Constants.ClimberConstants.L1));
+    }
+
+    /** Command to climb three levels (L3). */
+    public Command climbThreeLevelsCommand() {
+        return run(() -> moveToPosition(Constants.ClimberConstants.L3))
+                .until(() -> atHeight(Constants.ClimberConstants.L3));
+    }
+
+    /** Command to retract climber to ground (L0). */
+    public Command retractCommand() {
+        return run(() -> moveToPosition(Constants.ClimberConstants.L0))
+                .until(() -> atHeight(Constants.ClimberConstants.L0));
+    }
+
+    /** Command to stop the climber motor. */
+    public Command stopCommand() {
+        return runOnce(this::stop);
+    }
 }
