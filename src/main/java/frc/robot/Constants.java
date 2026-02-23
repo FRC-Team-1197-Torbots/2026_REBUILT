@@ -38,6 +38,7 @@ public final class Constants {
         public static final double L2 = 0.60; // ~2 feet
         public static final double L3 = 1.0;  // ~3.3 feet
         public static final double Tolerance = 0.02; // 2cm tolerance
+        public static final double SoftLimitBuffer = 0.05;
     }
 
     public static final class HopperConstants {
@@ -50,6 +51,9 @@ public final class Constants {
         public static final double LaserMinDistance = 200.0;
 
         public static final double HopperFeedSpeed = 0.6;
+        
+        public static final int HopperCurrentLimit = 40;
+        public static final double SplitterCurrentLimit = 30.0;
     }
 
     public static final class IntakeConstants {
@@ -69,6 +73,8 @@ public final class Constants {
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kV = 0.10; // ~0.1V per RPS
+        
+        public static final double RollerCurrentLimit = 40.0;
 
         // Intake Deploy (Rack & Pinion)
         public static final int IntakeDeployCanId = 26;
@@ -76,17 +82,28 @@ public final class Constants {
         public static final double kDeployI = 0.0;
         public static final double kDeployD = 0.0;
         
+        public static final double DeployCurrentLimit = 30.0;
+        
         // Deploy Positions in Rotations (Placeholder)
         public static final double DeployPosition = 10.0; // Fully Extended
         public static final double RetractPosition = 0.0;  // Fully Retracted (Home)
         public static final double DeployTolerance = 0.5;
     }
+    
+    public static final class HoodConstants {
+        public static final int HoodCanId = 23;
+        public static final double kP = 0.1;
+        public static final double DegreesPerRotation = (1.0 / 18.0) * 360.0;
+    }
 
     public static final class ShooterConstants {
         public static final int ShooterCanId1 = 21;
         public static final int ShooterCanId2 = 22;
-        public static final int HoodCanId = 23;
 
+        public static final double kP = 0.11;
+        public static final double kV = 0.12;
+        public static final double CurrentLimit = 80.0;
+        
         public static final double IdleSpeed = 15.0; // RPS (~900 RPM)
     }
 
@@ -96,6 +113,8 @@ public final class Constants {
         public static final double kI = 0.0d;
         public static final double kD = 0.0d;
         public static final double kTolerance = 1.0; // Degrees
+        
+        public static final double CurrentLimit = 30.0;
 
         // Gear Ratio: 240/24 = 10:1 reduction
         public static final double TurretGearRatio = 24.0 / 240.0;

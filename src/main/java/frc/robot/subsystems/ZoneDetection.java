@@ -123,4 +123,28 @@ public class ZoneDetection extends SubsystemBase {
     public ZONE getZone() {
         return myZone;
     }
+
+    public void publishRawDistance() {
+        // Read raw target pose in camera space directly from NetworkTables
+        // This avoids JSON parsing overhead if we just want distance
+        var entry = frc.robot.LimelightHelpers.getLimelightDoubleArrayEntry("limelight-front", "targetpose_cameraspace");
+        double[] targetPoseArray = entry.getDouble(new double[6]);
+
+        // Check if we have a valid target (array length 6 and not all zeros)
+        if (targetPoseArray.length >= 6 && (targetPoseArray[0] != 0 || targetPoseArray[2] != 0)) {
+            // Pose is [x, y, z, roll, pitch, yaw]
+            // Distance = sqrt(x^2 + y^2 + z^2)
+            double distanceMeters = Math.sqrt(
+                Math.pow(targetPoseArray[0], 2) + 
+                Math.pow(targetPoseArray[1], 2) + 
+                Math.pow(targetPoseArray[2], 2)
+            );
+
+            SmartDashboard.putNumber("Vision/RawDistance", distanceMeters);
+            SmartDashboard.putNumber("Vision/RawDistanceInches", edu.wpi.first.math.util.Units.metersToInches(distanceMeters));
+        } else {
+            SmartDashboard.putNumber("Vision/RawDistance", 0.0);
+            SmartDashboard.putNumber("Vision/RawDistanceInches", 0.0);
+        }
+    }
 }

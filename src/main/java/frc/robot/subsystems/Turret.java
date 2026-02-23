@@ -51,6 +51,10 @@ public class Turret extends SubsystemBase {
         turretConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = (TurretConstants.MinAngle / 360.0) / TurretConstants.TurretGearRatio;
         turretConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
+        // Safety: Current Limit
+        turretConfig.CurrentLimits.StatorCurrentLimit = TurretConstants.CurrentLimit;
+        turretConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
         TurretMotor.getConfigurator().apply(turretConfig);
         
         TurretMotor.setPosition(0);

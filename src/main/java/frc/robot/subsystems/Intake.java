@@ -29,6 +29,11 @@ public class Intake extends SubsystemBase {
         config.Slot0.kI = IntakeConstants.kI;
         config.Slot0.kD = IntakeConstants.kD;
         config.Slot0.kV = IntakeConstants.kV;
+        
+        // Safety: Current Limit for Intake Roller
+        config.CurrentLimits.StatorCurrentLimit = IntakeConstants.RollerCurrentLimit;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+
         intakeMotor.getConfigurator().apply(config);
 
         // Deploy Motor Config
@@ -36,6 +41,11 @@ public class Intake extends SubsystemBase {
         deployConfig.Slot0.kP = IntakeConstants.kDeployP;
         deployConfig.Slot0.kI = IntakeConstants.kDeployI;
         deployConfig.Slot0.kD = IntakeConstants.kDeployD;
+        
+        // Safety: Current Limit to prevent burnout on jam
+        deployConfig.CurrentLimits.StatorCurrentLimit = IntakeConstants.DeployCurrentLimit; // Amps
+        deployConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
         deployMotor.getConfigurator().apply(deployConfig);
         deployMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
         deployMotor.setPosition(0); // Assume starting at Retracted (0)

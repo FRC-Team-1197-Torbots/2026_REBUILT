@@ -30,7 +30,19 @@ public class Climber extends SubsystemBase {
         slot0Configs.kI = Constants.ClimberConstants.kI;
         slot0Configs.kD = Constants.ClimberConstants.kD;
 
-        climbMotor.getConfigurator().apply(slot0Configs);
+        // Safety: Soft Limits
+        var climbConfig = new TalonFXConfiguration();
+        climbConfig.Slot0 = slot0Configs; // Re-use the slot0 configs we just made
+        
+        // Max Extension: L3 + small buffer
+        climbConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = metersToRotations(Constants.ClimberConstants.L3 + Constants.ClimberConstants.SoftLimitBuffer); 
+        climbConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        
+        // Min Retraction: 0
+        climbConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = metersToRotations(0.0);
+        climbConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+
+        climbMotor.getConfigurator().apply(climbConfig);
         climbMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
