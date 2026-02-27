@@ -93,12 +93,13 @@ public class ZoneDetection extends SubsystemBase {
 
         // --- Standard Deviation Tuning ---
         double xyStdDev = 0.5;
-        double degStdDev = 10.0;
+        // MegaTag2 uses the robot's gyro internally, so we MUST set an extremely high/infinite 
+        // standard deviation for rotation so the WPILib Pose Estimator ignores the vision heading.
+        double degStdDev = 9999999.0;
 
         // Trust multi-tag observations much more
         if (mt2.tagCount >= 2) {
             xyStdDev = 0.3;
-            degStdDev = 1.0; 
         } 
         // Single tag logic
         else {
@@ -113,7 +114,7 @@ public class ZoneDetection extends SubsystemBase {
 
         // Add measurement to drivetrain
         drivetrain.addVisionMeasurement(mt2.pose, mt2.timestampSeconds,
-            VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(degStdDev)));
+            VecBuilder.fill(xyStdDev, xyStdDev, degStdDev));
 
         // Just push to dashboard for debugging (maybe just the front one or average?)
         SmartDashboard.putNumber("Vision/" + name + "/TagCount", mt2.tagCount);
