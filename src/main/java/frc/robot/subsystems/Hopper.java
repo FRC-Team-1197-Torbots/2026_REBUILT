@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.lang.constant.Constable;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;

@@ -128,8 +128,8 @@ public class ZoneDetection extends SubsystemBase {
         // Read raw target pose in camera space directly from NetworkTables
         // This avoids JSON parsing overhead if we just want distance
         var entry = frc.robot.LimelightHelpers.getLimelightDoubleArrayEntry("limelight-front", "targetpose_cameraspace");
-        double[] targetPoseArray = entry.getDouble(new double[6]);
-
+        edu.wpi.first.networktables.TimestampedDoubleArray ts = entry.getAtomic();
+        double[] targetPoseArray = ts.value;
         // Check if we have a valid target (array length 6 and not all zeros)
         if (targetPoseArray.length >= 6 && (targetPoseArray[0] != 0 || targetPoseArray[2] != 0)) {
             // Pose is [x, y, z, roll, pitch, yaw]

@@ -1,5 +1,5 @@
 package frc.robot.subsystems;
-
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
@@ -21,7 +21,9 @@ public class Hood extends SubsystemBase {
         
         // Configure PID and Safety
         com.revrobotics.spark.config.SparkFlexConfig config = new com.revrobotics.spark.config.SparkFlexConfig();
-        config.closedLoop.pid(HoodConstants.kP, 0.0, 0.0, com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
+        // TODO wrong lib version?
+        //config.closedLoop.pid(HoodConstants.kP, 0.0, 0.0, com.revrobotics.spark.config.ClosedLoopConfig.FeedbackDevice.kPrimaryEncoder);
+        config.closedLoop.pid(HoodConstants.kP, 0.0, 0.0);
         config.closedLoop.outputRange(-1, 1);
         
         // Apply configuration
