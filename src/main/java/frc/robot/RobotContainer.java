@@ -44,11 +44,11 @@ public class RobotContainer {
      * TORBOTS SPECIFIC VARIABLES
      ******************************/
     private final Intake m_intake = new Intake();
-    private final Hopper m_hopper = new Hopper(joystick, m_intake);
-    private final Shooter m_shooter1 = new Shooter(Constants.ShooterConstants.ShooterCanId1, Constants.ShooterConstants.ShooterCanId2);
-    private final Shooter m_shooter2 = new Shooter(Constants.ShooterConstants.ShooterCanId3, Constants.ShooterConstants.ShooterCanId4);
+    //private final Hopper m_hopper = new Hopper(joystick, m_intake);
+    //private final Shooter m_shooter1 = new Shooter(Constants.ShooterConstants.ShooterCanId1, Constants.ShooterConstants.ShooterCanId2);
+    //private final Shooter m_shooter2 = new Shooter(Constants.ShooterConstants.ShooterCanId3, Constants.ShooterConstants.ShooterCanId4);
     //private final Climber m_climber = new Climber();
-    private final Hood m_hood = new Hood();
+    //private final Hood m_hood = new Hood();
     // Use the drivetrain's Pigeon2 for ZoneDetection
     // private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain,
     // drivetrain.getPigeon2());
@@ -113,21 +113,21 @@ public class RobotContainer {
 
         //********************WORKING FUNCTIONS *****************************/
 
-        /*joystick.a().whileTrue(
-                Commands.parallel(
-                        m_intake.runIntakeCommand(drivetrain.getState().Speeds),
-                        m_hopper.runIndexCommand()));
+        joystick.a().whileTrue(m_intake.runIntakeCommand(drivetrain.getState().Speeds));
+
+        joystick.rightBumper().onTrue(Commands.runOnce(()->m_intake.deploy()));
+        joystick.leftBumper().onTrue(Commands.runOnce(()->m_intake.retract()));
 
 
         // Brake (X-Stance): hold Right Bumper
-        joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
+        //joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
         // Reset the field-centric heading on left bumper press.
-        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));*/
+        //joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         //********************FUNCTIONS For Testing*****************************/
 
         // TODO: Remove this manual binding in the future.
-        joystick.b().whileTrue(m_hopper.runHopperCommand());
+        //joystick.b().whileTrue(m_hopper.runHopperCommand());
 
     }
 
@@ -136,7 +136,7 @@ public class RobotContainer {
     }
 
     public void testPeriodic() {
-        if (joystick.getHID().getLeftBumper()) {
+        /*if (joystick.getHID().getLeftBumper()) {
             m_shooter1.Spin();
             m_shooter2.Spin();
         } else {
@@ -144,7 +144,7 @@ public class RobotContainer {
             m_shooter2.Stop();
         }
 
-        m_hood.GoToAngle();
+        m_hood.GoToAngle();*/
     //    TODO definition is commented out above
     //    m_zoneDetection.publishRawDistance();
     }

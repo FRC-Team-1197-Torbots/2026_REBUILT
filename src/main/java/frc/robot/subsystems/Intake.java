@@ -18,7 +18,7 @@ public class Intake extends SubsystemBase {
     private final TalonFX deployMotor;
     
     private final VelocityVoltage m_VelocityRequest = new VelocityVoltage(0).withSlot(0);
-    private final PositionVoltage m_DeployRequest = new PositionVoltage(0).withSlot(0); // Slot 0 for Deploy PID
+    private final PositionVoltage m_DeployRequest = new PositionVoltage(0).withSlot(0);
 
     public Intake() {
         intakeMotor = new TalonFX(IntakeConstants.IntakeCanId, "rio");
@@ -56,6 +56,8 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         super.periodic();
+
+        //SmartDashboard.putNumber("Intake Position", deployMotor.getPosition().getValueAsDouble());
     }
 
     public void setSpeed(double speed) {
@@ -114,10 +116,12 @@ public class Intake extends SubsystemBase {
     // Deployment Methods
     public void deploy() {
         deployMotor.setControl(m_DeployRequest.withPosition(IntakeConstants.DeployPosition));
+        //deployMotor.set(-0.2);
     }
 
     public void retract() {
         deployMotor.setControl(m_DeployRequest.withPosition(IntakeConstants.RetractPosition));
+        //deployMotor.set(0.2);
     }
 
     public Command runRetractCommand() {
@@ -135,7 +139,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void stopDeploy() {
-        deployMotor.stopMotor();
+        //deployMotor.set(0);;
     }
 
     public void setSurfaceSpeed(double mps) {

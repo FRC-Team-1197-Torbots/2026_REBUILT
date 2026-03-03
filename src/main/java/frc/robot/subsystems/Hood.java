@@ -17,7 +17,7 @@ public class Hood extends SubsystemBase {
     private double hoodangle = 0;
 
     public Hood() {
-        hood = new SparkFlex(HoodConstants.HoodCanId, MotorType.kBrushless);
+        //hood = new SparkFlex(HoodConstants.HoodCanId, MotorType.kBrushless);
         hoodController = hood.getClosedLoopController();
         
         // Configure PID and Safety

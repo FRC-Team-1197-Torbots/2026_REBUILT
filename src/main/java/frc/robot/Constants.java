@@ -85,7 +85,7 @@ public final class Constants {
         public static final double DeployCurrentLimit = 30.0;
         
         // Deploy Positions in Rotations (Placeholder)
-        public static final double DeployPosition = 10.0; // Fully Extended
+        public static final double DeployPosition = 30.0; // Fully Extended
         public static final double RetractPosition = 0.0;  // Fully Retracted (Home)
         public static final double DeployTolerance = 0.5;
     }

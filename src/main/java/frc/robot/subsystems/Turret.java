@@ -30,7 +30,7 @@ public class Turret extends SubsystemBase {
     @SuppressWarnings("rawtypes")
     public Turret(SwerveDrivetrain drivetrain, ZoneDetection zoneDetection) {
         this.zoneDetection = zoneDetection;
-        TurretMotor = new TalonFX(TurretConstants.TurretCanId);
+        TurretMotor = new TalonFX(TurretConstants.TurretCanId1);
 
         // Configure TalonFX
         var turretConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
