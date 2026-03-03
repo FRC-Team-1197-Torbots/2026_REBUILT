@@ -43,10 +43,11 @@ public final class Constants {
 
     public static final class HopperConstants {
         public static final int HopperCanId1 = 5;
-        public static final int HopperCanId2 = 6;
-        public static final int HooperSplitterCanID = 7;
+
+        public static final int TowerCanID = 9;
         
-        public static final int HooperLaserCANID = 8;
+        public static final int CanRangeID1 = 4;
+        public static final int CanRangeID2 = 5;
         // Interior space is ~10.25 inches (260mm).
         public static final double LaserMinDistance = 200.0;
 
@@ -91,14 +92,20 @@ public final class Constants {
     }
     
     public static final class HoodConstants {
-        public static final int HoodCanId = 23;
+        public static final int HoodCanId1 = 23;
+        public static final int HoodCanId2 = 24;
         public static final double kP = 0.1;
         public static final double DegreesPerRotation = (1.0 / 18.0) * 360.0;
+        public static double kI;
+        public static double kD;
     }
 
     public static final class ShooterConstants {
         public static final int ShooterCanId1 = 21;
         public static final int ShooterCanId2 = 22;
+
+        public static final int ShooterCanId3 = 23;
+        public static final int ShooterCanId4 = 24;
 
         public static final double kP = 0.11;
         public static final double kV = 0.12;
@@ -108,7 +115,12 @@ public final class Constants {
     }
 
     public static final class TurretConstants {
-        public static final int TurretCanId = 20;
+        public static final int TurretCanId1 = 20;
+        public static final int TurretCanId2 = 21;
+
+        public static final int encoderCanID1 = 2;
+        public static final int encoderCanID2 = 3;
+
         public static final double kP = 0.0012d;
         public static final double kI = 0.0d;
         public static final double kD = 0.0d;
