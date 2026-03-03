@@ -42,8 +42,7 @@ public final class Constants {
     }
 
     public static final class HopperConstants {
-        public static final int HopperCanId1 = 5;
-
+        public static final int FlopperCanID = 8;
         public static final int TowerCanID = 9;
         
         public static final int CanRangeID1 = 4;
@@ -58,7 +57,7 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static final int IntakeCanId = 25;
+        public static final int IntakeCanId = 7;
         // Speeds
         public static final double IntakeDutyCycle = 0.8; // 80% Power
         public static final double Min_Surface_Speed = 4.0; // 4.0 meters/second (approx 50-60% power)
@@ -78,7 +77,7 @@ public final class Constants {
         public static final double RollerCurrentLimit = 40.0;
 
         // Intake Deploy (Rack & Pinion)
-        public static final int IntakeDeployCanId = 26;
+        public static final int IntakeDeployCanId = 6;
         public static final double kDeployP = 0.1;
         public static final double kDeployI = 0.0;
         public static final double kDeployD = 0.0;
@@ -92,8 +91,8 @@ public final class Constants {
     }
     
     public static final class HoodConstants {
-        public static final int HoodCanId1 = 23;
-        public static final int HoodCanId2 = 24;
+        public static final int HoodCanId1 = 11;
+        public static final int HoodCanId2 = 21;
         public static final double kP = 0.1;
         public static final double DegreesPerRotation = (1.0 / 18.0) * 360.0;
         public static double kI;
@@ -115,8 +114,8 @@ public final class Constants {
     }
 
     public static final class TurretConstants {
-        public static final int TurretCanId1 = 20;
-        public static final int TurretCanId2 = 21;
+        public static final int TurretCanId1 = 12;
+        public static final int TurretCanId2 = 22;
 
         public static final int encoderCanID1 = 2;
         public static final int encoderCanID2 = 3;

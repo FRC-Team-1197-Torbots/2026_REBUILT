@@ -113,7 +113,7 @@ public class RobotContainer {
 
         //********************WORKING FUNCTIONS *****************************/
 
-        joystick.a().whileTrue(
+        /*joystick.a().whileTrue(
                 Commands.parallel(
                         m_intake.runIntakeCommand(drivetrain.getState().Speeds),
                         m_hopper.runIndexCommand()));
@@ -122,7 +122,7 @@ public class RobotContainer {
         // Brake (X-Stance): hold Right Bumper
         joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
         // Reset the field-centric heading on left bumper press.
-        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));*/
 
         //********************FUNCTIONS For Testing*****************************/
 
