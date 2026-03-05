@@ -3,12 +3,9 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 
 public final class Constants {
-    public static final class LimeLightConstants {
-        public static final String limelightname = "limelight-alpha";
-    }
-
     public static final class DriveConstants {
     }
 
@@ -78,7 +75,7 @@ public final class Constants {
 
         // Intake Deploy (Rack & Pinion)
         public static final int IntakeDeployCanId = 6;
-        public static final double kDeployP = 0.1;
+        public static final double kDeployP = 1.5;
         public static final double kDeployI = 0.0;
         public static final double kDeployD = 0.0;
         
@@ -119,8 +116,8 @@ public final class Constants {
         public static final int TurretCanId1 = 12;
         public static final int TurretCanId2 = 22;
 
-        public static final edu.wpi.first.math.geometry.Translation2d TurretOffset1 = new edu.wpi.first.math.geometry.Translation2d(0.0, 0.0);
-        public static final edu.wpi.first.math.geometry.Translation2d TurretOffset2 = new edu.wpi.first.math.geometry.Translation2d(0.0, 0.0);
+        public static final edu.wpi.first.math.geometry.Translation2d TurretOffset1 = new edu.wpi.first.math.geometry.Translation2d(Units.inchesToMeters(-6.24), Units.inchesToMeters(-8.15));
+        public static final edu.wpi.first.math.geometry.Translation2d TurretOffset2 = new edu.wpi.first.math.geometry.Translation2d(Units.inchesToMeters(-6.24), Units.inchesToMeters(8.15));
 
         public static final int encoderCanID1 = 2;
         public static final int encoderCanID2 = 3;

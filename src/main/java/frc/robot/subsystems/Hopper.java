@@ -5,7 +5,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.CANrange;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,8 +18,8 @@ public class Hopper extends SubsystemBase {
     private final CommandXboxController m_controller;
     
     // Motors
-    private final SparkFlex flopperMotor;
-    private final SparkFlex towerMotor;
+    private final TalonFX flopperMotor;
+    private final TalonFX towerMotor;
 
     // Sensors
     private final CANrange canRange1;
@@ -32,18 +32,18 @@ public class Hopper extends SubsystemBase {
         m_controller = controller;
         m_intake = intake;
         
-        flopperMotor = new SparkFlex(HopperConstants.FlopperCanID, MotorType.kBrushless);
-        towerMotor = new SparkFlex(HopperConstants.TowerCanID, MotorType.kBrushless);
+        flopperMotor = new TalonFX(HopperConstants.FlopperCanID);
+        towerMotor = new TalonFX(HopperConstants.TowerCanID);
 
         canRange1 = new CANrange(HopperConstants.CanRangeID1);
         canRange2 = new CANrange(HopperConstants.CanRangeID2);
 
         // Safety: Current Limits
-        SparkFlexConfig flexConfig = new SparkFlexConfig();
-        flexConfig.smartCurrentLimit(HopperConstants.HopperCurrentLimit);
+        //SparkFlexConfig flexConfig = new SparkFlexConfig();
+        //flexConfig.smartCurrentLimit(HopperConstants.HopperCurrentLimit);
         
-        flopperMotor.configure(flexConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        towerMotor.configure(flexConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        //flopperMotor.configure(flexConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        //towerMotor.configure(flexConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         // Optionally, apply invert if needed based on testing
         // flexConfig.inverted(true);

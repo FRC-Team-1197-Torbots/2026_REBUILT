@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        LimelightHelpers.SetIMUMode(Constants.LimeLightConstants.limelightname, 1);
+        
     }
 
     @Override

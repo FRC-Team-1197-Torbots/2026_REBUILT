@@ -127,6 +127,7 @@ public class Turret extends SubsystemBase {
             Pose2d turretFieldPose = currentRobotPose.transformBy(
                 new edu.wpi.first.math.geometry.Transform2d(m_robotOffset, new Rotation2d())
             );
+
             Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
             double targetFieldDegrees = delta.getAngle().getDegrees();
             
