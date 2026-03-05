@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,7 +35,7 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController driverController = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -47,11 +46,13 @@ public class RobotContainer {
      * TORBOTS SPECIFIC VARIABLES
      ******************************/
     private final Intake m_intake = new Intake();
-    private final Hopper m_hopper = new Hopper(joystick);
-    private final Shooter leftShooter = new Shooter(Constants.ShooterConstants.ShooterCanId1, Constants.ShooterConstants.ShooterCanId2, m_hopper);
-    private final Shooter rightShooter = new Shooter(Constants.ShooterConstants.ShooterCanId3, Constants.ShooterConstants.ShooterCanId4, m_hopper);
-    //private final Climber m_climber = new Climber();
-    
+    private final Hopper m_hopper = new Hopper(driverController);
+    private final Shooter leftShooter = new Shooter(Constants.ShooterConstants.ShooterCanId1,
+            Constants.ShooterConstants.ShooterCanId2, m_hopper);
+    private final Shooter rightShooter = new Shooter(Constants.ShooterConstants.ShooterCanId3,
+            Constants.ShooterConstants.ShooterCanId4, m_hopper);
+    // private final Climber m_climber = new Climber();
+
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -64,70 +65,74 @@ public class RobotContainer {
 
     private void configureNamedCommands() {
         // Intake Commands
-        //NamedCommands.registerCommand("Intake On", m_intake.runIntakeCommand(() -> drivetrain.getState().Speeds));
-        //NamedCommands.registerCommand("Intake Off", m_intake.stopCommand());
+        // NamedCommands.registerCommand("Intake On", m_intake.runIntakeCommand(() ->
+        // drivetrain.getState().Speeds));
+        // NamedCommands.registerCommand("Intake Off", m_intake.stopCommand());
 
         // Shooter Commands
-        //NamedCommands.registerCommand("Rev Shooter", m_shooter.runShooterCommand());
-        
+        // NamedCommands.registerCommand("Rev Shooter", m_shooter.runShooterCommand());
+
         // Composite Auto Shoot (Brake -> Shoot -> Feed -> Retract Intake)
-        /*Command autoShoot = Commands.parallel(
-            drivetrain.applyRequest(() -> brake),
-            m_shooter.runShooterCommand(),
-            Commands.sequence(
-                Commands.waitUntil(m_shooter::isAtSpeed),
-                m_hopper.runShootFeedCommand(),
-                m_intake.runRetractCommand()
-            )
-        );*/
-        //NamedCommands.registerCommand("Auto Shoot", autoShoot);
+        /*
+         * Command autoShoot = Commands.parallel(
+         * drivetrain.applyRequest(() -> brake),
+         * m_shooter.runShooterCommand(),
+         * Commands.sequence(
+         * Commands.waitUntil(m_shooter::isAtSpeed),
+         * m_hopper.runShootFeedCommand(),
+         * m_intake.runRetractCommand()
+         * )
+         * );
+         */
+        // NamedCommands.registerCommand("Auto Shoot", autoShoot);
 
         // Climber Commands
-        //NamedCommands.registerCommand("Climb L1", new Climb(m_climber, Climb.LEVELS.L1));
+        // NamedCommands.registerCommand("Climb L1", new Climb(m_climber,
+        // Climb.LEVELS.L1));
     }
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
-                                                                                                   // negative Y
-                                                                                                   // (forward)
-                .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with
-                                                                                    // negative X (left)
-            )
-        );
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive
+                                                                                                           // forward
+                                                                                                           // with
+                        // negative Y
+                        // (forward)
+                        .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise
+                                                                                            // with
+                // negative X (left)
+                ));
 
-        leftShooter.setDefaultCommand(Commands.run(()->leftShooter.LeftSpin(0.9), leftShooter));
-        rightShooter.setDefaultCommand(Commands.run(()->rightShooter.RightSpin(0.9), rightShooter));
+        leftShooter.setDefaultCommand(Commands.run(() -> leftShooter.LeftSpin(0.9), leftShooter));
+        rightShooter.setDefaultCommand(Commands.run(() -> rightShooter.RightSpin(0.9), rightShooter));
 
         // Brake (X-Stance): hold Right Bumper
-        //joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
+        // joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
         // Reset the field-centric heading on left bumper press.
-        //joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
+        // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        //********************WORKING FUNCTIONS *****************************/
+        // ********************WORKING FUNCTIONS *****************************/
 
-        // Right bumper deploys and runs intake
-        //joystick.rightBumper().whileTrue(m_intake.runDeployCommand());
-        
-        // Left bumper retracts intake
-        //joystick.leftBumper().onTrue(m_intake.runRetractCommand());
-
-
-        //********************FUNCTIONS For Testing*****************************/
+        // ********************FUNCTIONS For Testing*****************************/
 
         // TODO: Remove this manual binding in the future.
-        joystick.b().whileTrue(m_hopper.runHopperCommand());
-        joystick.a().onTrue(Commands.runOnce(()->m_intake.runIntake(drivetrain.getState().Speeds)))
-            .onFalse(Commands.runOnce(()->m_intake.stopIntake()));
+        driverController.b().whileTrue(m_hopper.runHopperCommand());
+        driverController.a().onTrue(Commands.runOnce(() -> m_intake.runIntake(drivetrain.getState().Speeds)))
+                .onFalse(Commands.runOnce(() -> m_intake.stopIntake()));
 
-        joystick.rightTrigger(0.5f).whileTrue(m_hopper.runShootCommand());
+        driverController.rightTrigger(0.5f).whileTrue(m_hopper.runShootCommand());
+
+        // Right bumper deploys and runs intake
+        driverController.rightBumper().whileTrue(m_intake.runDeployCommand());
+
+        // Left bumper retracts intake
+        driverController.leftBumper().onTrue(m_intake.runRetractCommand());
 
     }
 
@@ -136,16 +141,18 @@ public class RobotContainer {
     }
 
     public void testPeriodic() {
-        /*if (joystick.getHID().getLeftBumper()) {
-            m_shooter1.Spin();
-            m_shooter2.Spin();
-        } else {
-            m_shooter1.Stop();
-            m_shooter2.Stop();
-        }
-
-        m_hood.GoToAngle();*/
-    //    TODO definition is commented out above
-    //    m_zoneDetection.publishRawDistance();
+        /*
+         * if (joystick.getHID().getLeftBumper()) {
+         * m_shooter1.Spin();
+         * m_shooter2.Spin();
+         * } else {
+         * m_shooter1.Stop();
+         * m_shooter2.Stop();
+         * }
+         * 
+         * m_hood.GoToAngle();
+         */
+        // TODO definition is commented out above
+        // m_zoneDetection.publishRawDistance();
     }
 }
