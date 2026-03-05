@@ -18,6 +18,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.ZoneDetection;
 
 public class RobotContainer {
@@ -51,6 +52,11 @@ public class RobotContainer {
             Constants.ShooterConstants.ShooterCanId2, m_hopper);
     private final Shooter rightShooter = new Shooter(Constants.ShooterConstants.ShooterCanId3,
             Constants.ShooterConstants.ShooterCanId4, m_hopper);
+
+    // Turrets for testing
+    private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2);
+    private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1);
+
     // private final Climber m_climber = new Climber();
 
     private final SendableChooser<Command> autoChooser;
@@ -138,6 +144,14 @@ public class RobotContainer {
         // driverController.leftTrigger().whileTrue(m_intake.runDeployAndIntakeCommand(()
         // -> drivetrain.getState().Speeds));
 
+        // --- Turret Testing (D-Pad) ---
+        // Left Turret: D-Pad Left/Right
+        driverController.povLeft().onTrue(leftTurret.ManualTurnLeft()).onFalse(leftTurret.StopTurret());
+        driverController.povRight().onTrue(leftTurret.ManualTurnRight()).onFalse(leftTurret.StopTurret());
+
+        // Right Turret: D-Pad Up/Down
+        driverController.povUp().onTrue(rightTurret.ManualTurnLeft()).onFalse(rightTurret.StopTurret());
+        driverController.povDown().onTrue(rightTurret.ManualTurnRight()).onFalse(rightTurret.StopTurret());
     }
 
     public Command getAutonomousCommand() {
