@@ -18,6 +18,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.ZoneDetection;
 
 public class RobotContainer {
@@ -46,9 +47,9 @@ public class RobotContainer {
      * TORBOTS SPECIFIC VARIABLES
      ******************************/
     private final Intake m_intake = new Intake();
-    private final Hopper m_hopper = new Hopper(joystick, m_intake);
-    //private final Shooter m_shooter1 = new Shooter(Constants.ShooterConstants.ShooterCanId1, Constants.ShooterConstants.ShooterCanId2, Constants.HoodConstants.HoodCanId1, Constants.HoodConstants.HoodCanId2, Constants.TurretConstants.TurretCanId1, Constants.TurretConstants.TurretOffset1, drivetrain, m_zoneDetection);
-    //private final Shooter m_shooter2 = new Shooter(Constants.ShooterConstants.ShooterCanId3, Constants.ShooterConstants.ShooterCanId4, Constants.HoodConstants.HoodCanId3, Constants.HoodConstants.HoodCanId4, Constants.TurretConstants.TurretCanId2, Constants.TurretConstants.TurretOffset2, drivetrain, m_zoneDetection);
+    private final Hopper m_hopper = new Hopper(joystick);
+    private final Shooter leftShooter = new Shooter(Constants.ShooterConstants.ShooterCanId1, Constants.ShooterConstants.ShooterCanId2, m_hopper);
+    private final Shooter rightShooter = new Shooter(Constants.ShooterConstants.ShooterCanId3, Constants.ShooterConstants.ShooterCanId4, m_hopper);
     //private final Climber m_climber = new Climber();
     
     private final SendableChooser<Command> autoChooser;
@@ -63,8 +64,8 @@ public class RobotContainer {
 
     private void configureNamedCommands() {
         // Intake Commands
-        NamedCommands.registerCommand("Intake On", m_intake.runIntakeCommand(() -> drivetrain.getState().Speeds));
-        NamedCommands.registerCommand("Intake Off", m_intake.stopCommand());
+        //NamedCommands.registerCommand("Intake On", m_intake.runIntakeCommand(() -> drivetrain.getState().Speeds));
+        //NamedCommands.registerCommand("Intake Off", m_intake.stopCommand());
 
         // Shooter Commands
         //NamedCommands.registerCommand("Rev Shooter", m_shooter.runShooterCommand());
@@ -99,6 +100,9 @@ public class RobotContainer {
             )
         );
 
+        leftShooter.setDefaultCommand(Commands.run(()->leftShooter.LeftSpin(0.9), leftShooter));
+        rightShooter.setDefaultCommand(Commands.run(()->rightShooter.RightSpin(0.9), rightShooter));
+
         // Brake (X-Stance): hold Right Bumper
         //joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
         // Reset the field-centric heading on left bumper press.
@@ -110,17 +114,20 @@ public class RobotContainer {
         //********************WORKING FUNCTIONS *****************************/
 
         // Right bumper deploys and runs intake
-        joystick.rightBumper().whileTrue(m_intake.runDeployCommand());
+        //joystick.rightBumper().whileTrue(m_intake.runDeployCommand());
         
         // Left bumper retracts intake
-        joystick.leftBumper().onTrue(m_intake.runRetractCommand());
+        //joystick.leftBumper().onTrue(m_intake.runRetractCommand());
 
 
         //********************FUNCTIONS For Testing*****************************/
 
         // TODO: Remove this manual binding in the future.
         joystick.b().whileTrue(m_hopper.runHopperCommand());
-        joystick.a().whileTrue(Commands.runOnce(()->m_intake.runIntake(drivetrain.getState().Speeds)));
+        joystick.a().onTrue(Commands.runOnce(()->m_intake.runIntake(drivetrain.getState().Speeds)))
+            .onFalse(Commands.runOnce(()->m_intake.stopIntake()));
+
+        joystick.rightTrigger(0.5f).whileTrue(m_hopper.runShootCommand());
 
     }
 

@@ -26,11 +26,11 @@ public class Hopper extends SubsystemBase {
     private final CANrange canRange2;
 
     // References
-    private final Intake m_intake;
+    //private final Intake m_intake;
 
-    public Hopper(CommandXboxController controller, Intake intake) {
+    public Hopper(CommandXboxController controller) {
         m_controller = controller;
-        m_intake = intake;
+        //m_intake = intake;
         
         flopperMotor = new TalonFX(HopperConstants.FlopperCanID);
         towerMotor = new TalonFX(HopperConstants.TowerCanID);
@@ -61,7 +61,7 @@ public class Hopper extends SubsystemBase {
     /** Sets both hopper motors to the same speed. */
     public void setSpeed(double speed) {
         flopperMotor.set(-speed);
-        towerMotor.set(speed);
+        towerMotor.set(-speed);
     }
 
     public void stop() {
@@ -120,6 +120,12 @@ public class Hopper extends SubsystemBase {
             } else {
                 feed(HopperConstants.HopperFeedSpeed);
             }
+        }).finallyDo(interrupted -> stop());
+    }
+
+    public Command runShootCommand() {
+        return run(() -> {
+            feed(HopperConstants.HopperFeedSpeed);
         }).finallyDo(interrupted -> stop());
     }
 

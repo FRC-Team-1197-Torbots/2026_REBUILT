@@ -90,6 +90,8 @@ public class Intake extends SubsystemBase {
                 Constants.IntakeConstants.Min_Surface_Speed, 
                 robotVelocity * Constants.IntakeConstants.RobotSpeedMultiplier
             );
+
+            setSurfaceSpeed(targetSpeed);
     }
 
     public void runOuttake() {

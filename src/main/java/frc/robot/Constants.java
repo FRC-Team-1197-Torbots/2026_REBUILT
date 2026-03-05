@@ -47,7 +47,7 @@ public final class Constants {
         // Interior space is ~10.25 inches (260mm).
         public static final double LaserMinDistance = 200.0;
 
-        public static final double HopperFeedSpeed = 0.6;
+        public static final double HopperFeedSpeed = 0.8;
         
         public static final int HopperCurrentLimit = 40;
         public static final double SplitterCurrentLimit = 30.0;
@@ -99,11 +99,11 @@ public final class Constants {
     }
 
     public static final class ShooterConstants {
-        public static final int ShooterCanId1 = 21;
-        public static final int ShooterCanId2 = 22;
+        public static final int ShooterCanId1 = 29;//left
+        public static final int ShooterCanId2 = 28;
 
-        public static final int ShooterCanId3 = 23;
-        public static final int ShooterCanId4 = 24;
+        public static final int ShooterCanId3 = 18;//right
+        public static final int ShooterCanId4 = 19;
 
         public static final double kP = 0.11;
         public static final double kV = 0.12;
@@ -113,8 +113,8 @@ public final class Constants {
     }
 
     public static final class TurretConstants {
-        public static final int TurretCanId1 = 12;
-        public static final int TurretCanId2 = 22;
+        public static final int TurretCanId1 = 12; //right 
+        public static final int TurretCanId2 = 22; //left
 
         public static final edu.wpi.first.math.geometry.Translation2d TurretOffset1 = new edu.wpi.first.math.geometry.Translation2d(Units.inchesToMeters(-6.24), Units.inchesToMeters(-8.15));
         public static final edu.wpi.first.math.geometry.Translation2d TurretOffset2 = new edu.wpi.first.math.geometry.Translation2d(Units.inchesToMeters(-6.24), Units.inchesToMeters(8.15));
