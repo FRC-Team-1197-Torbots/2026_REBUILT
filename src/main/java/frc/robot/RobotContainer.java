@@ -128,11 +128,15 @@ public class RobotContainer {
 
         driverController.rightTrigger(0.5f).whileTrue(m_hopper.runShootCommand());
 
-        // Right bumper deploys and runs intake
-        driverController.rightBumper().whileTrue(m_intake.runDeployCommand());
+        // Click to drop intake
+        driverController.rightBumper().onTrue(m_intake.runDeployCommand());
 
-        // Left bumper retracts intake
+        // Click to retract intake
         driverController.leftBumper().onTrue(m_intake.runRetractCommand());
+
+        // TODO: Test command to deploy and run intake wheels simultaneously
+        // driverController.leftTrigger().whileTrue(m_intake.runDeployAndIntakeCommand(()
+        // -> drivetrain.getState().Speeds));
 
     }
 
