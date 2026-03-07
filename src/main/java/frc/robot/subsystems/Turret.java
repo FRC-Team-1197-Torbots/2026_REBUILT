@@ -22,7 +22,9 @@ public class Turret extends SubsystemBase {
     private ZoneDetection zoneDetection;
     private edu.wpi.first.math.geometry.Translation2d m_robotOffset;
 
-    public enum TURRENT_SIDE { RIGHT, LEFT};
+    public enum TURRENT_SIDE {
+        RIGHT, LEFT
+    };
 
     protected TURRENT_SIDE m_side;
 
@@ -59,7 +61,7 @@ public class Turret extends SubsystemBase {
     }
 
     public Turret(int turretCanId, edu.wpi.first.math.geometry.Translation2d robotOffset,
-            SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection,TURRENT_SIDE side) {
+            SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection, TURRENT_SIDE side) {
         this.zoneDetection = zoneDetection;
         m_robotOffset = robotOffset;
         TurretMotor = new TalonFX(turretCanId);
@@ -102,7 +104,7 @@ public class Turret extends SubsystemBase {
     @Override
     public void periodic() {
 
-        if(m_side == TURRENT_SIDE.LEFT)
+        if (m_side == TURRENT_SIDE.LEFT)
             return;
 
         // --- 1. Sensors & State ---
@@ -191,11 +193,8 @@ public class Turret extends SubsystemBase {
         // --- 4. Closed Loop Control ---
 
         // Optimize the target angle to fit within the valid range of the Turret (-90 to
-        // 270)
-        // Since the turret has a 360 degree total range (but hard stops), there is only
-        // ONE valid physical angle
-        // for any given direction. We force the target into that range manually.
-        double constrainedTargetDegrees = MathUtil.inputModulus(targetRelativeDegrees, TurretConstants.MinAngle,
+        // 90 for initial testing)
+        double constrainedTargetDegrees = MathUtil.clamp(targetRelativeDegrees, TurretConstants.MinAngle,
                 TurretConstants.MaxAngle);
 
         SmartDashboard.putNumber("Turret/Target Constrained",
@@ -215,6 +214,14 @@ public class Turret extends SubsystemBase {
 
     public void setPower(float speed) {
         TurretMotor.set(speed);
+    }
+
+    public void setTargetAngle(double targetDegrees) {
+        double constrainedTargetDegrees = MathUtil.clamp(targetDegrees, TurretConstants.MinAngle,
+                TurretConstants.MaxAngle);
+        double targetRotations = (constrainedTargetDegrees / 360.0) /
+                TurretConstants.TurretGearRatio;
+        TurretMotor.setControl(m_request.withPosition(targetRotations));
     }
 
     public Command ManualTurnLeft() {

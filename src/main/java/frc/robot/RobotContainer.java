@@ -29,162 +29,213 @@ import frc.robot.subsystems.ZoneDetection;
 import frc.robot.subsystems.Turret.TURRENT_SIDE;
 
 public class RobotContainer {
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
-                                                                                        // speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
-                                                                                      // max angular velocity
+        private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
+                                                                                            // top
+                                                                                            // speed
+        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per
+                                                                                          // second
+                                                                                          // max angular velocity
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+        /* Setting up bindings for necessary control of the swerve drive platform */
+        private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive
+                                                                                 // motors
 
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+        private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
-    private final Telemetry logger = new Telemetry(MaxSpeed);
+        private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController driverController = new CommandXboxController(0);
+        private final CommandXboxController driverController = new CommandXboxController(0);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+        public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    // Use the drivetrain's Pigeon2 for ZoneDetection
-    private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain, drivetrain.getPigeon2());
+        // Use the drivetrain's Pigeon2 for ZoneDetection
+        private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain, drivetrain.getPigeon2());
 
-    /***************************
-     * TORBOTS SPECIFIC VARIABLES
-     ******************************/
-    private final Intake m_intake = new Intake();
-    private final Hopper m_hopper = new Hopper(driverController);
-    private final Shooter leftShooter = new Shooter(Constants.ShooterConstants.ShooterCanId1,
-            Constants.ShooterConstants.ShooterCanId2, m_hopper);
-    private final Shooter rightShooter = new Shooter(Constants.ShooterConstants.ShooterCanId3,
-            Constants.ShooterConstants.ShooterCanId4, m_hopper);
+        /***************************
+         * TORBOTS SPECIFIC VARIABLES
+         ******************************/
+        private final Intake m_intake = new Intake();
+        private final Hopper m_hopper = new Hopper(driverController);
+        private final Shooter leftShooter = new Shooter(Constants.ShooterConstants.ShooterCanId1,
+                        Constants.ShooterConstants.ShooterCanId2, m_hopper);
+        private final Shooter rightShooter = new Shooter(Constants.ShooterConstants.ShooterCanId3,
+                        Constants.ShooterConstants.ShooterCanId4, m_hopper);
 
-    // Turrets for testing
-    private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2, 
-        Constants.TurretConstants.TurretOffset1, drivetrain, m_zoneDetection, TURRENT_SIDE.LEFT);
-    private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1,
-        Constants.TurretConstants.TurretOffset1, drivetrain, m_zoneDetection, TURRENT_SIDE.RIGHT);
-        
-    private final Hood rightHood = new Hood(Constants.HoodConstants.HoodCanId1);
-    private final Hood leftHood = new Hood(Constants.HoodConstants.HoodCanId2);
+        // Turrets for testing
+        private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2,
+                        Constants.TurretConstants.TurretOffset1, drivetrain, m_zoneDetection, TURRENT_SIDE.LEFT);
+        private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1,
+                        Constants.TurretConstants.TurretOffset1, drivetrain, m_zoneDetection, TURRENT_SIDE.RIGHT);
 
-    // private final Climber m_climber = new Climber();
+        private final Hood rightHood = new Hood(Constants.HoodConstants.HoodCanId1);
+        private final Hood leftHood = new Hood(Constants.HoodConstants.HoodCanId2);
 
-    private final SendableChooser<Command> autoChooser;
+        // private final Climber m_climber = new Climber();
 
-    public RobotContainer() {
-        configureNamedCommands();
-        configureBindings();
+        private final SendableChooser<Command> autoChooser;
 
-        //setting our inital pose
-        drivetrain.getState().Pose = new Pose2d(new Translation2d(0, 0), new Rotation2d(-90));
+        public RobotContainer() {
+                configureNamedCommands();
+                configureBindings();
 
-        autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("Auto selection", autoChooser);
-    }
+                // setting our inital pose
+                drivetrain.resetPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(-90)));
 
-    private void configureNamedCommands() {
-        // Intake Commands
-        // NamedCommands.registerCommand("Intake On", m_intake.runIntakeCommand(() ->
-        // drivetrain.getState().Speeds));
-        // NamedCommands.registerCommand("Intake Off", m_intake.stopCommand());
+                autoChooser = AutoBuilder.buildAutoChooser();
+                SmartDashboard.putData("Auto selection", autoChooser);
 
-        // Shooter Commands
-        // NamedCommands.registerCommand("Rev Shooter", m_shooter.runShooterCommand());
+                // Turret manual testing inputs
+                SmartDashboard.putNumber("Turret/ManualPowerLeft", 0.0);
+                SmartDashboard.putNumber("Turret/ManualPowerRight", 0.0);
+                SmartDashboard.putNumber("Turret/ManualAngleLeft", 0.0);
+                SmartDashboard.putNumber("Turret/ManualAngleRight", 0.0);
+                SmartDashboard.putBoolean("Turret/UseManualPosition", false);
 
-        // Composite Auto Shoot (Brake -> Shoot -> Feed -> Retract Intake)
-        /*
-         * Command autoShoot = Commands.parallel(
-         * drivetrain.applyRequest(() -> brake),
-         * m_shooter.runShooterCommand(),
-         * Commands.sequence(
-         * Commands.waitUntil(m_shooter::isAtSpeed),
-         * m_hopper.runShootFeedCommand(),
-         * m_intake.runRetractCommand()
-         * )
-         * );
-         */
-        // NamedCommands.registerCommand("Auto Shoot", autoShoot);
+                // Hood manual testing inputs
+                SmartDashboard.putNumber("Hood/ManualPowerLeft", 0.0);
+                SmartDashboard.putNumber("Hood/ManualPowerRight", 0.0);
+                SmartDashboard.putNumber("Hood/ManualAngleLeft", 0.0);
+                SmartDashboard.putNumber("Hood/ManualAngleRight", 0.0);
+                SmartDashboard.putBoolean("Hood/UseManualPosition", false);
+        }
 
-        // Climber Commands
-        // NamedCommands.registerCommand("Climb L1", new Climb(m_climber,
-        // Climb.LEVELS.L1));
-    }
+        private void configureNamedCommands() {
+                // Intake Commands
+                // NamedCommands.registerCommand("Intake On", m_intake.runIntakeCommand(() ->
+                // drivetrain.getState().Speeds));
+                // NamedCommands.registerCommand("Intake Off", m_intake.stopCommand());
 
-    private void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive
-                                                                                                           // forward
-                                                                                                           // with
-                        // negative Y
-                        // (forward)
-                        .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise
-                                                                                            // with
-                // negative X (left)
-                ));
+                // Shooter Commands
+                // NamedCommands.registerCommand("Rev Shooter", m_shooter.runShooterCommand());
 
-        // Shooter idle commands
-        /*leftShooter.setDefaultCommand(
-                Commands.run(() -> leftShooter.LeftSpin(Constants.ShooterConstants.IdleSpeed), leftShooter));
-        rightShooter.setDefaultCommand(
-                Commands.run(() -> rightShooter.RightSpin(Constants.ShooterConstants.IdleSpeed), rightShooter));*/
+                // Composite Auto Shoot (Brake -> Shoot -> Feed -> Retract Intake)
+                /*
+                 * Command autoShoot = Commands.parallel(
+                 * drivetrain.applyRequest(() -> brake),
+                 * m_shooter.runShooterCommand(),
+                 * Commands.sequence(
+                 * Commands.waitUntil(m_shooter::isAtSpeed),
+                 * m_hopper.runShootFeedCommand(),
+                 * m_intake.runRetractCommand()
+                 * )
+                 * );
+                 */
+                // NamedCommands.registerCommand("Auto Shoot", autoShoot);
 
-        // Brake (X-Stance): hold Right Bumper
-        // joystick.rightBumper().whileTrue(drivetrain.applyRequest(() -> brake));
-        // Reset the field-centric heading on left bumper press.
-        // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+                // Climber Commands
+                // NamedCommands.registerCommand("Climb L1", new Climb(m_climber,
+                // Climb.LEVELS.L1));
+        }
 
-        drivetrain.registerTelemetry(logger::telemeterize);
+        private void configureBindings() {
+                // Note that X is defined as forward according to WPILib convention,
+                // and Y is defined as to the left according to WPILib convention.
+                drivetrain.setDefaultCommand(
+                                // Drivetrain will execute this command periodically
+                                drivetrain.applyRequest(() -> drive
+                                                .withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive
+                                                                                                        // forward
+                                                                                                        // with
+                                                // negative Y
+                                                // (forward)
+                                                .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left
+                                                                                                        // with negative
+                                                                                                        // X (left)
+                                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive
+                                                                                                                    // counterclockwise
+                                                                                                                    // with
+                                // negative X (left)
+                                ));
 
-        // ********************WORKING FUNCTIONS *****************************/
+                // Shooter idle commands
+                /*
+                 * leftShooter.setDefaultCommand(
+                 * Commands.run(() ->
+                 * leftShooter.LeftSpin(Constants.ShooterConstants.IdleSpeed), leftShooter));
+                 * rightShooter.setDefaultCommand(
+                 * Commands.run(() ->
+                 * rightShooter.RightSpin(Constants.ShooterConstants.IdleSpeed), rightShooter));
+                 */
 
-        // ********************FUNCTIONS For Testing*****************************/
+                // Reset the field-centric heading on start button press (right middle button)
+                driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        // TODO: Remove this manual binding in the future.
-        driverController.b().whileTrue(m_hopper.runHopperCommand());
-        driverController.a().onTrue(Commands.runOnce(() -> m_intake.runIntake(drivetrain.getState().Speeds)))
-                .onFalse(Commands.runOnce(() -> m_intake.stopIntake()));
+                drivetrain.registerTelemetry(logger::telemeterize);
 
+                // ********************WORKING FUNCTIONS *****************************/
 
-        ParallelCommandGroup shootGroup = new ParallelCommandGroup(Commands.run(() -> leftShooter.LeftSpin(Constants.ShooterConstants.IdleSpeed), leftShooter),
-                Commands.run(() -> rightShooter.RightSpin(Constants.ShooterConstants.IdleSpeed), rightShooter), m_hopper.runShootCommand());
-                
-        ParallelCommandGroup stopShooters = new ParallelCommandGroup(Commands.run(() -> leftShooter.LeftSpin(0), leftShooter),
-                Commands.run(() -> rightShooter.RightSpin(0)));
+                // ********************FUNCTIONS For Testing*****************************/
 
-        driverController.rightTrigger(0.5f).whileTrue(shootGroup).onFalse(stopShooters);
+                // TODO: Remove this manual binding in the future.
+                driverController.b().whileTrue(m_hopper.runHopperCommand());
+                driverController.a().onTrue(Commands.runOnce(() -> m_intake.runIntake(drivetrain.getState().Speeds)))
+                                .onFalse(Commands.runOnce(() -> m_intake.stopIntake()));
 
-        // Click to drop intake
-        driverController.rightBumper().onTrue(m_intake.runDeployCommand());
+                ParallelCommandGroup shootGroup = new ParallelCommandGroup(
+                                Commands.run(() -> leftShooter.LeftSpin(Constants.ShooterConstants.IdleSpeed),
+                                                leftShooter),
+                                Commands.run(() -> rightShooter.RightSpin(Constants.ShooterConstants.IdleSpeed),
+                                                rightShooter),
+                                m_hopper.runShootCommand());
 
-        // Click to retract intake
-        driverController.leftBumper().onTrue(m_intake.runRetractCommand());
+                ParallelCommandGroup stopShooters = new ParallelCommandGroup(
+                                Commands.run(() -> leftShooter.LeftSpin(0), leftShooter),
+                                Commands.run(() -> rightShooter.RightSpin(0)));
 
-        // TODO: Test command to deploy and run intake wheels simultaneously
-        // driverController.leftTrigger().whileTrue(m_intake.runDeployAndIntakeCommand(()
-        // -> drivetrain.getState().Speeds));
+                driverController.rightTrigger(0.5f).whileTrue(shootGroup).onFalse(stopShooters);
 
-        // --- Turret Testing (D-Pad) ---
-        // Left Turret: D-Pad Left/Right
-        //driverController.povLeft().onTrue(rightHood.ManualHoodUp()).onFalse(rightHood.ManualHoodStop());
-        //driverController.povRight().onTrue(rightHood.ManualHoodDown()).onFalse(rightHood.ManualHoodStop());
+                // Click to drop intake
+                driverController.rightBumper().onTrue(m_intake.runDeployCommand());
 
-        // Right Turret: D-Pad Up/Down
-        //driverController.povUp().onTrue(leftHood.ManualHoodUp()).onFalse(leftHood.ManualHoodStop());
-        //driverController.povDown().onTrue(leftHood.ManualHoodDown()).onFalse(leftHood.ManualHoodStop());
-    }
+                // Click to retract intake
+                driverController.leftBumper().onTrue(m_intake.runRetractCommand());
 
-    public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
-    }
+                // TODO: Test command to deploy and run intake wheels simultaneously
+                // driverController.leftTrigger().whileTrue(m_intake.runDeployAndIntakeCommand(()
+                // -> drivetrain.getState().Speeds));
 
-    public void testPeriodic() {
+                // --- Turret Testing (D-Pad) ---
+                // Left Turret: D-Pad Left/Right
+                // driverController.povLeft().onTrue(rightHood.ManualHoodUp()).onFalse(rightHood.ManualHoodStop());
+                // driverController.povRight().onTrue(rightHood.ManualHoodDown()).onFalse(rightHood.ManualHoodStop());
 
-    }
+                // Right Turret: D-Pad Up/Down
+                // driverController.povUp().onTrue(leftHood.ManualHoodUp()).onFalse(leftHood.ManualHoodStop());
+                // driverController.povDown().onTrue(leftHood.ManualHoodDown()).onFalse(leftHood.ManualHoodStop());
+        }
+
+        public Command getAutonomousCommand() {
+                return autoChooser.getSelected();
+        }
+
+        public void testPeriodic() {
+                boolean usePosition = SmartDashboard.getBoolean("Turret/UseManualPosition", false);
+                if (usePosition) {
+                        double leftAngle = SmartDashboard.getNumber("Turret/ManualAngleLeft", 0.0);
+                        double rightAngle = SmartDashboard.getNumber("Turret/ManualAngleRight", 0.0);
+                        leftTurret.setTargetAngle(leftAngle);
+                        rightTurret.setTargetAngle(rightAngle);
+                } else {
+                        double leftPower = SmartDashboard.getNumber("Turret/ManualPowerLeft", 0.0);
+                        double rightPower = SmartDashboard.getNumber("Turret/ManualPowerRight", 0.0);
+                        leftTurret.setPower((float) leftPower);
+                        rightTurret.setPower((float) rightPower);
+                }
+
+                boolean useHoodPosition = SmartDashboard.getBoolean("Hood/UseManualPosition", false);
+                if (useHoodPosition) {
+                        double leftHoodAngle = SmartDashboard.getNumber("Hood/ManualAngleLeft", 0.0);
+                        double rightHoodAngle = SmartDashboard.getNumber("Hood/ManualAngleRight", 0.0);
+                        leftHood.setTargetAngle(leftHoodAngle);
+                        rightHood.setTargetAngle(rightHoodAngle);
+                } else {
+                        double leftHoodPower = SmartDashboard.getNumber("Hood/ManualPowerLeft", 0.0);
+                        double rightHoodPower = SmartDashboard.getNumber("Hood/ManualPowerRight", 0.0);
+                        leftHood.setPower(leftHoodPower);
+                        rightHood.setPower(rightHoodPower);
+                }
+        }
 
 }

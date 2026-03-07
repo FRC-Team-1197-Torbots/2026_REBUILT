@@ -2,11 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -16,28 +12,18 @@ import frc.robot.Constants.HoodConstants;
 
 public class Hood extends SubsystemBase {
     private TalonFX hoodMain;
-    private SparkClosedLoopController hoodController;
-
-    private double hoodangle = 0;
+    private final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
 
     public Hood(int hoodCanId) {
         hoodMain = new TalonFX(hoodCanId);
-        //hoodFollower = new SparkFlex(hoodCanId2, MotorType.kBrushless);
 
-        // Configure PID and Safety
-        /*com.revrobotics.spark.config.SparkFlexConfig configMain = new com.revrobotics.spark.config.SparkFlexConfig();
-        configMain.closedLoop.pid(Constants.HoodConstants.kP, Constants.HoodConstants.kI, Constants.HoodConstants.kD,
-                ClosedLoopSlot.kSlot0);
-        configMain.closedLoop.outputRange(-1, 1);
+        var hoodConfig = new TalonFXConfiguration();
+        hoodConfig.Slot0.kP = Constants.HoodConstants.kP;
+        hoodConfig.Slot0.kI = Constants.HoodConstants.kI;
+        hoodConfig.Slot0.kD = Constants.HoodConstants.kD;
 
-        com.revrobotics.spark.config.SparkFlexConfig configFollower = new com.revrobotics.spark.config.SparkFlexConfig();
-        configFollower.follow(hoodMain);
-
-        // Apply configuration
-        hoodMain.configure(configMain, com.revrobotics.ResetMode.kResetSafeParameters,
-                com.revrobotics.PersistMode.kPersistParameters);
-        hoodFollower.configure(configFollower, com.revrobotics.ResetMode.kResetSafeParameters,
-                com.revrobotics.PersistMode.kPersistParameters);*/
+        hoodMain.getConfigurator().apply(hoodConfig);
+        hoodMain.setPosition(0);
 
         SmartDashboard.putNumber("Hood/Hood Angle", 0);
     }
@@ -56,13 +42,17 @@ public class Hood extends SubsystemBase {
 
     @Override
     public void periodic() {
-        hoodangle = SmartDashboard.getNumber("Hood Angle", 0);
+        SmartDashboard.putNumber("Hood/Current Angle", ConvertTicksToAngle(hoodMain.getPosition().getValueAsDouble()));
     }
 
-    public void GoToAngle() {
-        double ticks = ConvertDegreesToTicks(hoodangle);
-        SmartDashboard.putNumber("Requested Ticks", ticks);
-        hoodController.setSetpoint(ticks, ControlType.kPosition);
+    public void setTargetAngle(double targetDegrees) {
+        double ticks = ConvertDegreesToTicks(targetDegrees);
+        SmartDashboard.putNumber("Hood/Requested Ticks", ticks);
+        hoodMain.setControl(m_request.withPosition(ticks));
+    }
+
+    public void setPower(double power) {
+        hoodMain.set(power);
     }
 
     private double ConvertTicksToAngle(double ticks) {
