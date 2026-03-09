@@ -88,7 +88,10 @@ public class ZoneDetection extends SubsystemBase {
         // Get the MegaTag2 estimate directly
         // PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         // //megatag1 in case
-        PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+        PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+
+        if(mt2 == null)
+            return;
 
         // Basic validation: must have tags and not be an empty pose
         if (mt2.tagCount == 0 || mt2.pose == null) {

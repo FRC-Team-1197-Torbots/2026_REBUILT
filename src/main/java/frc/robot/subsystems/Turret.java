@@ -1,10 +1,14 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,12 +25,17 @@ public class Turret extends SubsystemBase {
     private SwerveDrivetrain<?, ?, ?> DriveTrain;
     private ZoneDetection zoneDetection;
     private edu.wpi.first.math.geometry.Translation2d m_robotOffset;
+    private CANcoder encoder;
+
+    private PIDController turrentPID;
 
     public enum TURRENT_SIDE {
         RIGHT, LEFT
     };
 
     protected TURRENT_SIDE m_side;
+
+    private double PDTest;
 
     // TalonFX Control Request
     private final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
@@ -60,52 +69,52 @@ public class Turret extends SubsystemBase {
         TurretMotor.setPosition(0);
     }
 
-    public Turret(int turretCanId, edu.wpi.first.math.geometry.Translation2d robotOffset,
+    public Turret(int turretCanId, int encoderID, edu.wpi.first.math.geometry.Translation2d turretOffset,
             SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection, TURRENT_SIDE side) {
+
         this.zoneDetection = zoneDetection;
-        m_robotOffset = robotOffset;
-        TurretMotor = new TalonFX(turretCanId);
+        m_robotOffset = turretOffset;
         m_side = side;
+        DriveTrain = drivetrain;
 
-        // Configure TalonFX
+        encoder = new CANcoder(encoderID);
+        TurretMotor = new TalonFX(turretCanId);
+
         var turretConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
-
-        // Slot 0 PID config
-        turretConfig.Slot0.kP = TurretConstants.kP;
-        turretConfig.Slot0.kI = TurretConstants.kI;
-        turretConfig.Slot0.kD = TurretConstants.kD;
-        // Note: kTolerance is handled by the closed loop logic manually or by just
-        // checking error,
-        // TalonFX doesn't have a "Tolerance" config that stops the motor automatically
-        // for PositionVoltage,
-        // it just servos to the position.
-
-        // Forward Limit: 270 degrees.
-        turretConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (TurretConstants.MaxAngle / 360.0)
-                / TurretConstants.TurretGearRatio;
-        turretConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-
-        // Reverse Limit: -90 degrees.
-        turretConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = (TurretConstants.MinAngle / 360.0)
-                / TurretConstants.TurretGearRatio;
-        turretConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-
-        // Safety: Current Limit
-        turretConfig.CurrentLimits.StatorCurrentLimit = TurretConstants.CurrentLimit;
-        turretConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         TurretMotor.getConfigurator().apply(turretConfig);
 
-        TurretMotor.setPosition(0);
+        encoder.setPosition(0);
 
-        DriveTrain = drivetrain;
+        turrentPID = new PIDController(Constants.TurretConstants.kP, Constants.TurretConstants.kI,
+                Constants.TurretConstants.kD);
+        turrentPID.disableContinuousInput();
+        SmartDashboard.putNumber("Turret/PD", 0);
+        SmartDashboard.putNumber("Turret/ErrorPercent", 0);
     }
 
     @Override
     public void periodic() {
 
-        if (m_side == TURRENT_SIDE.LEFT)
-            return;
+        PDTest = SmartDashboard.getNumber("Turret/PD", 0);
+        turrentPID.setPID(PDTest, 0, 0);
+
+        if (m_side == TURRENT_SIDE.LEFT) {
+            SmartDashboard.putNumber("Left Encoder", encoder.getPosition().getValueAsDouble());
+        }
+
+        boolean usePosition = SmartDashboard.getBoolean("Turret/UseManualPosition", false);
+        if (usePosition) {
+            double leftAngle = SmartDashboard.getNumber("Turret/ManualAngleLeft", 0.0);
+            //double rightAngle = SmartDashboard.getNumber("Turret/ManualAngleRight", 0.0);
+            setTargetAngle(leftAngle);
+            // rightTurret.setTargetAngle(rightAngle);
+        } else {
+            double leftPower = SmartDashboard.getNumber("Turret/ManualPowerLeft", 0.0);
+            //double rightPower = SmartDashboard.getNumber("Turret/ManualPowerRight", 0.0);
+            setPower((float) leftPower);
+            // rightTurret.setPower((float) rightPower);
+        }
 
         // --- 1. Sensors & State ---
         // Get current position in Rotations
@@ -201,6 +210,7 @@ public class Turret extends SubsystemBase {
                 constrainedTargetDegrees);
         SmartDashboard.putNumber("Turret/Error", constrainedTargetDegrees -
                 currentTurretDegrees);
+        getErrorInPer();
 
         // Convert Target Degrees -> Motor Rotations
         // Rotations = Degrees / 360
@@ -216,12 +226,30 @@ public class Turret extends SubsystemBase {
         TurretMotor.set(speed);
     }
 
-    public void setTargetAngle(double targetDegrees) {
-        double constrainedTargetDegrees = MathUtil.clamp(targetDegrees, TurretConstants.MinAngle,
-                TurretConstants.MaxAngle);
-        double targetRotations = (constrainedTargetDegrees / 360.0) /
-                TurretConstants.TurretGearRatio;
-        TurretMotor.setControl(m_request.withPosition(targetRotations));
+    public void setTargetAngle(double targetRotations) {
+        double motoroutput = turrentPID.calculate(encoder.getPosition().getValueAsDouble(), targetRotations);
+
+        motoroutput = MathUtil.clamp(motoroutput, -0.75, 75);
+
+        SmartDashboard.putNumber("PID Result", motoroutput);
+
+        TurretMotor.set(motoroutput);
+    }
+
+    public void getErrorInPer() {
+
+        double actualPosition = encoder.getPosition().getValueAsDouble();
+        double targetPosition = turrentPID.getSetpoint();
+
+        double error = Math.abs(targetPosition - actualPosition);
+
+        double percentError = 0;
+
+        if (Math.abs(targetPosition) > 0.0001) { // prevent divide by zero
+            percentError = (error / Math.abs(targetPosition)) * 100.0;
+        }
+
+        SmartDashboard.putNumber("Turret/PercentError", percentError);
     }
 
     public Command ManualTurnLeft() {

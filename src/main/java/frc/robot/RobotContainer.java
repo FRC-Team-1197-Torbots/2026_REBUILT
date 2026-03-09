@@ -61,10 +61,12 @@ public class RobotContainer {
                         Constants.ShooterConstants.ShooterCanId4, m_hopper);
 
         // Turrets for testing
-        private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2,
-                        Constants.TurretConstants.TurretOffset1, drivetrain, m_zoneDetection, TURRENT_SIDE.LEFT);
-        private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1,
-                        Constants.TurretConstants.TurretOffset1, drivetrain, m_zoneDetection, TURRENT_SIDE.RIGHT);
+        private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2, 
+                        Constants.TurretConstants.encoderCanID2, Constants.TurretConstants.TurretOffset1, 
+                        drivetrain, m_zoneDetection, TURRENT_SIDE.LEFT);
+        //private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1,
+        //                Constants.TurretConstants.encoderCanID2 ,Constants.TurretConstants.TurretOffset1, 
+        //                drivetrain, m_zoneDetection, TURRENT_SIDE.RIGHT);
 
         private final Hood rightHood = new Hood(Constants.HoodConstants.HoodCanId1);
         private final Hood leftHood = new Hood(Constants.HoodConstants.HoodCanId2);
@@ -154,14 +156,14 @@ public class RobotContainer {
                                 ));
 
                 // Shooter idle commands
-                /*
-                 * leftShooter.setDefaultCommand(
-                 * Commands.run(() ->
-                 * leftShooter.LeftSpin(Constants.ShooterConstants.IdleSpeed), leftShooter));
-                 * rightShooter.setDefaultCommand(
-                 * Commands.run(() ->
-                 * rightShooter.RightSpin(Constants.ShooterConstants.IdleSpeed), rightShooter));
-                 */
+                
+                leftShooter.setDefaultCommand(
+                Commands.run(() ->
+                leftShooter.LeftSpin(Constants.ShooterConstants.IdleSpeed), leftShooter));
+                rightShooter.setDefaultCommand(
+                Commands.run(() ->
+                rightShooter.RightSpin(Constants.ShooterConstants.IdleSpeed), rightShooter));
+                
 
                 // Reset the field-centric heading on start button press (right middle button)
                 driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
@@ -177,7 +179,7 @@ public class RobotContainer {
                 driverController.a().onTrue(Commands.runOnce(() -> m_intake.runIntake(drivetrain.getState().Speeds)))
                                 .onFalse(Commands.runOnce(() -> m_intake.stopIntake()));
 
-                ParallelCommandGroup shootGroup = new ParallelCommandGroup(
+                /*ParallelCommandGroup shootGroup = new ParallelCommandGroup(
                                 Commands.run(() -> leftShooter.LeftSpin(Constants.ShooterConstants.IdleSpeed),
                                                 leftShooter),
                                 Commands.run(() -> rightShooter.RightSpin(Constants.ShooterConstants.IdleSpeed),
@@ -186,9 +188,9 @@ public class RobotContainer {
 
                 ParallelCommandGroup stopShooters = new ParallelCommandGroup(
                                 Commands.run(() -> leftShooter.LeftSpin(0), leftShooter),
-                                Commands.run(() -> rightShooter.RightSpin(0)));
+                                Commands.run(() -> rightShooter.RightSpin(0)));*/
 
-                driverController.rightTrigger(0.5f).whileTrue(shootGroup).onFalse(stopShooters);
+                //driverController.rightTrigger(0.5f).whileTrue(shootGroup).onFalse(stopShooters);
 
                 // Click to drop intake
                 driverController.rightBumper().onTrue(m_intake.runDeployCommand());
@@ -201,13 +203,13 @@ public class RobotContainer {
                 // -> drivetrain.getState().Speeds));
 
                 // --- Turret Testing (D-Pad) ---
-                // Left Turret: D-Pad Left/Right
-                // driverController.povLeft().onTrue(rightHood.ManualHoodUp()).onFalse(rightHood.ManualHoodStop());
-                // driverController.povRight().onTrue(rightHood.ManualHoodDown()).onFalse(rightHood.ManualHoodStop());
+                //Left Turret: D-Pad Left/Right
+                //driverController.povLeft().onTrue(rightTurret.ManualTurnLeft()).onFalse(rightTurret.StopTurret());
+                //driverController.povRight().onTrue(rightTurret.ManualTurnRight()).onFalse(rightTurret.StopTurret());
 
-                // Right Turret: D-Pad Up/Down
-                // driverController.povUp().onTrue(leftHood.ManualHoodUp()).onFalse(leftHood.ManualHoodStop());
-                // driverController.povDown().onTrue(leftHood.ManualHoodDown()).onFalse(leftHood.ManualHoodStop());
+                //Right Turret: D-Pad Up/Down
+                //driverController.povUp().onTrue(leftTurret.ManualTurnLeft()).onFalse(leftTurret.StopTurret());
+                //driverController.povDown().onTrue(leftTurret.ManualTurnRight()).onFalse(leftTurret.StopTurret());
         }
 
         public Command getAutonomousCommand() {
@@ -220,12 +222,12 @@ public class RobotContainer {
                         double leftAngle = SmartDashboard.getNumber("Turret/ManualAngleLeft", 0.0);
                         double rightAngle = SmartDashboard.getNumber("Turret/ManualAngleRight", 0.0);
                         leftTurret.setTargetAngle(leftAngle);
-                        rightTurret.setTargetAngle(rightAngle);
+                        //rightTurret.setTargetAngle(rightAngle);
                 } else {
                         double leftPower = SmartDashboard.getNumber("Turret/ManualPowerLeft", 0.0);
                         double rightPower = SmartDashboard.getNumber("Turret/ManualPowerRight", 0.0);
                         leftTurret.setPower((float) leftPower);
-                        rightTurret.setPower((float) rightPower);
+                        //rightTurret.setPower((float) rightPower);
                 }
 
                 boolean useHoodPosition = SmartDashboard.getBoolean("Hood/UseManualPosition", false);
@@ -242,7 +244,7 @@ public class RobotContainer {
                 }
 
                 // Shooter Testing
-                boolean useShooterRPM = SmartDashboard.getBoolean("Shooter/UseManualRPM", false);
+                /*boolean useShooterRPM = SmartDashboard.getBoolean("Shooter/UseManualRPM", false);
                 if (useShooterRPM) {
                         double leftRPM = SmartDashboard.getNumber("Shooter/ManualRPMMLeft", 0.0);
                         double rightRPM = SmartDashboard.getNumber("Shooter/ManualRPMMRight", 0.0);
@@ -253,7 +255,7 @@ public class RobotContainer {
                         double rightShooterPower = SmartDashboard.getNumber("Shooter/ManualPowerRight", 0.0);
                         leftShooter.setPowerLeft(leftShooterPower);
                         rightShooter.setPowerRight(rightShooterPower);
-                }
+                }*/
         }
 
 }

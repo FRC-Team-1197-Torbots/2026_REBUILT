@@ -120,18 +120,18 @@ public final class Constants {
         public static final int encoderCanID1 = 2;
         public static final int encoderCanID2 = 3;
 
-        public static final double kP = 0.0012d;
+        public static final double kP = 0.3d;
         public static final double kI = 0.0d;
         public static final double kD = 0.0d;
-        public static final double kTolerance = 1.0; // Degrees
+        //public static final double kTolerance = 0.0; // Degrees
         
         public static final double CurrentLimit = 30.0;
 
         // Gear Ratio: 240/24 = 10:1 reduction
-        public static final double TurretGearRatio = 3f / 100f;
+        public static final double TurretGearRatio = 1f / 8f;
 
-        public static final double MinAngle = -90.0;
-        public static final double MaxAngle = 90.0;        
+        public static final double MinAngle = -2;
+        public static final double MaxAngle = 2; //need to convert to angle and eventually use radians        
 
     }
 
