@@ -48,7 +48,7 @@ public class RobotContainer {
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
         // Use the drivetrain's Pigeon2 for ZoneDetection
-        //private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain, drivetrain.getPigeon2());
+        private final ZoneDetection m_zoneDetection = new ZoneDetection(drivetrain, drivetrain.getPigeon2());
 
         /***************************
          * TORBOTS SPECIFIC VARIABLES
@@ -63,7 +63,7 @@ public class RobotContainer {
         // Turrets for testing
         private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2, 
                         Constants.TurretConstants.encoderCanID2, Constants.TurretConstants.TurretOffset1, 
-                        drivetrain, null, TURRENT_SIDE.LEFT);
+                        drivetrain, m_zoneDetection, TURRENT_SIDE.LEFT);
         //private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1,
         //                Constants.TurretConstants.encoderCanID2 ,Constants.TurretConstants.TurretOffset1, 
         //                drivetrain, m_zoneDetection, TURRENT_SIDE.RIGHT);
@@ -131,15 +131,7 @@ public class RobotContainer {
                                 // negative X (left)
                                 ));
 
-                // Shooter idle commands
-                
-                /*leftShooter.setDefaultCommand(
-                Commands.run(() ->
-                leftShooter.LeftSpin(Constants.ShooterConstants.IdleSpeed), leftShooter));
-                rightShooter.setDefaultCommand(
-                Commands.run(() ->
-                rightShooter.RightSpin(Constants.ShooterConstants.IdleSpeed), rightShooter));*/
-                
+                // Shooter idle commands                
 
                 // Reset the field-centric heading on start button press (right middle button)
                 driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
