@@ -166,23 +166,10 @@ public class RobotContainer {
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup).onFalse(stopShooters);
 
                 // Click to drop intake
-                driverController.rightBumper().onTrue(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds)).onFalse(Commands.run(() -> m_intake.stopIntake()));
+                driverController.rightBumper().onTrue(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
 
                 // Click to retract intake
                 driverController.leftBumper().onTrue(m_intake.runRetractCommand());
-
-                // TODO: Test command to deploy and run intake wheels simultaneously
-                // driverController.leftTrigger().whileTrue(m_intake.runDeployAndIntakeCommand(()
-                // -> drivetrain.getState().Speeds));
-
-                // --- Turret Testing (D-Pad) ---
-                //Left Turret: D-Pad Left/Right
-                //driverController.povLeft().onTrue(rightTurret.ManualTurnLeft()).onFalse(rightTurret.StopTurret());
-                //driverController.povRight().onTrue(rightTurret.ManualTurnRight()).onFalse(rightTurret.StopTurret());
-
-                //Right Turret: D-Pad Up/Down
-                //driverController.povUp().onTrue(leftTurret.ManualTurnLeft()).onFalse(leftTurret.StopTurret());
-                //driverController.povDown().onTrue(leftTurret.ManualTurnRight()).onFalse(leftTurret.StopTurret());
         }
 
         public Command getAutonomousCommand() {

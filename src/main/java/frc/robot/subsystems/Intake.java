@@ -24,6 +24,9 @@ public class Intake extends SubsystemBase {
     private Double m_deployTarget = null;
     private final edu.wpi.first.wpilibj.Timer m_deployTimer = new edu.wpi.first.wpilibj.Timer();
 
+    private enum INTAKE_POSITION{ DEPLOYED, RETRACTED};
+    private INTAKE_POSITION m_position;
+
     public Intake() {
         intakeMotor = new TalonFX(IntakeConstants.IntakeCanId);
         deployMotor = new TalonFX(IntakeConstants.IntakeDeployCanId);
@@ -54,7 +57,7 @@ public class Intake extends SubsystemBase {
         deployMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
         deployMotor.setPosition(0); // Assume starting at Retracted (0)
 
-        // SmartDashboard.setDefaultBoolean("Intake/UseVariableSpeed", true);
+        m_position = INTAKE_POSITION.RETRACTED;
     }
 
     @Override
@@ -142,20 +145,33 @@ public class Intake extends SubsystemBase {
 
     // Deployment Methods
     public void deploy() {
-        SmartDashboard.putBoolean("Intake/Loop Running", true);
+        if(m_position == INTAKE_POSITION.DEPLOYED)
+            return;
+
+
         m_deployTarget = IntakeConstants.DeployPosition;
         m_deployTimer.restart();
         deployMotor.setControl(m_DeployRequest.withPosition(IntakeConstants.DeployPosition));
     }
 
     public void retract() {
-        SmartDashboard.putBoolean("Intake/Loop Running", true);
+        stopIntake();
+        
+        if(m_position == INTAKE_POSITION.RETRACTED)
+            return;
+        
         m_deployTarget = IntakeConstants.RetractPosition;
         m_deployTimer.restart();
         deployMotor.setControl(m_DeployRequest.withPosition(IntakeConstants.RetractPosition));
     }
 
     public void stopDeploy() {
+        if(m_deployTarget == IntakeConstants.DeployPosition) 
+            m_position = INTAKE_POSITION.DEPLOYED;
+        
+        if(m_deployTarget == IntakeConstants.RetractPosition)
+            m_position = INTAKE_POSITION.RETRACTED;
+
         m_deployTarget = null;
         deployMotor.setControl(m_StopDeployRequest);
     }
