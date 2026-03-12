@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Hood;
@@ -157,6 +158,19 @@ public class RobotContainer {
                 driverController.povUp().onTrue(drivetrain.runOnce(() -> {
                         drivetrain.resetPose(startingPoseChooser.getSelected());
                 }));
+
+                ParallelCommandGroup hood5, hood0, hood10;
+                
+                hood5 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(5)),
+                        Commands.runOnce(()->rightHood.setTargetAngle(5)));
+                hood0 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(0)),
+                        Commands.runOnce(()->rightHood.setTargetAngle(0)));
+                hood10 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(10)),
+                        Commands.runOnce(()->rightHood.setTargetAngle(10)));
+
+                driverController.povDown().onTrue(hood5);
+                driverController.povRight().onTrue(hood0);
+                driverController.povLeft().onTrue(hood10);                
 
                 // ******************** OVERRIDES *****************************/
                 // Manual encoder resets without touching PID voltages

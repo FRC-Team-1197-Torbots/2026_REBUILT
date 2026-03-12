@@ -90,10 +90,9 @@ public final class Constants {
     public static final class HoodConstants {
         public static final int HoodCanId1 = 11;
         public static final int HoodCanId2 = 21;
-        public static final double kP = 0.1;
-        public static final double DegreesPerRotation = (1.0 / 18.0) * 360.0;
-        public static double kI;
-        public static double kD;
+        public static final double kP = 1.2;
+        public static double kI = 0;
+        public static double kD = 0;
     }
 
     public static final class ShooterConstants {
