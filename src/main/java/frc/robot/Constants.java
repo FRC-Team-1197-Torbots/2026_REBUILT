@@ -103,11 +103,10 @@ public final class Constants {
         public static final int ShooterCanId3 = 18;// right
         public static final int ShooterCanId4 = 19;
 
-        public static final double kP = 0.11;
-        public static final double kV = 0.12;
-        public static final double CurrentLimit = 80.0;
+        public static double kP = 0.0005f;
 
-        public static final double IdleSpeed = 0.5f * 12; // Need to find control speed, currently just set to voltage
+        public static final double IdleSpeed = 0.3; // Need to find control speed, currently just set to voltage
+        public static final double ShootSpeed = 0.7;
     }
 
     public static final class TurretConstants {

@@ -129,8 +129,8 @@ public class RobotContainer {
 
                 // ******************** Default Commands *****************************/
                 // Shooter idle commands (2000 RPM ≈ 33.33 RPS)
-                leftShooter.setDefaultCommand(leftShooter.run(() -> leftShooter.Spin(33.33)));
-                rightShooter.setDefaultCommand(rightShooter.run(() -> rightShooter.Spin(33.33)));
+                leftShooter.setDefaultCommand(leftShooter.run(() -> leftShooter.runIdle()));
+                rightShooter.setDefaultCommand(rightShooter.run(() -> rightShooter.runIdle()));
 
                 // ********************WORKING FUNCTIONS *****************************/
                 // Reset the field-centric heading on start button press (right middle button)
@@ -146,8 +146,8 @@ public class RobotContainer {
                 // ********************FUNCTIONS For Testing*****************************/
                 // Active shooting commands (3500 RPM ≈ 58.33 RPS)
                 ParallelCommandGroup shootGroup = new ParallelCommandGroup(
-                                Commands.run(() -> leftShooter.Spin(58.33), leftShooter),
-                                Commands.run(() -> rightShooter.Spin(58.33), rightShooter),
+                                Commands.run(() -> leftShooter.Hack(), leftShooter),
+                                Commands.run(() -> rightShooter.Hack(), rightShooter),
                                 Commands.waitUntil(() -> leftShooter.isAtSpeed() && rightShooter.isAtSpeed())
                                                 .andThen(m_hopper.runShootCommand()));
 
