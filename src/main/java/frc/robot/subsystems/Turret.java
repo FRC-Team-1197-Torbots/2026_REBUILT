@@ -153,7 +153,7 @@ public class Turret extends SubsystemBase {
             SmartDashboard.putNumber("Turret " + m_side.name() + "/Constrained Angle", constrainedTargetDegrees);
 
             // Apply to Motor
-            setTargetAngle(constrainedTargetDegrees);
+            //setTargetAngle(constrainedTargetDegrees);
         } else {
             // Idle / Forward
             SmartDashboard.putNumber("Turret " + m_side.name() + "/Distance to Target (m)", 0.0);
@@ -180,7 +180,7 @@ public class Turret extends SubsystemBase {
 
         motoroutput = MathUtil.clamp(motoroutput, -0.75, 75);
 
-        // TurretMotor.set(motoroutput);
+        TurretMotor.set(motoroutput);
     }
 
     /**

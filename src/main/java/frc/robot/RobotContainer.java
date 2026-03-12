@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -159,18 +158,18 @@ public class RobotContainer {
                         drivetrain.resetPose(startingPoseChooser.getSelected());
                 }));
 
-                ParallelCommandGroup hood5, hood0, hood10;
+                //ParallelCommandGroup hood5, hood0, hood10;
                 
-                hood5 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(5)),
+                /*hood5 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(5)),
                         Commands.runOnce(()->rightHood.setTargetAngle(5)));
                 hood0 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(0)),
                         Commands.runOnce(()->rightHood.setTargetAngle(0)));
                 hood10 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(10)),
-                        Commands.runOnce(()->rightHood.setTargetAngle(10)));
+                        Commands.runOnce(()->rightHood.setTargetAngle(10)));*/
 
-                driverController.povDown().onTrue(hood5);
-                driverController.povRight().onTrue(hood0);
-                driverController.povLeft().onTrue(hood10);                
+                driverController.povDown().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(75)));
+                driverController.povRight().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(0)));
+                driverController.povLeft().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(-90)));                
 
                 // ******************** OVERRIDES *****************************/
                 // Manual encoder resets without touching PID voltages
