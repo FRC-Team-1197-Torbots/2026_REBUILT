@@ -43,13 +43,8 @@ public class Hood extends SubsystemBase {
 
     public void periodic() {
         super.periodic();
-
-        SmartDashboard.putNumber("Hood " + m_side.name() + "/Hood Angle", hoodMain.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Hood " + m_side.name() + "/Hood Target", Target);
-        
+                
         double delta = Math.abs(Target - hoodMain.getPosition().getValueAsDouble());
-
-        SmartDashboard.putNumber("Hood " + m_side.name() + "/Hood Delta", delta);
 
         if(delta <= PIDTolerance) {
             hoodMain.setControl(stophoodrequest);

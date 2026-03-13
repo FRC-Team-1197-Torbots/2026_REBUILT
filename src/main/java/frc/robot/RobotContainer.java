@@ -125,9 +125,9 @@ public class RobotContainer {
                                 ));
 
                 // ******************** Default Commands *****************************/
-                // Shooter idle commands (2000 RPM ≈ 33.33 RPS)
-                //leftShooter.setDefaultCommand(leftShooter.run(() -> leftShooter.runIdle()));
-                //rightShooter.setDefaultCommand(rightShooter.run(() -> rightShooter.runIdle()));
+                // Shooter idle commands (using the new closed-loop target RPM)
+                leftShooter.setDefaultCommand(leftShooter.run(() -> leftShooter.runIdle()));
+                rightShooter.setDefaultCommand(rightShooter.run(() -> rightShooter.runIdle()));
 
                 // ********************WORKING FUNCTIONS *****************************/
                 // Reset the field-centric heading on start button press (right middle button)
@@ -153,20 +153,7 @@ public class RobotContainer {
                 // Reset the odometry to the chosen starting pose on D-PAD UP press
                 driverController.povUp().onTrue(drivetrain.runOnce(() -> {
                         drivetrain.resetPose(startingPoseChooser.getSelected());
-                }));
-
-                //ParallelCommandGroup hood5, hood0, hood10;
-                
-                /*hood5 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(5)),
-                        Commands.runOnce(()->rightHood.setTargetAngle(5)));
-                hood0 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(0)),
-                        Commands.runOnce(()->rightHood.setTargetAngle(0)));
-                hood10 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(10)),
-                        Commands.runOnce(()->rightHood.setTargetAngle(10)));*/
-
-                // driverController.povDown().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(75)));
-                // driverController.povRight().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(0)));
-                // driverController.povLeft().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(-90)));                
+                }));         
 
                 // ******************** OVERRIDES *****************************/
                 // Manual encoder resets without touching PID voltages

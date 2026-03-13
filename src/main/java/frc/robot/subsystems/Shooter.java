@@ -20,6 +20,7 @@ import frc.robot.Constants.ShooterConstants;
 public class Shooter extends SubsystemBase {
     private SparkMax shooterWheel1, shooterWheel2;
     private PIDController m_pidController;
+    private final edu.wpi.first.math.controller.SimpleMotorFeedforward m_feedforward;
 
     public enum SHOOTER_SIDE {
         RIGHT, LEFT
@@ -42,6 +43,9 @@ public class Shooter extends SubsystemBase {
         config1.inverted(m_side == SHOOTER_SIDE.LEFT);
 
         m_pidController = new PIDController(Constants.ShooterConstants.kP, 0, 0);
+        // kV = 12 Volts / Max RPM. Assuming ~5600 max RPM for NEOs/Vortex on flywheels.
+        // Adjust Constants.ShooterConstants.kV accordingly (e.g., 0.0021).
+        m_feedforward = new edu.wpi.first.math.controller.SimpleMotorFeedforward(0.0, Constants.ShooterConstants.kV);
         // Basic PID configuration (Needs to be tuned)
         //config1.closedLoop.pid(0.008, 0, 0);
 
@@ -60,8 +64,13 @@ public class Shooter extends SubsystemBase {
     public void setSpeed(double rps) {
         shooterspeed = rps;
         double rpm = rps * 60.0;
-        double power = m_pidController.calculate(shooterWheel1.getEncoder().getVelocity(), rpm);
-        shooterWheel1.set(power);
+        
+        // Feedforward does 90% of the work, PID just cleans up the error
+        double ffVoltage = m_feedforward.calculate(rpm);
+        double pidVoltage = m_pidController.calculate(shooterWheel1.getEncoder().getVelocity(), rpm);
+        
+        // Apply pure voltage instead of percent output (set()) since FF is in volts
+        shooterWheel1.setVoltage(ffVoltage + pidVoltage);
     }
 
     public void Spin(double speedMeasurement) {
@@ -72,9 +81,16 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Shooter " + m_side.name() + "/Speed requested",
                 rpm);
 
-        double power = m_pidController.calculate(shooterWheel1.getEncoder().getVelocity(), rpm);
-        power = MathUtil.clamp(power, 0.2f, 1);
-        shooterWheel1.setVoltage(power * 12);
+        // Feedforward does 90% of the work, PID just cleans up the error
+        double ffVoltage = m_feedforward.calculate(rpm);
+        double pidVoltage = m_pidController.calculate(shooterWheel1.getEncoder().getVelocity(), rpm);
+        
+        double totalVoltage = ffVoltage + pidVoltage;
+
+        // Optionally clamp total voltage to realistic battery limits (12V)
+        totalVoltage = MathUtil.clamp(totalVoltage, 0.0, 12.0);
+        
+        shooterWheel1.setVoltage(totalVoltage);
 
         SmartDashboard.putNumber("Shooter " + m_side.name() + "/Power Requested", power);
     }
@@ -92,6 +108,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void Stop() {
+        // Idle speed is now technically a target RPM
         Spin(ShooterConstants.IdleSpeed); // Keep it spinning at idle instead of full stop
     }
 

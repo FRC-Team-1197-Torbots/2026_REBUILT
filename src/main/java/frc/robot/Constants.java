@@ -103,9 +103,11 @@ public final class Constants {
         public static final int ShooterCanId4 = 19;
 
         public static double kP = 0.0005f;
+        public static final double kV = 0.0021; // Volts per RPM. Roughly 12V / 5600 RPM for a NEO/Vortex
 
-        public static final double IdleSpeed = 0.3; // Need to find control speed, currently just set to voltage
-        public static final double ShootSpeed = 0.7;
+        // Idle speed is now technically a target RPM
+        public static final double IdleSpeed = 500;
+        public static final double ShootSpeed = 3500;
     }
 
     public static final class TurretConstants {
