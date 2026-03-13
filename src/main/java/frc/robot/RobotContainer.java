@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Hood;
@@ -27,7 +26,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.ZoneDetection;
 import frc.robot.subsystems.Shooter.SHOOTER_SIDE;
-import frc.robot.subsystems.Turret.TURRENT_SIDE;
+import frc.robot.subsystems.Turret.TURRET_SIDE;
 
 public class RobotContainer {
         private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
@@ -45,7 +44,7 @@ public class RobotContainer {
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
         private final CommandXboxController driverController = new CommandXboxController(0);
-        private final CommandXboxController overrideController = new CommandXboxController(1);
+        //private final CommandXboxController overrideController = new CommandXboxController(1);
         /***************************
          * CORE SUBSYSTEMS
          ******************************/
@@ -69,13 +68,11 @@ public class RobotContainer {
 
         // Turrets for testing
         private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2,
-                        Constants.TurretConstants.encoderCanID2, Constants.TurretConstants.TurretOffset1,
-                        drivetrain, m_zoneDetection, TURRENT_SIDE.LEFT);
-        // private final Turret rightTurret = new
-        // Turret(Constants.TurretConstants.TurretCanId1,
-        // Constants.TurretConstants.encoderCanID2
-        // ,Constants.TurretConstants.TurretOffset1,
-        // drivetrain, m_zoneDetection, TURRENT_SIDE.RIGHT);
+                Constants.TurretConstants.encoderCanID2, Constants.TurretConstants.TurretOffset2,
+                drivetrain, m_zoneDetection, TURRET_SIDE.LEFT);
+        private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1,
+                Constants.TurretConstants.encoderCanID1, Constants.TurretConstants.TurretOffset1,
+                drivetrain, m_zoneDetection, TURRET_SIDE.RIGHT);
 
         private final Hood rightHood = new Hood(Constants.HoodConstants.HoodCanId1, Hood.HOOD_SIDE.RIGHT);
         private final Hood leftHood = new Hood(Constants.HoodConstants.HoodCanId2, Hood.HOOD_SIDE.LEFT);
@@ -167,17 +164,17 @@ public class RobotContainer {
                 hood10 = new ParallelCommandGroup(Commands.runOnce(()->leftHood.setTargetAngle(10)),
                         Commands.runOnce(()->rightHood.setTargetAngle(10)));*/
 
-                driverController.povDown().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(75)));
-                driverController.povRight().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(0)));
-                driverController.povLeft().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(-90)));                
+                // driverController.povDown().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(75)));
+                // driverController.povRight().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(0)));
+                // driverController.povLeft().onTrue(Commands.runOnce(()->leftTurret.setTargetAngle(-90)));                
 
                 // ******************** OVERRIDES *****************************/
                 // Manual encoder resets without touching PID voltages
-                overrideController.povUp().onTrue(m_intake.forceRetract());
-                overrideController.povDown().onTrue(m_intake.forceDeploy());
+                // overrideController.povUp().onTrue(m_intake.forceRetract());
+                // overrideController.povDown().onTrue(m_intake.forceDeploy());
 
-                // Allow the co-driver to auto-home manually or in test mode
-                overrideController.start().onTrue(m_intake.autoHome());
+                // // Allow the co-driver to auto-home manually or in test mode
+                // overrideController.start().onTrue(m_intake.autoHome());
         }
 
         public Command getAutonomousCommand() {

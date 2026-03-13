@@ -136,8 +136,8 @@ public final class Constants {
         // Offset for the absolute CANcoder to treat its starting valid position as 0
         // degrees.
         // Measured in motor rotations. (45 degrees = 1 rotation).
-        public static final double TurrentRotationOffset = -0.31;
-
+        public static final double TurrentRotationOffsetLeft = -0.31;
+        public static final double TurrentRotationOffsetRight = -0.44;
     }
 
     public static final class FieldConstants {

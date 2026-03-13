@@ -26,16 +26,16 @@ public class Turret extends SubsystemBase {
     private PIDController turrentPID;
     private double TargetRotations;
 
-    public enum TURRENT_SIDE {
+    public enum TURRET_SIDE {
         RIGHT, LEFT
     };
 
-    protected TURRENT_SIDE m_side;
+    protected TURRET_SIDE m_side;
     // y in inches: 159.1 = 4.0386 m
     // x in inches: 182.1 = 4.6228 m
 
     public Turret(int turretCanId, int encoderID, edu.wpi.first.math.geometry.Translation2d turretOffset,
-            SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection, TURRENT_SIDE side) {
+            SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection, TURRET_SIDE side) {
 
         this.zoneDetection = zoneDetection;
         m_robotOffset = turretOffset;
@@ -61,7 +61,7 @@ public class Turret extends SubsystemBase {
         double currentMotorRotations = TurretMotor.getPosition().getValueAsDouble();
         // Convert to Degrees for Logic, factoring in the CANcoder's physical zero
         // offset
-        double absoluteRotations = currentMotorRotations - TurretConstants.TurrentRotationOffset;
+        double absoluteRotations = getRelativeRotation();
         double currentTurretDegrees = rotationsToDegrees(absoluteRotations);
 
         double robotHeadingDegrees = (DriveTrain != null) ? DriveTrain.getState().Pose.getRotation().getDegrees() : 0.0;
@@ -141,10 +141,7 @@ public class Turret extends SubsystemBase {
             // Apply to Motor
             setTargetAngle(constrainedTargetDegrees);
         } else {
-            // Idle / Forward
-            SmartDashboard.putNumber("Turret " + m_side.name() + "/Distance to Target (m)", 0.0);
-            SmartDashboard.putNumber("Turret " + m_side.name() + "/Target Relative Angle", 0.0);
-            SmartDashboard.putNumber("Turret " + m_side.name() + "/Constrained Angle", 0.0);
+            setTargetAngle(0);
         }
     }
 
@@ -152,10 +149,11 @@ public class Turret extends SubsystemBase {
         if(!DriverStation.isEnabled()) 
             return;
 
-        double currentAbsRotations = encoder.getPosition().getValueAsDouble() - TurretConstants.TurrentRotationOffset;
+        
+        double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(currentAbsRotations, TargetRotations);
 
-        SmartDashboard.putNumber("Turret " + m_side.name() + "/Encoder Position", currentAbsRotations);
+        SmartDashboard.putNumber("Turret " + m_side.name() + "/Encoder Position", encoder.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Turret " + m_side.name() + "/Target Angle", TargetRotations);
         SmartDashboard.putNumber("Turret " + m_side.name() + "/Motor Output", motoroutput);
 
@@ -174,7 +172,7 @@ public class Turret extends SubsystemBase {
         if (Math.abs(targetAngle) > 90)
             return;
 
-        TargetRotations = DegreesToRotations(targetAngle);
+        TargetRotations = degreesToRotations(targetAngle);
     }
 
     /**
@@ -189,7 +187,15 @@ public class Turret extends SubsystemBase {
         return rotations * 45.0;
     }
 
-    public double DegreesToRotations(double degrees) {
+    public double degreesToRotations(double degrees) {
         return degrees / 45;
+    }
+
+    public double getRelativeRotation() {
+        if(m_side == TURRET_SIDE.LEFT) {
+            return encoder.getPosition().getValueAsDouble() - TurretConstants.TurrentRotationOffsetLeft;
+        } else {
+            return encoder.getPosition().getValueAsDouble() - TurretConstants.TurrentRotationOffsetRight;
+        }
     }
 }
