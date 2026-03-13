@@ -92,7 +92,7 @@ public class Shooter extends SubsystemBase {
         
         shooterWheel1.setVoltage(totalVoltage);
 
-        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Power Requested", power);
+        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Power Requested", totalVoltage);
     }
 
     public void Hack() {

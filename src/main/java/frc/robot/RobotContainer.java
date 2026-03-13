@@ -142,8 +142,8 @@ public class RobotContainer {
                 // ********************FUNCTIONS For Testing*****************************/
                 // Active shooting commands (3500 RPM ≈ 58.33 RPS)
                 ParallelCommandGroup shootGroup = new ParallelCommandGroup(
-                                Commands.run(() -> leftShooter.Hack(), leftShooter),
-                                Commands.run(() -> rightShooter.Hack(), rightShooter),
+                                leftShooter.runShooterCommand(),
+                                rightShooter.runShooterCommand(),
                                 Commands.waitUntil(() -> leftShooter.isAtSpeed() && rightShooter.isAtSpeed())
                                                 .andThen(m_hopper.runShootCommand()));
 
