@@ -52,7 +52,7 @@ public class Turret extends SubsystemBase {
         TurretMotor = new TalonFX(turretCanId);
 
         var turretConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
-        
+
         // Set Neutral Mode to Brake
         turretConfig.MotorOutput.NeutralMode = com.ctre.phoenix6.signals.NeutralModeValue.Brake;
 
@@ -159,9 +159,6 @@ public class Turret extends SubsystemBase {
             double constrainedTargetDegrees = MathUtil.clamp(targetRelativeDegrees, TurretConstants.MinAngle,
                     TurretConstants.MaxAngle);
 
-            SmartDashboard.putNumber("Turret " + m_side.name() + "/Target Relative Angle", targetRelativeDegrees);
-            SmartDashboard.putNumber("Turret " + m_side.name() + "/Constrained Angle", constrainedTargetDegrees);
-
             // Apply to Motor
             setTargetAngle(constrainedTargetDegrees);
         } else {
@@ -174,10 +171,6 @@ public class Turret extends SubsystemBase {
     public void EvaluateTurret() {              
         double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(currentAbsRotations, TargetRotations);
-
-        SmartDashboard.putNumber("Turret " + m_side.name() + "/Encoder Position", getRelativeRotation());
-        SmartDashboard.putNumber("Turret " + m_side.name() + "/Target Angle", TargetRotations);
-        SmartDashboard.putNumber("Turret " + m_side.name() + "/Motor Output", motoroutput);
 
         TurretMotor.set(motoroutput);
     }
