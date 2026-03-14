@@ -52,18 +52,7 @@ public class Turret extends SubsystemBase {
         TurretMotor = new TalonFX(turretCanId);
 
         var turretConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
-
-        // Configure the TalonFX to use the remote CANcoder for its position measurements
-        // This makes the motor controllers internal soft limits use the CANcoder's rotations
-        // turretConfig.Feedback.FeedbackRemoteSensorID = encoder.getDeviceID();
-        // turretConfig.Feedback.FeedbackSensorSource = com.ctre.phoenix6.signals.FeedbackSensorSourceValue.RemoteCANcoder;
-
-        // Enable and map the Soft Limits 
-        // turretConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        // turretConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 2.1;
-        // turretConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        // turretConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -2.1;
-
+        
         // Set Neutral Mode to Brake
         turretConfig.MotorOutput.NeutralMode = com.ctre.phoenix6.signals.NeutralModeValue.Brake;
 
