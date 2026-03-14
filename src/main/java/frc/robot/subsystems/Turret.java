@@ -6,9 +6,10 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import frc.robot.ShootingKinematics;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -103,10 +104,9 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        if (m_side == TURRENT_SIDE.LEFT)
+        if (DriveTrain == null || zoneDetection == null) {
             return;
-
+        }
         // --- 1. Sensors & State ---
         // Get current position in Rotations
         double currentMotorRotations = TurretMotor.getPosition().getValueAsDouble();
@@ -170,17 +170,17 @@ public class Turret extends SubsystemBase {
 
         if (shouldTrack && targetPose != null) {
             Pose2d currentRobotPose = DriveTrain.getState().Pose;
-            Pose2d turretFieldPose = currentRobotPose.transformBy(
-                    new edu.wpi.first.math.geometry.Transform2d(m_robotOffset, new Rotation2d()));
+            ChassisSpeeds speeds = DriveTrain.getState().Speeds;
 
-            Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
-            double targetFieldDegrees = delta.getAngle().getDegrees();
+            targetRelativeDegrees = ShootingKinematics.getLeadAdjustedAngleDegrees(
+                    currentRobotPose,
+                    speeds,
+                    targetPose.getTranslation(),
+                    Constants.ShootingConstants.BallSpeedMps,
+                    Constants.ShootingConstants.LeadAngleScale);
 
-            SmartDashboard.putNumber("Turret/Target Field Angle", targetFieldDegrees);
-
-            // RobotHeading + TurretRelative = TargetField
-            // TurretRelative = TargetField - RobotHeading
-            targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees;
+            SmartDashboard.putNumber("Turret/Target Field Angle",
+                    robotHeadingDegrees + targetRelativeDegrees);
         } else {
             // Idle / Forward
             targetRelativeDegrees = 0.0;
@@ -209,7 +209,7 @@ public class Turret extends SubsystemBase {
                 TurretConstants.TurretGearRatio;
 
         // Apply to Motor
-        // TurretMotor.setControl(m_request.withPosition(targetRotations));
+        TurretMotor.setControl(m_request.withPosition(targetRotations));
     }
 
     public void setPower(float speed) {
@@ -238,6 +238,12 @@ public class Turret extends SubsystemBase {
 
     public double GetCurrentAngle() {
         return TurretMotor.getPosition().getValueAsDouble() * TurretConstants.TurretGearRatio * 360.0f;
+    }
+
+    /** Returns true if turret is within tolerance of the target angle. */
+    public boolean isOnTarget(double targetDegrees) {
+        double current = GetCurrentAngle();
+        return Math.abs(MathUtil.inputModulus(current - targetDegrees, -180, 180)) <= TurretConstants.kTolerance;
     }
 
     // Kept for reference or backward compatibility if other classes call it

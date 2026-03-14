@@ -120,6 +120,12 @@ public class Shooter extends SubsystemBase {
         return Math.abs(currentSpeedRps - shooterspeed) <= (Math.abs(shooterspeed) * 0.05);
     }
 
+    /** Returns true if shooter is within 5% of target RPM. */
+    public boolean isAtSpeed(double targetRpm) {
+        double currentRpm = shooterWheel1.getEncoder().getVelocity();
+        return Math.abs(currentRpm - targetRpm) <= Math.abs(targetRpm) * 0.05;
+    }
+
     public Hood getHood() {
         return m_hood;
     }

@@ -8,10 +8,12 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,6 +29,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.ZoneDetection;
 import frc.robot.subsystems.Turret.TURRENT_SIDE;
+import frc.robot.Commands.ShootWhileMoving;
 
 public class RobotContainer {
         private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
@@ -106,6 +109,19 @@ public class RobotContainer {
         }
 
         private void configureNamedCommands() {
+                // Shoot While Moving - for use at PathPlanner waypoint events
+                NamedCommands.registerCommand("ShootWhileMoving",
+                                new ShootWhileMoving(
+                                                rightTurret,
+                                                rightShooter,
+                                                rightHood,
+                                                m_hopper,
+                                                () -> drivetrain.getState().Pose,
+                                                () -> drivetrain.getState().Speeds,
+                                                this::getShootTargetTranslation,
+                                                false) // use RightSpin
+                                .withTimeout(15.0)); // Max duration for auto shooting segment
+
                 // Intake Commands
                 // NamedCommands.registerCommand("Intake On", m_intake.runIntakeCommand(() ->
                 // drivetrain.getState().Speeds));
@@ -131,6 +147,35 @@ public class RobotContainer {
                 // Climber Commands
                 // NamedCommands.registerCommand("Climb L1", new Climb(m_climber,
                 // Climb.LEVELS.L1));
+        }
+
+        /** Returns the target translation for shooting (hub or passing corner) based on zone and alliance. */
+        private Translation2d getShootTargetTranslation() {
+                var alliance = DriverStation.getAlliance();
+                if (!alliance.isPresent()) {
+                        return Constants.FieldConstants.BlueTargetPose.getTranslation();
+                }
+                var zone = m_zoneDetection.getZone();
+                Pose2d robotPose = drivetrain.getState().Pose;
+
+                if (alliance.get() == DriverStation.Alliance.Blue) {
+                        if (zone == ZoneDetection.ZONE.BLUE) {
+                                return Constants.FieldConstants.BlueTargetPose.getTranslation();
+                        } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
+                                return robotPose.getY() < Constants.FieldConstants.FieldWidth / 2.0
+                                                ? Constants.FieldConstants.BluePassingCornerRight.getTranslation()
+                                                : Constants.FieldConstants.BluePassingCornerLeft.getTranslation();
+                        }
+                } else {
+                        if (zone == ZoneDetection.ZONE.RED) {
+                                return Constants.FieldConstants.RedTargetPose.getTranslation();
+                        } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
+                                return robotPose.getY() < Constants.FieldConstants.FieldWidth / 2.0
+                                                ? Constants.FieldConstants.RedPassingCornerRight.getTranslation()
+                                                : Constants.FieldConstants.RedPassingCornerLeft.getTranslation();
+                        }
+                }
+                return Constants.FieldConstants.BlueTargetPose.getTranslation();
         }
 
         private void configureBindings() {
