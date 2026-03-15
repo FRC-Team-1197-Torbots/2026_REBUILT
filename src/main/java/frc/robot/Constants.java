@@ -90,7 +90,7 @@ public final class Constants {
     public static final class HoodConstants {
         public static final int HoodCanId1 = 11;
         public static final int HoodCanId2 = 21;
-        public static final double kP = 1.2;
+        public static final double kP = 1.1;
         public static double kI = 0;
         public static double kD = 0;
     }
@@ -107,7 +107,7 @@ public final class Constants {
 
         // Target speeds in RPS (Rotations Per Second)
         public static final double IdleSpeed = 500.0 / 60.0; // 500 RPM
-        public static final double ShootSpeed = 3000.0 / 60.0; // 3000 RPM
+        public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
     }
 
     public static final class TurretConstants {
@@ -123,13 +123,13 @@ public final class Constants {
         public static final int encoderCanID2 = 3;
 
         public static final class LeftTurret {
-            public static final double kP = 0.25d;
+            public static final double kP = 0.3d;
             public static final double kI = 0.0d;
             public static final double kD = 0.0d;
         }
 
         public static final class RightTurret {
-            public static final double kP = 0.25d;
+            public static final double kP = 0.3d;
             public static final double kI = 0.0d;
             public static final double kD = 0.0d;
         }
@@ -146,8 +146,8 @@ public final class Constants {
         // Offset for the absolute CANcoder to treat its starting valid position as 0
         // degrees.
         // Measured in motor rotations. (45 degrees = 1 rotation).
-        public static final double TurrentRotationOffsetLeft = -0.0;
-        public static final double TurrentRotationOffsetRight = -0.27;
+        public static final double TurrentRotationOffsetLeft = -0.13;
+        public static final double TurrentRotationOffsetRight = -0.337;
     }
 
     public static final class FieldConstants {

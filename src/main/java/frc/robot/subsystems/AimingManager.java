@@ -50,16 +50,21 @@ public class AimingManager extends SubsystemBase {
 
         // Trajectory Data: Distance (m) -> Hood Angle (deg)
         // TODO: Tune these placeholder values on the field!
-        hoodMap.put(1.0, 10.0);
-        hoodMap.put(3.0, 25.0);
-        hoodMap.put(5.0, 40.0);
-        hoodMap.put(7.0, 45.0);
+        hoodMap.put(1.78, 0.0);
+        hoodMap.put(1.97, 0.0);
+        hoodMap.put(2.76, 3.0);
+        hoodMap.put(2.58, 3.0);
+        hoodMap.put(3.1, 7.0);
+        hoodMap.put(3.0, 7.0);
 
         // Trajectory Data: Distance (m) -> Shooter Speed (RPS - 3000 RPM is 50 RPS)
         // TODO: Tune these placeholder values on the field!
-        shooterMap.put(1.0, 35.0);
-        shooterMap.put(3.0, 45.0);
-        shooterMap.put(5.0, 50.0);
+        shooterMap.put(1.97, 5000.0/60);
+        shooterMap.put(1.78, 5000.0/60);
+        shooterMap.put(2.76, 5000.0/60);
+        shooterMap.put(2.58, 5000.0/60);
+        shooterMap.put(3.1, 5500.0);
+        shooterMap.put(3.18, 5500.0);
         shooterMap.put(7.0, 55.0);
     }
 

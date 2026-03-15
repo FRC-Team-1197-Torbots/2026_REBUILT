@@ -1,3 +1,4 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -147,7 +148,7 @@ public class RobotContainer {
                                 Commands.waitUntil(() -> leftShooter.isAtSpeed() && rightShooter.isAtSpeed())
                                                 .andThen(m_hopper.runShootCommand()));
 
-                driverController.rightTrigger(0.5f).whileTrue(m_hopper.runShootCommand());
+                driverController.rightTrigger(0.5f).whileTrue(shootGroup);
 
                 // Reset the odometry to the chosen starting pose on BACK press
                 driverController.back().onTrue(drivetrain.runOnce(() -> {
@@ -168,8 +169,8 @@ public class RobotContainer {
                 }, leftHood, rightHood));
 
                 driverController.povUp().onTrue(Commands.runOnce(() -> {
-                        leftHood.setTargetAngle(7);
-                        rightHood.setTargetAngle(7);
+                        leftHood.setTargetAngle(5);
+                        rightHood.setTargetAngle(5);
                 }, leftHood, rightHood));
 
                 driverController.povRight().onTrue(Commands.runOnce(() -> {

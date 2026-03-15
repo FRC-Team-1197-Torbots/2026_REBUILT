@@ -73,6 +73,7 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
+
         // --- 1. Sensors & State ---
         // Get current position in Rotations
         double currentMotorRotations = TurretMotor.getPosition().getValueAsDouble();
@@ -171,6 +172,10 @@ public class Turret extends SubsystemBase {
     public void EvaluateTurret() {              
         double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(currentAbsRotations, TargetRotations);
+
+        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Target Rotation", TargetRotations);
+        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Adjusted Rotation", currentAbsRotations);
+        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Actual Rotation", encoder.getPosition().getValueAsDouble());
 
         TurretMotor.set(motoroutput);
     }

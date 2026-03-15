@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase {
 
         SparkMaxConfig config1 = new SparkMaxConfig();
         config1.idleMode(IdleMode.kCoast);
-        config1.smartCurrentLimit(70);
+        //config1.smartCurrentLimit(70);
 
         // Invert the main motor if it's the left side
         config1.inverted(m_side == SHOOTER_SIDE.LEFT);
