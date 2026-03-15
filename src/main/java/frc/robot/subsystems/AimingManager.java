@@ -27,22 +27,19 @@ public class AimingManager extends SubsystemBase {
     private final ZoneDetection zoneDetection;
 
     // References to the hardware subsystems
-    private final Turret leftTurret;
-    // private final Turret rightTurret;
     private final Hood leftHood;
     private final Hood rightHood;
     private final Shooter leftShooter;
     private final Shooter rightShooter;
 
     // Use WPILib's interpolation map for ball trajectory tuning
-    private final InterpolatingDoubleTreeMap hoodMap = new InterpolatingDoubleTreeMap();
-    private final InterpolatingDoubleTreeMap shooterMap = new InterpolatingDoubleTreeMap();
+    public InterpolatingDoubleTreeMap hoodMap = new InterpolatingDoubleTreeMap();
+    public InterpolatingDoubleTreeMap shooterMap = new InterpolatingDoubleTreeMap();
 
     public AimingManager(CommandSwerveDrivetrain drivetrain, ZoneDetection zoneDetection,
-            Turret leftTurret, Hood leftHood, Hood rightHood, Shooter leftShooter, Shooter rightShooter) {
+            Hood leftHood, Hood rightHood, Shooter leftShooter, Shooter rightShooter) {
         this.drivetrain = drivetrain;
         this.zoneDetection = zoneDetection;
-        this.leftTurret = leftTurret;
         this.leftHood = leftHood;
         this.rightHood = rightHood;
         this.leftShooter = leftShooter;
@@ -75,29 +72,30 @@ public class AimingManager extends SubsystemBase {
         if (targetPose != null) {
             // 1. Get current robot state
             Pose2d currentRobotPose = drivetrain.getState().Pose;
-            double robotHeadingDegrees = currentRobotPose.getRotation().getDegrees();
 
-            // 2. Calculate LEFT Turret & Hood & Shooter
-            calculateAndApplyAiming(currentRobotPose, robotHeadingDegrees, targetPose,
-                    TurretConstants.TurretOffset1, leftTurret, leftHood, leftShooter, "Left");
+            // 2. Calculate LEFT Hood & Shooter
+            calculateAndApplyAiming(currentRobotPose, targetPose,
+                    TurretConstants.TurretOffset1, leftHood, leftShooter, "Left");
 
-            // 3. Calculate RIGHT Turret & Hood & Shooter (when uncommented)
-            // calculateAndApplyAiming(currentRobotPose, robotHeadingDegrees, targetPose,
-            // TurretConstants.TurretOffset2, rightTurret, rightHood, rightShooter, "Right");
+            // 3. Calculate RIGHT Hood & Shooter
+            calculateAndApplyAiming(currentRobotPose, targetPose,
+                    TurretConstants.TurretOffset2, rightHood, rightShooter, "Right");
         } else {
             // Idle state if no target is valid
-            if (leftTurret != null)
-                leftTurret.setTargetAngle(0.0);
             if (leftHood != null)
                 leftHood.setTargetAngle(0.0);
             if (leftShooter != null)
                 leftShooter.runIdle();
+            if (rightHood != null)
+                rightHood.setTargetAngle(0.0);
+            if (rightShooter != null)
+                rightShooter.runIdle();
         }
     }
 
-    private void calculateAndApplyAiming(Pose2d robotPose, double robotHeading, Pose2d targetPose,
-            Translation2d turretOffset, Turret turret, Hood hood, Shooter shooter, String sideName) {
-        if (turret == null && hood == null && shooter == null)
+    private void calculateAndApplyAiming(Pose2d robotPose, Pose2d targetPose,
+            Translation2d turretOffset, Hood hood, Shooter shooter, String sideName) {
+        if (hood == null && shooter == null)
             return;
 
         // Where is the turret actually located on the field based on the robot's
@@ -106,22 +104,6 @@ public class AimingManager extends SubsystemBase {
                 new edu.wpi.first.math.geometry.Transform2d(turretOffset, new Rotation2d()));
 
         Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
-
-        // ------------- YAW (TURRET) MATH -------------
-        double targetFieldDegrees = delta.getAngle().getDegrees();
-        double targetRelativeDegrees = targetFieldDegrees - robotHeading;
-
-        // Wrap the angle to handle the -180/180 degree boundary sign flip
-        targetRelativeDegrees = MathUtil.inputModulus(targetRelativeDegrees, -180.0, 180.0);
-
-        // Optimize the target angle to fit within the valid physical range of the
-        // Turret
-        double constrainedYaw = MathUtil.clamp(targetRelativeDegrees, TurretConstants.MinAngle,
-                TurretConstants.MaxAngle);
-
-        if (turret != null) {
-            turret.setTargetAngle(constrainedYaw);
-        }
 
         // ------------- PITCH (HOOD) MATH & SHOOTER SPEED MATH -------------
         double distanceMeters = delta.getNorm();
@@ -140,7 +122,6 @@ public class AimingManager extends SubsystemBase {
 
         // Telemetry
         SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", distanceMeters);
-        SmartDashboard.putNumber("AimingManager/" + sideName + "/TargetYaw", constrainedYaw);
         SmartDashboard.putNumber("AimingManager/" + sideName + "/TargetPitch", calculatedPitch);
         SmartDashboard.putNumber("AimingManager/" + sideName + "/TargetRPS", calculatedRPS);
     }
