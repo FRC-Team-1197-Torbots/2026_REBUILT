@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import edu.wpi.first.math.MathUtil;
@@ -21,7 +20,6 @@ public class Turret extends SubsystemBase {
     private ZoneDetection zoneDetection;
     private edu.wpi.first.math.geometry.Translation2d m_robotOffset;
     private edu.wpi.first.math.geometry.Transform2d m_turretOffsetTransform;
-    private CANcoder encoder;
 
     private PIDController turrentPID;
     private double TargetRotations;
@@ -36,7 +34,7 @@ public class Turret extends SubsystemBase {
 
     protected TURRET_SIDE m_side;
 
-    public Turret(int turretCanId, int encoderID, edu.wpi.first.math.geometry.Translation2d turretOffset,
+    public Turret(int turretCanId, edu.wpi.first.math.geometry.Translation2d turretOffset,
             SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection, TURRET_SIDE side) {
 
         this.zoneDetection = zoneDetection;
@@ -48,7 +46,6 @@ public class Turret extends SubsystemBase {
         // A Transform2d without a Rotational component simply translates the origin point
         m_turretOffsetTransform = new edu.wpi.first.math.geometry.Transform2d(m_robotOffset, new Rotation2d());
 
-        encoder = new CANcoder(encoderID);
         TurretMotor = new TalonFX(turretCanId);
 
         var turretConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
@@ -167,17 +164,27 @@ public class Turret extends SubsystemBase {
         }
 
         EvaluateTurret();
+
+        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Target Rotation", TargetRotations);
+        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Actual Rotation", TurretMotor.getPosition().getValueAsDouble());
     }
 
     public void EvaluateTurret() {              
         double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(currentAbsRotations, TargetRotations);
 
-        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Target Rotation", TargetRotations);
-        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Adjusted Rotation", currentAbsRotations);
-        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Actual Rotation", encoder.getPosition().getValueAsDouble());
+        // Enforce soft limits
+        double minLimit = (m_side == TURRET_SIDE.LEFT) ? TurretConstants.LeftTurret.MinRotationLimit : TurretConstants.RightTurret.MinRotationLimit;
+        double maxLimit = (m_side == TURRET_SIDE.LEFT) ? TurretConstants.LeftTurret.MaxRotationLimit : TurretConstants.RightTurret.MaxRotationLimit;
 
-        TurretMotor.set(motoroutput);
+        if (currentAbsRotations <= minLimit && motoroutput < 0) {
+            motoroutput = 0; // Prevent driving further negative
+        } else if (currentAbsRotations >= maxLimit && motoroutput > 0) {
+            motoroutput = 0; // Prevent driving further positive
+        }
+
+        // Commented out to allow manual movement for finding limits
+        // TurretMotor.set(motoroutput);
     }
 
     /**
@@ -210,10 +217,6 @@ public class Turret extends SubsystemBase {
     }
 
     public double getRelativeRotation() {
-        if(m_side == TURRET_SIDE.LEFT) {
-            return encoder.getPosition().getValueAsDouble() - TurretConstants.TurrentRotationOffsetLeft;
-        } else {
-            return encoder.getPosition().getValueAsDouble() - TurretConstants.TurrentRotationOffsetRight;
-        }
+        return TurretMotor.getPosition().getValueAsDouble();
     }
 }
