@@ -41,16 +41,6 @@ public class Hood extends SubsystemBase {
           
     }
 
-    public void periodic() {
-        super.periodic();
-                
-        double delta = Math.abs(Target - hoodMain.getPosition().getValueAsDouble());
-
-        if(delta <= PIDTolerance) {
-            hoodMain.setControl(stophoodrequest);
-        }        
-    }
-
     public Command ManualHoodUp() {
         return Commands.runOnce(() -> hoodMain.set(0.3));
     }
