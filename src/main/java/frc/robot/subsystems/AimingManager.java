@@ -75,13 +75,7 @@ public class AimingManager extends SubsystemBase {
             // 3. Calculate RIGHT Hood & Shooter
             calculateAndApplyAiming(currentRobotPose, targetPose,
                     TurretConstants.TurretOffset2, rightHood, rightShooter, "Right");
-        } else {
-            // // Idle state if no target is valid
-            // if (leftHood != null)
-            //     leftHood.setTargetAngle(0.0);
-            // if (rightHood != null)
-            //     rightHood.setTargetAngle(0.0);
-        }
+        } 
     }
 
     private void calculateAndApplyAiming(Pose2d robotPose, Pose2d targetPose,

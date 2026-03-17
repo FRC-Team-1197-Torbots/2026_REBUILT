@@ -169,10 +169,19 @@ public class Turret extends SubsystemBase {
             double distanceToTarget = delta.getNorm();
             SmartDashboard.putNumber("Turret " + m_side.name() + "/Distance to Target (m)", distanceToTarget);
 
-            // RobotHeading + TurretRelative = TargetField
-            // TurretRelative = TargetField - RobotHeading + 180 (Since the turrets are
-            // backwards)
-            double targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees + 180.0;
+            // Calculate the raw difference between where the target is and where the robot is facing
+            double headingDifference = MathUtil.inputModulus(targetFieldDegrees - robotHeadingDegrees, -180.0, 180.0);
+
+            double targetRelativeDegrees;
+
+            // If the robot is generally facing the hub (+/- 90 deg), reset turrets to 0
+            if (Math.abs(headingDifference) < 90.0) {
+                targetRelativeDegrees = 0.0;
+            } else {
+                // RobotHeading + TurretRelative = TargetField
+                // TurretRelative = TargetField - RobotHeading + 180 (Since the turrets are backwards)
+                targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees + 180.0;
+            }
 
             // Wrap the angle to handle the -180/180 degree boundary sign flip
             targetRelativeDegrees = MathUtil.inputModulus(targetRelativeDegrees, -180.0, 180.0);
@@ -208,10 +217,8 @@ public class Turret extends SubsystemBase {
      * @param targetAngle The target angle in degrees relative to the robot's front
      */
     public void setTargetAngle(double targetAngle) {
-        if (Math.abs(targetAngle) > 90)
-            return;
-
-        TargetRotations = degreesToRotations(targetAngle);
+        double clampedAngle = edu.wpi.first.math.MathUtil.clamp(targetAngle, -90.0, 90.0);
+        TargetRotations = degreesToRotations(clampedAngle);
     }
 
     /**
