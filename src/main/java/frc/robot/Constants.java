@@ -121,17 +121,17 @@ public final class Constants {
         public static final edu.wpi.first.math.geometry.Translation2d TurretOffset2 = new edu.wpi.first.math.geometry.Translation2d(
                 Units.inchesToMeters(-6.24), Units.inchesToMeters(8.15)); // right
 
-        public static final int encoderCanID1 = 2;
-        public static final int encoderCanID2 = 3;
+        public static final int encoderCanID1 = 3;
+        public static final int encoderCanID2 = 2;
 
         public static final class LeftTurret {
-            public static final double kP = 0.3d;
+            public static final double kP = 0.4d;
             public static final double kI = 0.0d;
             public static final double kD = 0.0d;
         }
 
         public static final class RightTurret {
-            public static final double kP = 0.3d;
+            public static final double kP = 0.4d;
             public static final double kI = 0.0d;
             public static final double kD = 0.0d;
         }
@@ -148,8 +148,8 @@ public final class Constants {
         // Offset for the absolute CANcoder to treat its starting valid position as 0
         // degrees.
         // Measured in motor rotations. (45 degrees = 1 rotation).
-        public static final double TurrentRotationOffsetLeft = -0.13;
-        public static final double TurrentRotationOffsetRight = -0.337;
+        public static final double TurrentRotationOffsetLeft = -0.00219;
+        public static final double TurrentRotationOffsetRight = -0.5055;
     }
 
     public static final class FieldConstants {

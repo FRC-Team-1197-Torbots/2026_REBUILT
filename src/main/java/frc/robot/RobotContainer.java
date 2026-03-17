@@ -69,16 +69,16 @@ public class RobotContainer {
         // Turrets for testing
         private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2,
                 Constants.TurretConstants.encoderCanID1, Constants.TurretConstants.TurretOffset2,
-                drivetrain, m_zoneDetection, TURRET_SIDE.LEFT);
+                drivetrain, m_zoneDetection, TURRET_SIDE.LEFT, m_intake);
         private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1,
-                Constants.TurretConstants.encoderCanID1, Constants.TurretConstants.TurretOffset1,
-                drivetrain, m_zoneDetection, TURRET_SIDE.RIGHT);
+                Constants.TurretConstants.encoderCanID2, Constants.TurretConstants.TurretOffset1,
+                drivetrain, m_zoneDetection, TURRET_SIDE.RIGHT, m_intake);
 
         private final Hood rightHood = new Hood(Constants.HoodConstants.HoodCanId1, Hood.HOOD_SIDE.RIGHT);
         private final Hood leftHood = new Hood(Constants.HoodConstants.HoodCanId2, Hood.HOOD_SIDE.LEFT);
 
-        private final frc.robot.subsystems.AimingManager m_aimingManager = new frc.robot.subsystems.AimingManager(
-                        drivetrain, m_zoneDetection, leftHood, rightHood, leftShooter, rightShooter);
+        // private final frc.robot.subsystems.AimingManager m_aimingManager = new frc.robot.subsystems.AimingManager(
+        //                 drivetrain, m_zoneDetection, leftHood, rightHood, leftShooter, rightShooter);
 
         private final SendableChooser<Command> autoChooser;
 
@@ -143,24 +143,20 @@ public class RobotContainer {
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup);
 
                 driverController.povDown().onTrue(Commands.runOnce(() -> {
-                        leftHood.setTargetAngle(0);
-                        rightHood.setTargetAngle(0);
-                }, leftHood, rightHood));
+                        leftTurret.setTargetAngle(0);
+                        rightTurret.setTargetAngle(0);
+                }));
 
                 driverController.povLeft().onTrue(Commands.runOnce(() -> {
-                        leftHood.setTargetAngle(3);
-                        rightHood.setTargetAngle(3);
-                }, leftHood, rightHood));
-
-                driverController.povUp().onTrue(Commands.runOnce(() -> {
-                        leftHood.setTargetAngle(5);
-                        rightHood.setTargetAngle(5);
-                }, leftHood, rightHood));
+                        leftTurret.setTargetAngle(10);
+                        rightTurret.setTargetAngle(10);
+                }));
 
                 driverController.povRight().onTrue(Commands.runOnce(() -> {
-                        leftHood.setTargetAngle(10);
-                        rightHood.setTargetAngle(10);
-                }, leftHood, rightHood));
+                        leftTurret.setTargetAngle(-10);
+                        rightTurret.setTargetAngle(-10);
+                }));
+
 
                 // ******************** OVERRIDES *****************************/
                 // Manual encoder resets without touching PID voltages
@@ -175,7 +171,4 @@ public class RobotContainer {
                 return autoChooser.getSelected();
         }
 
-        public void testPeriodic() {
-
-        }
 }

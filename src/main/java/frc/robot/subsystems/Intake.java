@@ -24,11 +24,11 @@ public class Intake extends SubsystemBase {
     private Double m_deployTarget = null;
     private final edu.wpi.first.wpilibj.Timer m_deployTimer = new edu.wpi.first.wpilibj.Timer();
 
-    private enum INTAKE_POSITION {
+    public enum INTAKE_POSITION {
         DEPLOYED, RETRACTED
     };
 
-    private INTAKE_POSITION m_position;
+    public INTAKE_POSITION m_position;
 
     public Intake() {
         intakeMotor = new TalonFX(IntakeConstants.IntakeCanId);

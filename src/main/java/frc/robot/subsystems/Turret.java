@@ -8,10 +8,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.Intake.INTAKE_POSITION;
 import frc.robot.Constants;
 
 public class Turret extends SubsystemBase {
@@ -25,7 +25,7 @@ public class Turret extends SubsystemBase {
 
     private PIDController turrentPID;
     private double TargetRotations;
-    
+
     // Cache for Alliance to reduce JNI overhead
     private java.util.Optional<edu.wpi.first.wpilibj.DriverStation.Alliance> m_alliance = java.util.Optional.empty();
     private int m_allianceCheckDelay = 0;
@@ -35,17 +35,20 @@ public class Turret extends SubsystemBase {
     };
 
     protected TURRET_SIDE m_side;
+    private Intake m_Intake;
 
     public Turret(int turretCanId, int encoderID, edu.wpi.first.math.geometry.Translation2d turretOffset,
-            SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection, TURRET_SIDE side) {
+            SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection, TURRET_SIDE side, Intake intake) {
 
         this.zoneDetection = zoneDetection;
         m_robotOffset = turretOffset;
         m_side = side;
         DriveTrain = drivetrain;
 
-        // Pre-compute the transform here so we don't allocate it in periodic() every 20ms
-        // A Transform2d without a Rotational component simply translates the origin point
+        // Pre-compute the transform here so we don't allocate it in periodic() every
+        // 20ms
+        // A Transform2d without a Rotational component simply translates the origin
+        // point
         m_turretOffsetTransform = new edu.wpi.first.math.geometry.Transform2d(m_robotOffset, new Rotation2d());
 
         encoder = new CANcoder(encoderID);
@@ -60,25 +63,33 @@ public class Turret extends SubsystemBase {
 
         TargetRotations = getRelativeRotation();
 
-        if(side == TURRET_SIDE.LEFT) {
-            turrentPID = new PIDController(Constants.TurretConstants.LeftTurret.kP, Constants.TurretConstants.LeftTurret.kI,
-                Constants.TurretConstants.LeftTurret.kD);
+        if (side == TURRET_SIDE.LEFT) {
+            turrentPID = new PIDController(Constants.TurretConstants.LeftTurret.kP,
+                    Constants.TurretConstants.LeftTurret.kI,
+                    Constants.TurretConstants.LeftTurret.kD);
         } else {
-            turrentPID = new PIDController(Constants.TurretConstants.RightTurret.kP, Constants.TurretConstants.RightTurret.kI,
-                Constants.TurretConstants.RightTurret.kD);
+            turrentPID = new PIDController(Constants.TurretConstants.RightTurret.kP,
+                    Constants.TurretConstants.RightTurret.kI,
+                    Constants.TurretConstants.RightTurret.kD);
         }
 
         turrentPID.disableContinuousInput();
+
+        m_Intake = intake;
+
+        // setTargetAngle(0);
     }
 
     @Override
     public void periodic() {
-
+        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
+                encoder.getPosition().getValueAsDouble());
         // --- 1. Sensors & State ---
         // Get current position in Rotations
         double currentMotorRotations = TurretMotor.getPosition().getValueAsDouble();
-        
-        // Convert to Degrees for Logic, factoring in the CANcoder's physical zero offset
+
+        // Convert to Degrees for Logic, factoring in the CANcoder's physical zero
+        // offset
         double absoluteRotations = getRelativeRotation();
         double currentTurretDegrees = rotationsToDegrees(absoluteRotations);
 
@@ -93,7 +104,7 @@ public class Turret extends SubsystemBase {
             m_allianceCheckDelay--;
         }
         var alliance = m_alliance;
-        
+
         Pose2d targetPose = null;
         boolean shouldTrack = false;
 
@@ -106,7 +117,7 @@ public class Turret extends SubsystemBase {
                 if (zone == ZoneDetection.ZONE.BLUE) {
                     // Home Zone -> Attack Hub
                     targetPose = Constants.FieldConstants.BlueTargetPose;
-                    shouldTrack = true;
+
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
                     // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
@@ -116,13 +127,13 @@ public class Turret extends SubsystemBase {
                     } else {
                         targetPose = Constants.FieldConstants.BluePassingCornerLeft;
                     }
-                    shouldTrack = true;
+
                 }
             } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
                 if (zone == ZoneDetection.ZONE.RED) {
                     // Home Zone -> Attack Hub
                     targetPose = Constants.FieldConstants.RedTargetPose;
-                    shouldTrack = true;
+
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
                     if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth /
@@ -131,15 +142,20 @@ public class Turret extends SubsystemBase {
                     } else {
                         targetPose = Constants.FieldConstants.RedPassingCornerLeft;
                     }
-                    shouldTrack = true;
                 }
             }
+        }
+
+        if (m_Intake.m_position == INTAKE_POSITION.RETRACTED) {
+            shouldTrack = false;
+        } else {
+            shouldTrack = true;
         }
 
         // --- 3. Calculate Desired Angle & Apply Control ---
         if (shouldTrack && targetPose != null) {
             Pose2d currentRobotPose = DriveTrain.getState().Pose;
-            Pose2d turretFieldPose = currentRobotPose.transformBy(m_turretOffsetTransform);            
+            Pose2d turretFieldPose = currentRobotPose.transformBy(m_turretOffsetTransform);
 
             Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
             double targetFieldDegrees = delta.getAngle().getDegrees();
@@ -149,13 +165,14 @@ public class Turret extends SubsystemBase {
             SmartDashboard.putNumber("Turret " + m_side.name() + "/Distance to Target (m)", distanceToTarget);
 
             // RobotHeading + TurretRelative = TargetField
-            // TurretRelative = TargetField - RobotHeading + 180 (Since the turrets are backwards)
+            // TurretRelative = TargetField - RobotHeading + 180 (Since the turrets are
+            // backwards)
             double targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees + 180.0;
 
             // Wrap the angle to handle the -180/180 degree boundary sign flip
             targetRelativeDegrees = MathUtil.inputModulus(targetRelativeDegrees, -180.0, 180.0);
 
-            // Optimize the target angle to fit within the valid range of the Turret 
+            // Optimize the target angle to fit within the valid range of the Turret
             // (-90 to 90 degrees based on Constants)
             double constrainedTargetDegrees = MathUtil.clamp(targetRelativeDegrees, TurretConstants.MinAngle,
                     TurretConstants.MaxAngle);
@@ -169,13 +186,12 @@ public class Turret extends SubsystemBase {
         EvaluateTurret();
     }
 
-    public void EvaluateTurret() {              
+    public void EvaluateTurret() {
         double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(currentAbsRotations, TargetRotations);
 
-        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Target Rotation", TargetRotations);
-        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Adjusted Rotation", currentAbsRotations);
-        SmartDashboard.putNumber("Turrent" + m_side.name() +"/Actual Rotation", encoder.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
+        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Adjusted Rotation", currentAbsRotations);
 
         TurretMotor.set(motoroutput);
     }
@@ -210,7 +226,7 @@ public class Turret extends SubsystemBase {
     }
 
     public double getRelativeRotation() {
-        if(m_side == TURRET_SIDE.LEFT) {
+        if (m_side == TURRET_SIDE.LEFT) {
             return encoder.getPosition().getValueAsDouble() - TurretConstants.TurrentRotationOffsetLeft;
         } else {
             return encoder.getPosition().getValueAsDouble() - TurretConstants.TurrentRotationOffsetRight;

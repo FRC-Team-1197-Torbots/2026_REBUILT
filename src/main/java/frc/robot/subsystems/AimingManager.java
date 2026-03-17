@@ -57,7 +57,7 @@ public class AimingManager extends SubsystemBase {
         shooterMap.put(1.5, 1700.0/60);
         shooterMap.put(1.9, 1900.0/60);
         shooterMap.put(2.4, 2000.0/60);
-        shooterMap.put(2.58, 5000.0/60);
+        
     }
 
     @Override
