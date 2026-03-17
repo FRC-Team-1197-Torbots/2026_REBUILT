@@ -36,6 +36,11 @@ public class AimingManager extends SubsystemBase {
     public InterpolatingDoubleTreeMap hoodMap = new InterpolatingDoubleTreeMap();
     public InterpolatingDoubleTreeMap shooterMap = new InterpolatingDoubleTreeMap();
 
+    // Shoot-on-the-Move Settings
+    public boolean enableShootOnTheMove = false;
+    private final double AVERAGE_PIECE_SPEED_MPS = 10.0; // Needs tuning
+
+
     public AimingManager(CommandSwerveDrivetrain drivetrain, ZoneDetection zoneDetection,
             Hood leftHood, Hood rightHood, Shooter leftShooter, Shooter rightShooter) {
         this.drivetrain = drivetrain;
@@ -60,20 +65,47 @@ public class AimingManager extends SubsystemBase {
         
     }
 
+    public void setShootOnTheMove(boolean enable) {
+        this.enableShootOnTheMove = enable;
+    }
+
+    private Pose2d applyShootOnTheMove(Pose2d robotPose, Pose2d targetPose) {
+        if (!enableShootOnTheMove || targetPose == null) {
+            return targetPose;
+        }
+
+        edu.wpi.first.math.kinematics.ChassisSpeeds speeds = drivetrain.getState().Speeds;
+
+        double distance = targetPose.getTranslation().getDistance(robotPose.getTranslation());
+        double timeOfFlight = distance / AVERAGE_PIECE_SPEED_MPS;
+
+        double offsetX = speeds.vxMetersPerSecond * timeOfFlight;
+        double offsetY = speeds.vyMetersPerSecond * timeOfFlight;
+
+        return new Pose2d(
+                targetPose.getX() - offsetX,
+                targetPose.getY() - offsetY,
+                targetPose.getRotation()
+        );
+    }
+
     @Override
     public void periodic() {
-        Pose2d targetPose = getTargetPose();
+        Pose2d baseTargetPose = getTargetPose();
 
-        if (targetPose != null) {
+        if (baseTargetPose != null) {
             // 1. Get current robot state
             Pose2d currentRobotPose = drivetrain.getState().Pose;
+            
+            // Generate Virtual Target
+            Pose2d virtualTargetPose = applyShootOnTheMove(currentRobotPose, baseTargetPose);
 
             // 2. Calculate LEFT Hood & Shooter
-            calculateAndApplyAiming(currentRobotPose, targetPose,
+            calculateAndApplyAiming(currentRobotPose, virtualTargetPose,
                     TurretConstants.TurretOffset1, leftHood, leftShooter, "Left");
 
             // 3. Calculate RIGHT Hood & Shooter
-            calculateAndApplyAiming(currentRobotPose, targetPose,
+            calculateAndApplyAiming(currentRobotPose, virtualTargetPose,
                     TurretConstants.TurretOffset2, rightHood, rightShooter, "Right");
         } 
     }
