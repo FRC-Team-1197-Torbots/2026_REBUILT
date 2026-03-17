@@ -56,7 +56,7 @@ public class AimingManager extends SubsystemBase {
         // TODO: Tune these placeholder values on the field!
         shooterMap.put(1.5, 1700.0/60);
         shooterMap.put(1.9, 1900.0/60);
-        shooterMap.put(2.4, 2000.0/60);
+        shooterMap.put(2.4, 2500.0/60);
         
     }
 
@@ -76,11 +76,11 @@ public class AimingManager extends SubsystemBase {
             calculateAndApplyAiming(currentRobotPose, targetPose,
                     TurretConstants.TurretOffset2, rightHood, rightShooter, "Right");
         } else {
-            // Idle state if no target is valid
-            if (leftHood != null)
-                leftHood.setTargetAngle(0.0);
-            if (rightHood != null)
-                rightHood.setTargetAngle(0.0);
+            // // Idle state if no target is valid
+            // if (leftHood != null)
+            //     leftHood.setTargetAngle(0.0);
+            // if (rightHood != null)
+            //     rightHood.setTargetAngle(0.0);
         }
     }
 
@@ -106,13 +106,13 @@ public class AimingManager extends SubsystemBase {
         // }
 
         // Calculate Shooter Speed using interpolation map
-        // double calculatedRPS = shooterMap.get(distanceMeters);
-        // if (shooter != null) {
-        //     shooter.Spin(calculatedRPS);
-        // }
+        double calculatedRPS = shooterMap.get(distanceMeters);
+        if (shooter != null) {
+            shooter.setShooterSpeed(calculatedRPS);
+        }
 
         // Telemetry
-        SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", distanceMeters);
+        //SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", distanceMeters);
         // SmartDashboard.putNumber("AimingManager/" + sideName + "/TargetPitch", calculatedPitch);
     }
 

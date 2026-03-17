@@ -81,7 +81,7 @@ public final class Constants {
         public static final double kDeployI = 0.0;
         public static final double kDeployD = 0.0;
 
-        public static final double DeployCurrentLimit = 30.0;
+        public static final double DeployCurrentLimit = 50.0;
 
         // Deploy Positions in Rotations (Placeholder)
         public static final double DeployPosition = 30.0; // Fully Extended
@@ -104,11 +104,11 @@ public final class Constants {
         public static final int ShooterCanId3 = 18;// right
         public static final int ShooterCanId4 = 19;
 
-        public static double kP = 0.0005f;
-        public static final double kV = 0.0021; // Volts per RPM. Roughly 12V / 5600 RPM for a NEO/Vortex
+        public static double kP = 0.0046f;
+        public static final double kV = 0.0025; // Volts per RPM. Roughly 12V / 5600 RPM for a NEO/Vortex
 
         // Target speeds in RPS (Rotations Per Second)
-        public static final double IdleSpeed = 500.0 / 60.0; // 500 RPM
+        public static final double IdleSpeed = 1500.0 / 60.0; // 500 RPM
         public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
     }
 
@@ -148,8 +148,8 @@ public final class Constants {
         // Offset for the absolute CANcoder to treat its starting valid position as 0
         // degrees.
         // Measured in motor rotations. (45 degrees = 1 rotation).
-        public static final double TurrentRotationOffsetLeft = -0.00219;
-        public static final double TurrentRotationOffsetRight = -0.5055;
+        //public static final double TurrentRotationOffsetLeft = -0.00219;
+        //public static final double TurrentRotationOffsetRight = -0.5055;
     }
 
     public static final class FieldConstants {

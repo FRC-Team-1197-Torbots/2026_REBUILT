@@ -85,8 +85,12 @@ public class Shooter extends SubsystemBase {
         Spin(Constants.ShooterConstants.IdleSpeed);
     }
 
-    public void Spin() {
-        Spin(ShooterConstants.ShootSpeed);
+    public void Shoot() {
+        Spin(shooterspeed);
+    }
+
+    public void setShooterSpeed(double speed) {
+        shooterspeed = speed;
     }
 
     public void Stop() {
@@ -95,14 +99,14 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command runShooterCommand() {
-        return run(this::Spin).finallyDo(interrupted -> Stop());
+        return run(this::Shoot).finallyDo(interrupted -> Stop());
     }
 
     public boolean isAtSpeed() {
         // SparkMax returns velocity in RPM
         double currentSpeedRpm = shooterWheel1.getEncoder().getVelocity();
         double currentSpeedRps = currentSpeedRpm / 60.0;
-        return Math.abs(currentSpeedRps - shooterspeed) <= (Math.abs(shooterspeed) * 0.10);
+        return Math.abs(currentSpeedRps - (shooterspeed)) <=  0.5;
     }
 
     @Override
@@ -110,8 +114,10 @@ public class Shooter extends SubsystemBase {
         super.periodic();
 
         SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed",
-                shooterWheel1.getEncoder().getVelocity());
+                shooterWheel1.getEncoder().getVelocity()/60.0);
         SmartDashboard.putBoolean("Shooter " + m_side.name() + "/Is At Speed",
                 isAtSpeed());
+        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Speed Request",
+                shooterspeed);
     }
 }

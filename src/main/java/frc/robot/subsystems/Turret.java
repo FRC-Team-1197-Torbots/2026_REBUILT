@@ -16,6 +16,8 @@ import frc.robot.Constants;
 
 public class Turret extends SubsystemBase {
 
+    private double TurrentRotationOffset = 0;
+
     private TalonFX TurretMotor;
     private SwerveDrivetrain<?, ?, ?> DriveTrain;
     private ZoneDetection zoneDetection;
@@ -52,6 +54,9 @@ public class Turret extends SubsystemBase {
         m_turretOffsetTransform = new edu.wpi.first.math.geometry.Transform2d(m_robotOffset, new Rotation2d());
 
         encoder = new CANcoder(encoderID);
+
+        TurrentRotationOffset = encoder.getPosition().getValueAsDouble();
+
         TurretMotor = new TalonFX(turretCanId);
 
         var turretConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
@@ -226,10 +231,6 @@ public class Turret extends SubsystemBase {
     }
 
     public double getRelativeRotation() {
-        if (m_side == TURRET_SIDE.LEFT) {
-            return encoder.getPosition().getValueAsDouble() - TurretConstants.TurrentRotationOffsetLeft;
-        } else {
-            return encoder.getPosition().getValueAsDouble() - TurretConstants.TurrentRotationOffsetRight;
-        }
+        return encoder.getPosition().getValueAsDouble() - TurrentRotationOffset;
     }
 }
