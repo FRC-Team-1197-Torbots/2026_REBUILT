@@ -72,10 +72,10 @@ public class RobotContainer {
 
         // Turrets for testing
         private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2,
-                        Constants.TurretConstants.encoderCanID1, Constants.TurretConstants.TurretOffset2,
+                        Constants.TurretConstants.encoderCanID1, Constants.TurretConstants.TurretOffset1,
                         drivetrain, m_zoneDetection, TURRET_SIDE.LEFT, m_intake);
         private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1,
-                        Constants.TurretConstants.encoderCanID2, Constants.TurretConstants.TurretOffset1,
+                        Constants.TurretConstants.encoderCanID2, Constants.TurretConstants.TurretOffset2,
                         drivetrain, m_zoneDetection, TURRET_SIDE.RIGHT, m_intake);
 
         private final Hood rightHood = new Hood(Constants.HoodConstants.HoodCanId1, Hood.HOOD_SIDE.RIGHT);

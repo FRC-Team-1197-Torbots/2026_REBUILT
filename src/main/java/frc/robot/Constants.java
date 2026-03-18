@@ -104,11 +104,11 @@ public final class Constants {
         public static final int ShooterCanId3 = 18;// right
         public static final int ShooterCanId4 = 19;
 
-        public static double kP = 0.0046f;
-        public static final double kV = 0.0025; // Volts per RPM. Roughly 12V / 5600 RPM for a NEO/Vortex
+        public static double kP = 0.0035f;
+        public static final double kV = 0.0027; // Volts per RPM. Roughly 12V / 5600 RPM for a NEO/Vortex
 
         // Target speeds in RPS (Rotations Per Second)
-        public static final double IdleSpeed = 1500.0 / 60.0; // 500 RPM
+        public static final double IdleSpeed = 700.0 / 60.0; // 500 RPM
         public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
     }
 
@@ -138,15 +138,15 @@ public final class Constants {
         public static final int TurretCanId2 = 22; // left
 
         public static final edu.wpi.first.math.geometry.Translation2d TurretOffset1 = new edu.wpi.first.math.geometry.Translation2d(
-                Units.inchesToMeters(-6.24), Units.inchesToMeters(-8.15)); // left
+                Units.inchesToMeters(-8.15), Units.inchesToMeters(-6.24)); // left
         public static final edu.wpi.first.math.geometry.Translation2d TurretOffset2 = new edu.wpi.first.math.geometry.Translation2d(
-                Units.inchesToMeters(-6.24), Units.inchesToMeters(8.15)); // right
+                Units.inchesToMeters(8.15), Units.inchesToMeters(-6.24)); // right
 
         public static final int encoderCanID1 = 3;
         public static final int encoderCanID2 = 2;
 
         public static final class LeftTurret {
-            public static final double kP = 0.4d;
+            public static final double kP = 0.43d;
             public static final double kI = 0.0d;
             public static final double kD = 0.0d;
         }
