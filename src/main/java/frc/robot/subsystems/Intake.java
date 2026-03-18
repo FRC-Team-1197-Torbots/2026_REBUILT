@@ -3,6 +3,9 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -232,6 +235,14 @@ public class Intake extends SubsystemBase {
         return run(() -> runIntake(speedSupplier.get())) // Run intake rollers indefinitely
                 .beforeStarting(this::deploy);
     }
+
+    public Command runDeployImmediate(Supplier<ChassisSpeeds> speedSupplier) {
+        return runOnce(() -> runIntake(speedSupplier.get())) // Run intake rollers indefinitely
+                .beforeStarting(this::deploy);
+    }
+
+    public Command runIntakeWheelAuto(Supplier<ChassisSpeeds> speedSupplier) {
+        return run(() -> runIntake(speedSupplier.get())).withTimeout(6.7);     }
 
     // Agitation: Helps push balls towards shooter / unjam
     // Alternates between Forward and Reverse to clear jams

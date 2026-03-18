@@ -68,7 +68,7 @@ public class ShootWhileMoving extends Command {
 
     @Override
     public void initialize() {
-        m_lastTargetAngle = m_turret.GetCurrentAngle();
+        //m_lastTargetAngle = m_turret.GetCurrentAngle();
     }
 
     @Override
@@ -94,32 +94,32 @@ public class ShootWhileMoving extends Command {
 
         m_turret.setTargetAngle(m_lastTargetAngle);
 
-        double rpm = ShootingKinematics.getShooterRPMForDistance(distance);
-        if (m_useLeftShooter) {
-            m_shooter.LeftSpin(rpm);
-        } else {
-            m_shooter.RightSpin(rpm);
-        }
+        // double rpm = ShootingKinematics.getShooterRPMForDistance(distance);
+        // if (m_useLeftShooter) {
+        //     m_shooter.LeftSpin(rpm);
+        // } else {
+        //     m_shooter.RightSpin(rpm);
+        // }
 
-        if (m_hood != null) {
-            double hoodAngle = ShootingKinematics.getHoodAngleForDistance(distance);
-            m_hood.setTargetAngle(hoodAngle);
-        }
+        // if (m_hood != null) {
+        //     double hoodAngle = ShootingKinematics.getHoodAngleForDistance(distance);
+        //     m_hood.setTargetAngle(hoodAngle);
+        // }
 
-        if (m_turret.isOnTarget(m_lastTargetAngle) && m_shooter.isAtSpeed(rpm)) {
-            m_hopper.feed(Constants.HopperConstants.HopperFeedSpeed);
-        } else {
-            m_hopper.stop();
-        }
+        // if (m_turret.isOnTarget(m_lastTargetAngle) && m_shooter.isAtSpeed(rpm)) {
+        //     m_hopper.feed(Constants.HopperConstants.HopperFeedSpeed);
+        // } else {
+        //     m_hopper.stop();
+        // }
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        m_hopper.stop();
-        if (m_useLeftShooter) {
-            m_shooter.LeftSpin(0);
-        } else {
-            m_shooter.RightSpin(0);
-        }
-    }
+    // @Override
+    // public void end(boolean interrupted) {
+    //     m_hopper.stop();
+    //     if (m_useLeftShooter) {
+    //         m_shooter.LeftSpin(0);
+    //     } else {
+    //         m_shooter.RightSpin(0);
+    //     }
+    // }
 }

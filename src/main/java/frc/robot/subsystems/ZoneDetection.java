@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
@@ -39,8 +40,10 @@ public class ZoneDetection extends SubsystemBase {
     }
 
     private void updatePoseEstimation() {
-        for (String limelightName : limelightNames) {
-            processLimelight(limelightName);
+        if (DriverStation.isTeleop()) {
+            for (String limelightName : limelightNames) {
+                processLimelight(limelightName);
+            }
         }
     }
 
@@ -90,7 +93,7 @@ public class ZoneDetection extends SubsystemBase {
         // //megatag1 in case
         PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
 
-        if(mt2 == null)
+        if (mt2 == null)
             return;
 
         // Basic validation: must have tags and not be an empty pose

@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -44,6 +46,8 @@ public class RobotContainer {
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
         private final CommandXboxController driverController = new CommandXboxController(0);
+
+        
         // private final CommandXboxController overrideController = new
         // CommandXboxController(1);
         /***************************
@@ -82,6 +86,12 @@ public class RobotContainer {
 
         private final SendableChooser<Command> autoChooser;
 
+        ParallelCommandGroup shootGroup = new ParallelCommandGroup(
+                                leftShooter.runShooterCommand(),
+                                rightShooter.runShooterCommand(),
+                                Commands.waitUntil(() -> leftShooter.isAtSpeed() && rightShooter.isAtSpeed())
+                                                .andThen(m_hopper.runShootCommand()));
+
         public RobotContainer() {
                 configureNamedCommands();
                 configureBindings();
@@ -91,7 +101,9 @@ public class RobotContainer {
         }
 
         private void configureNamedCommands() {
-
+                NamedCommands.registerCommand("intake on", m_intake.runDeployImmediate(() -> drivetrain.getState().Speeds));
+                NamedCommands.registerCommand("run intake", m_intake.runIntakeWheelAuto(() -> drivetrain.getState().Speeds));
+                NamedCommands.registerCommand("shoot balls", shootGroup);
         }
 
         private void configureBindings() {
@@ -134,11 +146,7 @@ public class RobotContainer {
 
                 // ********************FUNCTIONS For Testing*****************************/
                 // Active shooting commands (3500 RPM ≈ 58.33 RPS)
-                ParallelCommandGroup shootGroup = new ParallelCommandGroup(
-                                leftShooter.runShooterCommand(),
-                                rightShooter.runShooterCommand(),
-                                Commands.waitUntil(() -> leftShooter.isAtSpeed() && rightShooter.isAtSpeed())
-                                                .andThen(m_hopper.runShootCommand()));
+                
 
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup);
 

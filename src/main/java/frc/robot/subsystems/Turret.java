@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
@@ -207,7 +208,8 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
         SmartDashboard.putNumber("Turrent" + m_side.name() + "/Adjusted Rotation", currentAbsRotations);
 
-        TurretMotor.set(motoroutput);
+        if(DriverStation.isTeleop())
+            TurretMotor.set(motoroutput);
     }
 
     /**
