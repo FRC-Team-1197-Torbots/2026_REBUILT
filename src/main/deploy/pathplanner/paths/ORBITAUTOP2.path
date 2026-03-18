@@ -3,83 +3,84 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.467156626506024,
-        "y": 0.5490602409638552
+        "x": 3.5984623655913985,
+        "y": 0.5599879518072293
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.980759036144579,
-        "y": 0.4288554216867476
+        "x": 4.684067966266886,
+        "y": 0.664513724004375
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ORBITSHOOT"
     },
     {
       "anchor": {
-        "x": 7.603409638554217,
-        "y": 1.9368795180722884
+        "x": 7.484908602150537,
+        "y": 1.6407150537634423
       },
       "prevControl": {
-        "x": 7.514641876866286,
-        "y": 0.4081014001134915
+        "x": 7.10946609410066,
+        "y": 0.7693176276723716
       },
       "nextControl": {
-        "x": 7.701759036144578,
-        "y": 3.630674698795181
+        "x": 7.8798924731182804,
+        "y": 2.557467741935485
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.603409638554217,
-        "y": 5.750650602409639
+        "x": 7.592188172043009,
+        "y": 3.5376129032258072
       },
       "prevControl": {
-        "x": 7.7989609121437535,
-        "y": 5.349770491551087
+        "x": 7.825409781512305,
+        "y": 3.627655564651036
       },
       "nextControl": {
-        "x": 7.166301204819278,
-        "y": 6.646722891566265
+        "x": 2.4769032258064536,
+        "y": 1.562693548387097
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.2978915662650605,
-        "y": 5.718
+        "x": 1.3504677419354847,
+        "y": 2.6257365591397854
       },
       "prevControl": {
-        "x": 4.439011145021043,
-        "y": 5.118912221153097
+        "x": 1.8771129032258074,
+        "y": 3.64794753206374
       },
       "nextControl": null,
-      "isLocked": true,
-      "linkedName": null
+      "isLocked": false,
+      "linkedName": "HUMAN BALLS"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.8846473029045727,
+      "waypointRelativePos": 1.2197309417040354,
       "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 2.3775933609958244,
+      "waypointRelativePos": 1.8699551569506674,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 2.1255605381165923,
+      "rotationDegrees": 135.0
+    },
+    {
+      "waypointRelativePos": 2.3632286995515766,
       "rotationDegrees": 135.0
     }
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "ShootWhileMoving",
-      "waypointRelativePos": 0.9241573033707929,
-      "endWaypointRelativePos": 2.323033707865176,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.5,
     "maxAcceleration": 3.5,
@@ -90,13 +91,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 135.0
+    "rotation": 178.11181199325904
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -1.5259769606429463
   },
   "useDefaultConstraints": true
 }

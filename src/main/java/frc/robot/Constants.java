@@ -112,6 +112,27 @@ public final class Constants {
         public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
     }
 
+    /** Constants for shoot-while-moving (velocity-based lead angle). */
+    public static final class ShootingConstants {
+        /** Estimated ball exit velocity in m/s for time-of-flight. Tune via testing. */
+        public static final double BallSpeedMps = 12.0;
+        /** Tunable scale for lead angle (1.0 = nominal). */
+        public static final double LeadAngleScale = 1.0;
+        /** Min robot velocity (m/s) to apply lead - below this use static aim. */
+        public static final double VelocityThresholdMps = 0.3;
+        /** Time-of-flight clamp (s) to avoid huge lead at point-blank. */
+        public static final double MinTimeOfFlight = 0.1;
+        public static final double MaxTimeOfFlight = 1.0;
+        /** Base shooter RPM at close range. Scale up with distance. */
+        public static final double BaseShooterRPM = 3600.0;
+        /** RPM per meter of distance (linear scaling). */
+        public static final double RpmPerMeter = 100.0;
+        /** Base hood angle (deg) at close range. */
+        public static final double BaseHoodAngleDeg = 15.0;
+        /** Hood angle per meter of distance (deg). */
+        public static final double HoodAnglePerMeter = 2.0;
+    }
+
     public static final class TurretConstants {
         public static final int TurretCanId1 = 12; // right
         public static final int TurretCanId2 = 22; // left

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.3504677419354847,
+        "y": 2.6257365591397854
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.5143153084835639,
+        "y": 2.8674791865513267
+      },
+      "isLocked": false,
+      "linkedName": "HUMAN BALLS"
+    },
+    {
+      "anchor": {
+        "x": 1.462623655913979,
+        "y": 2.654994623655915
+      },
+      "prevControl": {
+        "x": 1.3203570803489604,
+        "y": 2.3931248069270072
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 360.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -179.4093427853532
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 178.11181199325904
+  },
+  "useDefaultConstraints": true
+}
