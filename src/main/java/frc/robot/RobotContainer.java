@@ -72,23 +72,23 @@ public class RobotContainer {
 
         // Turrets for testing
         private final Turret leftTurret = new Turret(Constants.TurretConstants.TurretCanId2,
-                        Constants.TurretConstants.encoderCanID1, Constants.TurretConstants.TurretOffset1,
+                        Constants.TurretConstants.encoderCanID1, Constants.TurretConstants.TurretOffset2,
                         drivetrain, m_zoneDetection, TURRET_SIDE.LEFT, m_intake);
         private final Turret rightTurret = new Turret(Constants.TurretConstants.TurretCanId1,
-                        Constants.TurretConstants.encoderCanID2, Constants.TurretConstants.TurretOffset2,
+                        Constants.TurretConstants.encoderCanID2, Constants.TurretConstants.TurretOffset1,
                         drivetrain, m_zoneDetection, TURRET_SIDE.RIGHT, m_intake);
 
         private final Hood rightHood = new Hood(Constants.HoodConstants.HoodCanId1, Hood.HOOD_SIDE.RIGHT);
         private final Hood leftHood = new Hood(Constants.HoodConstants.HoodCanId2, Hood.HOOD_SIDE.LEFT);
 
         private final frc.robot.subsystems.AimingManager m_aimingManager = new
-        frc.robot.subsystems.AimingManager(drivetrain, m_zoneDetection, leftHood, rightHood, leftShooter, rightShooter);
+        frc.robot.subsystems.AimingManager(drivetrain, m_zoneDetection, leftTurret, rightTurret, leftShooter, rightShooter);
 
         private final SendableChooser<Command> autoChooser;
 
         Command shootGroup = new ParallelDeadlineGroup(
-                                Commands.waitUntil(() -> leftShooter.isAtSpeed() || rightShooter.isAtSpeed()).withTimeout(1.5)
-                                                .andThen(m_hopper.runShootFeedCommand()),
+                                Commands.waitUntil(() -> leftShooter.isAtSpeed() && rightShooter.isAtSpeed()).withTimeout(1)
+                                                .andThen(m_hopper.runShootCommand()),
                                 leftShooter.runShooterCommand(),
                                 rightShooter.runShooterCommand());
 
@@ -144,11 +144,12 @@ public class RobotContainer {
                 // // Click to retract intake
                 driverController.leftBumper().onTrue(m_intake.runRetractCommand());
 
-                // ********************FUNCTIONS For Testing*****************************/
-                // Active shooting commands (3500 RPM ≈ 58.33 RPS)
-                
-
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup);
+
+                //////////////////////Testing functions//////////////////////////
+                driverController.a().whileTrue(m_intake.runAgiCommand())
+                        .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
+                
 
                 // ******************** OVERRIDES *****************************/
                 // Manual encoder resets without touching PID voltages

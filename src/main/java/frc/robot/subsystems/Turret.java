@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
@@ -9,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
@@ -55,6 +58,8 @@ public class Turret extends SubsystemBase {
         m_turretOffsetTransform = new edu.wpi.first.math.geometry.Transform2d(m_robotOffset, new Rotation2d());
 
         encoder = new CANcoder(encoderID);
+        encoder.setPosition(0);
+        TargetRotations = 0;
 
         TurrentRotationOffset = encoder.getPosition().getValueAsDouble();
 
@@ -67,7 +72,7 @@ public class Turret extends SubsystemBase {
 
         TurretMotor.getConfigurator().apply(turretConfig);
 
-        TargetRotations = getRelativeRotation();
+        
 
         if (side == TURRET_SIDE.LEFT) {
             turrentPID = new PIDController(Constants.TurretConstants.LeftTurret.kP,
@@ -88,8 +93,7 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
-                encoder.getPosition().getValueAsDouble());
+        
         // --- 1. Sensors & State ---
         // Get current position in Rotations
         double currentMotorRotations = TurretMotor.getPosition().getValueAsDouble();
@@ -170,7 +174,6 @@ public class Turret extends SubsystemBase {
 
             // Calculate distance to target (norm of the translation difference)
             double distanceToTarget = delta.getNorm();
-            SmartDashboard.putNumber("Turret " + m_side.name() + "/Distance to Target (m)", distanceToTarget);
 
             // Calculate the raw difference between where the target is and where the robot
             // is facing
@@ -206,11 +209,12 @@ public class Turret extends SubsystemBase {
     }
 
     public void EvaluateTurret() {
-        double currentAbsRotations = getRelativeRotation();
-        double motoroutput = turrentPID.calculate(currentAbsRotations, TargetRotations);
+        // double currentAbsRotations = getRelativeRotation();
+        double motoroutput = turrentPID.calculate(encoder.getPosition().getValueAsDouble(), TargetRotations);
 
         SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
-        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Adjusted Rotation", currentAbsRotations);
+        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
+                encoder.getPosition().getValueAsDouble());
 
         if (DriverStation.isTeleop())
             TurretMotor.set(motoroutput);
@@ -245,5 +249,35 @@ public class Turret extends SubsystemBase {
 
     public double getRelativeRotation() {
         return encoder.getPosition().getValueAsDouble() - TurrentRotationOffset;
+    }
+
+    public double getDistanceToTarget() {
+        Pose2d targetPose = null;
+
+        if (m_allianceCheckDelay <= 0) {
+            m_alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
+            m_allianceCheckDelay = 50; // Check once per second
+        } else {
+            m_allianceCheckDelay--;
+        }
+        var alliance = m_alliance;
+        var color = alliance.get();
+
+        if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
+            targetPose = Constants.FieldConstants.BlueTargetPose;
+        } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
+            targetPose = Constants.FieldConstants.RedTargetPose;
+        }
+
+        Pose2d currentRobotPose = DriveTrain.getState().Pose;
+        Pose2d turretFieldPose = currentRobotPose.transformBy(m_turretOffsetTransform);
+
+        Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
+        double targetFieldDegrees = delta.getAngle().getDegrees();
+
+        // Calculate distance to target (norm of the translation difference)
+        double distanceToTarget = delta.getNorm();
+
+        return distanceToTarget;
     }
 }

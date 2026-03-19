@@ -106,7 +106,7 @@ public class Shooter extends SubsystemBase {
         // SparkMax returns velocity in RPM
         double currentSpeedRpm = shooterWheel1.getEncoder().getVelocity();
         double currentSpeedRps = currentSpeedRpm / 60.0;
-        return Math.abs(currentSpeedRps - (shooterspeed)) <=  0.5;
+        return Math.abs(currentSpeedRps - (shooterspeed)) <=  1.0;
     }
 
     @Override

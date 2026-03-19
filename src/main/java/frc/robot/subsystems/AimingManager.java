@@ -27,8 +27,8 @@ public class AimingManager extends SubsystemBase {
     private final ZoneDetection zoneDetection;
 
     // References to the hardware subsystems
-    private final Hood leftHood;
-    private final Hood rightHood;
+    private final Turret leftturret;
+    private final Turret rightturret;
     private final Shooter leftShooter;
     private final Shooter rightShooter;
 
@@ -42,11 +42,11 @@ public class AimingManager extends SubsystemBase {
 
 
     public AimingManager(CommandSwerveDrivetrain drivetrain, ZoneDetection zoneDetection,
-            Hood leftHood, Hood rightHood, Shooter leftShooter, Shooter rightShooter) {
+            Turret leftTurret, Turret righTurret, Shooter leftShooter, Shooter rightShooter) {
         this.drivetrain = drivetrain;
         this.zoneDetection = zoneDetection;
-        this.leftHood = leftHood;
-        this.rightHood = rightHood;
+        this.leftturret = leftTurret;
+        this.rightturret = righTurret;
         this.leftShooter = leftShooter;
         this.rightShooter = rightShooter;
 
@@ -62,7 +62,7 @@ public class AimingManager extends SubsystemBase {
         shooterMap.put(1.5, 1700.0/60);
         shooterMap.put(1.9, 1900.0/60);
         shooterMap.put(2.4, 2500.0/60);
-        
+        shooterMap.put(4.5, 3700.0/60);
     }
 
     public void setShootOnTheMove(boolean enable) {
@@ -98,32 +98,33 @@ public class AimingManager extends SubsystemBase {
             Pose2d currentRobotPose = drivetrain.getState().Pose;
             
             // Generate Virtual Target
-            Pose2d virtualTargetPose = applyShootOnTheMove(currentRobotPose, baseTargetPose);
+            Pose2d virtualTargetPose = new Pose2d();
 
             // 2. Calculate LEFT Hood & Shooter
             calculateAndApplyAiming(currentRobotPose, virtualTargetPose,
-                    TurretConstants.TurretOffset1, leftHood, leftShooter, "Left");
+                    TurretConstants.TurretOffset2, leftturret, leftShooter, "Left");
 
             // 3. Calculate RIGHT Hood & Shooter
             calculateAndApplyAiming(currentRobotPose, virtualTargetPose,
-                    TurretConstants.TurretOffset2, rightHood, rightShooter, "Right");
+                    TurretConstants.TurretOffset1, rightturret, rightShooter, "Right");
         } 
     }
 
     private void calculateAndApplyAiming(Pose2d robotPose, Pose2d targetPose,
-            Translation2d turretOffset, Hood hood, Shooter shooter, String sideName) {
-        if (hood == null && shooter == null)
+            Translation2d turretOffset, Turret turret, Shooter shooter, String sideName) {
+
+        if (turret == null && shooter == null)
             return;
 
         // Where is the turret actually located on the field based on the robot's
         // center?
-        Pose2d turretFieldPose = robotPose.transformBy(
-                new edu.wpi.first.math.geometry.Transform2d(turretOffset, new Rotation2d()));
+        // Pose2d turretFieldPose = robotPose.transformBy(
+        //         new edu.wpi.first.math.geometry.Transform2d(turretOffset, new Rotation2d()));
 
-        Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
+        // Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
 
-        // ------------- PITCH (HOOD) MATH & SHOOTER SPEED MATH -------------
-        double distanceMeters = delta.getNorm();
+        // // ------------- PITCH (HOOD) MATH & SHOOTER SPEED MATH -------------
+        // double distanceMeters = delta.getNorm();
 
         // Calculate Hood Pitch using interpolation map
         // double calculatedPitch = hoodMap.get(distanceMeters);
@@ -132,13 +133,13 @@ public class AimingManager extends SubsystemBase {
         // }
 
         // Calculate Shooter Speed using interpolation map
-        double calculatedRPS = shooterMap.get(distanceMeters);
+        double calculatedRPS = shooterMap.get(turret.getDistanceToTarget());
         if (shooter != null) {
             shooter.setShooterSpeed(calculatedRPS);
         }
 
         // Telemetry
-        //SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", distanceMeters);
+        SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", turret.getDistanceToTarget());
         // SmartDashboard.putNumber("AimingManager/" + sideName + "/TargetPitch", calculatedPitch);
     }
 

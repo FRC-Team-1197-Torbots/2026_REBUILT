@@ -28,7 +28,7 @@ public class Intake extends SubsystemBase {
     private final edu.wpi.first.wpilibj.Timer m_deployTimer = new edu.wpi.first.wpilibj.Timer();
 
     public enum INTAKE_POSITION {
-        DEPLOYED, RETRACTED
+        DEPLOYED, RETRACTED, AGI
     };
 
     public INTAKE_POSITION m_position;
@@ -89,8 +89,8 @@ public class Intake extends SubsystemBase {
             if (isAtTarget || isStalled) {
                 // If it stalls while retracting, it hit the home position, so zero the encoder.
                 // This ensures repeated deployments remain accurate even if skipping teeth.
-                if (isStalled && m_deployTarget == IntakeConstants.RetractPosition) {
-                    deployMotor.setPosition(0);
+                if (isStalled && m_deployTarget == IntakeConstants.DeployPosition) {
+                    deployMotor.setPosition(30);
                 }
 
                 stopDeploy();
@@ -148,10 +148,19 @@ public class Intake extends SubsystemBase {
         return runOnce(this::stopIntake);
     }
 
+    public void agi() {
+        if(m_position == INTAKE_POSITION.AGI)
+            return;
+
+        m_deployTarget = IntakeConstants.AgiPosition;
+        m_deployTimer.restart();
+        deployMotor.setControl(m_DeployRequest.withPosition(IntakeConstants.AgiPosition));
+    }
+
     // Deployment Methods
     public void deploy() {
-        if (m_position == INTAKE_POSITION.DEPLOYED)
-            return;
+        // if (m_position == INTAKE_POSITION.DEPLOYED)
+        //     return;
 
         m_deployTarget = IntakeConstants.DeployPosition;
         m_deployTimer.restart();
@@ -188,6 +197,10 @@ public class Intake extends SubsystemBase {
 
     public Command runDeployCommand() {
         return runOnce(this::deploy);
+    }
+
+    public Command runAgiCommand() {
+        return runOnce(this::agi);
     }
 
     /**
@@ -245,15 +258,6 @@ public class Intake extends SubsystemBase {
         return run(() -> runIntake(speedSupplier.get())).withTimeout(6.7)
             .beforeStarting(this::deploy);     }
 
-    // Agitation: Helps push balls towards shooter / unjam
-    // Alternates between Forward and Reverse to clear jams
-    public Command runAgitateCommand() {
-        return edu.wpi.first.wpilibj2.command.Commands.sequence(
-                run(() -> setSpeed(-IntakeConstants.IntakeDutyCycle)).withTimeout(0.25), // Reverse for 0.25s
-                run(() -> setSpeed(IntakeConstants.IntakeDutyCycle)).withTimeout(0.25) // Forward for 0.25s
-        ).repeatedly()
-                .finallyDo(interrupted -> stopIntake()); // Should stop the intake, not deploy
-    }
 
     public void setSurfaceSpeed(double mps) {
         double wheelCircumferenceMeters = Units.inchesToMeters(Constants.IntakeConstants.wheelDiameter) * Math.PI;

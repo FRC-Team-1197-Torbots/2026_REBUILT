@@ -87,6 +87,7 @@ public final class Constants {
         public static final double DeployPosition = 30.0; // Fully Extended
         public static final double RetractPosition = 0.0; // Fully Retracted (Home)
         public static final double DeployTolerance = 0.5;
+        public static final double AgiPosition = 24.0;
     }
 
     public static final class HoodConstants {
@@ -104,11 +105,11 @@ public final class Constants {
         public static final int ShooterCanId3 = 18;// right
         public static final int ShooterCanId4 = 19;
 
-        public static double kP = 0.0035f;
-        public static final double kV = 0.0027; // Volts per RPM. Roughly 12V / 5600 RPM for a NEO/Vortex
+        public static double kP = 0.00003f;
+        public static final double kV = 0.0025; // Volts per RPM. Roughly 12V / 5600 RPM for a NEO/Vortex
 
         // Target speeds in RPS (Rotations Per Second)
-        public static final double IdleSpeed = 700.0 / 60.0; // 500 RPM
+        public static final double IdleSpeed = 750.0 / 60.0; // 500 RPM
         public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
     }
 
