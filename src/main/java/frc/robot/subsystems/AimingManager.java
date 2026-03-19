@@ -132,8 +132,14 @@ public class AimingManager extends SubsystemBase {
         //     hood.setTargetAngle(calculatedPitch);
         // }
 
-        // Calculate Shooter Speed using interpolation map
-        double calculatedRPS = shooterMap.get(turret.getDistanceToTarget());
+        // Calculate Shooter Speed using interpolation map or override for passing
+        double calculatedRPS;
+        if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
+            calculatedRPS = 2500.0 / 60.0;
+        } else {
+            calculatedRPS = shooterMap.get(turret.getDistanceToTarget());
+        }
+        
         if (shooter != null) {
             shooter.setShooterSpeed(calculatedRPS);
         }

@@ -86,11 +86,7 @@ public class RobotContainer {
 
         private final SendableChooser<Command> autoChooser;
 
-        Command shootGroup = new ParallelDeadlineGroup(
-                                Commands.waitUntil(() -> leftShooter.isAtSpeed() && rightShooter.isAtSpeed()).withTimeout(1)
-                                                .andThen(m_hopper.runShootCommand()),
-                                leftShooter.runShooterCommand(),
-                                rightShooter.runShooterCommand());
+        Command shootGroup = new frc.robot.Commands.ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection);
 
         public RobotContainer() {
                 configureNamedCommands();
