@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -86,11 +86,11 @@ public class RobotContainer {
 
         private final SendableChooser<Command> autoChooser;
 
-        ParallelCommandGroup shootGroup = new ParallelCommandGroup(
-                                leftShooter.runShooterCommand(),
-                                rightShooter.runShooterCommand(),
+        Command shootGroup = new ParallelDeadlineGroup(
                                 Commands.waitUntil(() -> leftShooter.isAtSpeed() && rightShooter.isAtSpeed())
-                                                .andThen(m_hopper.runShootCommand()));
+                                                .andThen(m_hopper.runShootFeedCommand()),
+                                leftShooter.runShooterCommand(),
+                                rightShooter.runShooterCommand());
 
         public RobotContainer() {
                 configureNamedCommands();

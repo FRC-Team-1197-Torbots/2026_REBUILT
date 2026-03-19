@@ -138,13 +138,25 @@ public class Hopper extends SubsystemBase {
      * Ends when the hopper has been empty (no ball detected) for a set duration.
      */
     public Command runShootFeedCommand() {
-        // Debounce the "empty" signal for 1 second to ensure we don't stop prematurely
-        // between balls.
-        edu.wpi.first.math.filter.Debouncer debouncer = new edu.wpi.first.math.filter.Debouncer(1.0,
-                edu.wpi.first.math.filter.Debouncer.DebounceType.kBoth);
+        // Feed until balls stop passing through the hopper sensors.
+        // We require at least one positive sensor detection (`hasBall()`) so we don't
+        // immediately finish if the sensors start empty.
+        final double kNoBallTimeoutSeconds = 1.0;
 
-        return run(() -> feed(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed))
-                .until(() -> debouncer.calculate(!hasBall()))
+        final edu.wpi.first.wpilibj.Timer noBallTimer = new edu.wpi.first.wpilibj.Timer();
+        noBallTimer.start();
+
+        final boolean[] hasSeenBall = new boolean[] { false };
+
+        return run(() -> {
+            feed(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
+
+            if (hasBall()) {
+                hasSeenBall[0] = true;
+                // Reset the "no ball" timer whenever a ball is detected.
+                noBallTimer.reset();
+            }
+        }).until(() -> hasSeenBall[0] && noBallTimer.hasElapsed(kNoBallTimeoutSeconds))
                 .finallyDo(interrupted -> stop());
     }
 }
