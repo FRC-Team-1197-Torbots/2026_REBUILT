@@ -5,25 +5,19 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "intake on"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "run intake"
-                }
-              },
-              {
                 "type": "path",
                 "data": {
                   "pathName": "simplest auto everrrrrrr"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "run intake"
                 }
               }
             ]

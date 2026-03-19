@@ -242,7 +242,8 @@ public class Intake extends SubsystemBase {
     }
 
     public Command runIntakeWheelAuto(Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get())).withTimeout(6.7);     }
+        return run(() -> runIntake(speedSupplier.get())).withTimeout(6.7)
+            .beforeStarting(this::deploy);     }
 
     // Agitation: Helps push balls towards shooter / unjam
     // Alternates between Forward and Reverse to clear jams

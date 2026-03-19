@@ -87,7 +87,7 @@ public class RobotContainer {
         private final SendableChooser<Command> autoChooser;
 
         Command shootGroup = new ParallelDeadlineGroup(
-                                Commands.waitUntil(() -> leftShooter.isAtSpeed() && rightShooter.isAtSpeed())
+                                Commands.waitUntil(() -> leftShooter.isAtSpeed() || rightShooter.isAtSpeed()).withTimeout(1.5)
                                                 .andThen(m_hopper.runShootFeedCommand()),
                                 leftShooter.runShooterCommand(),
                                 rightShooter.runShooterCommand());

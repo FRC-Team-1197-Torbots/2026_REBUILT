@@ -48,16 +48,16 @@
     },
     {
       "anchor": {
-        "x": 6.805686746987951,
-        "y": 0.8507473118279585
+        "x": 6.248373493975904,
+        "y": 2.9313012048192775
       },
       "prevControl": {
-        "x": 8.005267392149243,
-        "y": 1.250607526881721
+        "x": 6.880506025332394,
+        "y": 3.3222252702634236
       },
       "nextControl": {
-        "x": 5.187528623165567,
-        "y": 0.3113612705538318
+        "x": 5.4178674698795195,
+        "y": 2.4176987951807236
       },
       "isLocked": false,
       "linkedName": null
@@ -68,8 +68,8 @@
         "y": 1.204722891566264
       },
       "prevControl": {
-        "x": 2.8280000000000003,
-        "y": 0.45071084337349476
+        "x": 2.7077951807228917,
+        "y": 2.822024096385543
       },
       "nextControl": null,
       "isLocked": false,
@@ -90,11 +90,11 @@
       "rotationDegrees": 110.0
     },
     {
-      "waypointRelativePos": 3.1701244813278078,
+      "waypointRelativePos": 3.1302904564315335,
       "rotationDegrees": 180.0
     },
     {
-      "waypointRelativePos": 3.4755186721991658,
+      "waypointRelativePos": 3.674688796680493,
       "rotationDegrees": 180.0
     }
   ],
@@ -136,7 +136,7 @@
     },
     {
       "name": "shoot balls",
-      "waypointRelativePos": 3.2674937965260598,
+      "waypointRelativePos": 4.0,
       "endWaypointRelativePos": null,
       "command": null
     }

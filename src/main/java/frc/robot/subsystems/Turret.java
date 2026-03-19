@@ -114,6 +114,12 @@ public class Turret extends SubsystemBase {
         Pose2d targetPose = null;
         boolean shouldTrack = false;
 
+        if (m_Intake.m_position == INTAKE_POSITION.RETRACTED) {
+            shouldTrack = false;
+        } else {
+            shouldTrack = true;
+        }
+
         if (alliance.isPresent() && zoneDetection != null && DriveTrain != null &&
                 m_robotOffset != null) {
             var color = alliance.get();
@@ -127,13 +133,13 @@ public class Turret extends SubsystemBase {
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
                     // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
-                    if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth /
-                            2.0) {
-                        targetPose = Constants.FieldConstants.BluePassingCornerRight;
-                    } else {
-                        targetPose = Constants.FieldConstants.BluePassingCornerLeft;
-                    }
-
+                    // if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth /
+                    // 2.0) {
+                    // targetPose = Constants.FieldConstants.BluePassingCornerRight;
+                    // } else {
+                    // targetPose = Constants.FieldConstants.BluePassingCornerLeft;
+                    // }
+                    shouldTrack = false;
                 }
             } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
                 if (zone == ZoneDetection.ZONE.RED) {
@@ -142,20 +148,16 @@ public class Turret extends SubsystemBase {
 
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
-                    if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth /
-                            2.0) {
-                        targetPose = Constants.FieldConstants.RedPassingCornerRight;
-                    } else {
-                        targetPose = Constants.FieldConstants.RedPassingCornerLeft;
-                    }
+                    // if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth /
+                    // 2.0) {
+                    // targetPose = Constants.FieldConstants.RedPassingCornerRight;
+                    // } else {
+                    // targetPose = Constants.FieldConstants.RedPassingCornerLeft;
+                    // }
+
+                    shouldTrack = false;
                 }
             }
-        }
-
-        if (m_Intake.m_position == INTAKE_POSITION.RETRACTED) {
-            shouldTrack = false;
-        } else {
-            shouldTrack = true;
         }
 
         // --- 3. Calculate Desired Angle & Apply Control ---
@@ -170,7 +172,8 @@ public class Turret extends SubsystemBase {
             double distanceToTarget = delta.getNorm();
             SmartDashboard.putNumber("Turret " + m_side.name() + "/Distance to Target (m)", distanceToTarget);
 
-            // Calculate the raw difference between where the target is and where the robot is facing
+            // Calculate the raw difference between where the target is and where the robot
+            // is facing
             double headingDifference = MathUtil.inputModulus(targetFieldDegrees - robotHeadingDegrees, -180.0, 180.0);
 
             double targetRelativeDegrees;
@@ -180,7 +183,8 @@ public class Turret extends SubsystemBase {
                 targetRelativeDegrees = 0.0;
             } else {
                 // RobotHeading + TurretRelative = TargetField
-                // TurretRelative = TargetField - RobotHeading + 180 (Since the turrets are backwards)
+                // TurretRelative = TargetField - RobotHeading + 180 (Since the turrets are
+                // backwards)
                 targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees + 180.0;
             }
 
@@ -208,7 +212,7 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
         SmartDashboard.putNumber("Turrent" + m_side.name() + "/Adjusted Rotation", currentAbsRotations);
 
-        if(DriverStation.isTeleop())
+        if (DriverStation.isTeleop())
             TurretMotor.set(motoroutput);
     }
 
