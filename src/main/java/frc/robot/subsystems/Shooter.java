@@ -63,10 +63,7 @@ public class Shooter extends SubsystemBase {
         // SparkMax expects RPM, so if RPS is given, convert to RPM
         shooterspeed = speedMeasurement;
         double rpm = speedMeasurement * 60.0;
-
-        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Speed requested",
-                rpm);
-
+        
         // Feedforward does 90% of the work, PID just cleans up the error
         double ffVoltage = m_feedforward.calculate(rpm);
         double pidVoltage = m_pidController.calculate(shooterWheel1.getEncoder().getVelocity(), rpm);
@@ -77,8 +74,6 @@ public class Shooter extends SubsystemBase {
         totalVoltage = MathUtil.clamp(totalVoltage, 0.0, 12.0);
 
         shooterWheel1.setVoltage(totalVoltage);
-
-        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Power Requested", totalVoltage);
     }
 
     public void runIdle() {
