@@ -6,14 +6,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
-    public static final class DriveConstants {
-    }
-
-    public static final class ModuleConstants {
-    }
-
-    public static final class AutoConstants {
-    }
 
     public static final class ClimberConstants {
         public static final Pose2d lowerClimbPosition = new Pose2d(1.066, 2.782, Rotation2d.fromDegrees(90));
@@ -170,8 +162,8 @@ public final class Constants {
         // Offset for the absolute CANcoder to treat its starting valid position as 0
         // degrees.
         // Measured in motor rotations. (45 degrees = 1 rotation).
-        //public static final double TurrentRotationOffsetLeft = -0.00219;
-        //public static final double TurrentRotationOffsetRight = -0.5055;
+        // public static final double TurrentRotationOffsetLeft = -0.00219;
+        // public static final double TurrentRotationOffsetRight = -0.5055;
     }
 
     public static final class FieldConstants {

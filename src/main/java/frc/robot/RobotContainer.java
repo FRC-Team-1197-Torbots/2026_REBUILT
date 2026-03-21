@@ -48,8 +48,7 @@ public class RobotContainer {
         private final CommandXboxController driverController = new CommandXboxController(0);
 
         
-        // private final CommandXboxController overrideController = new
-        // CommandXboxController(1);
+        private final CommandXboxController overrideController = new CommandXboxController(1);
         /***************************
          * CORE SUBSYSTEMS
          ******************************/
@@ -143,7 +142,7 @@ public class RobotContainer {
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup);
 
                 //////////////////////Testing functions//////////////////////////
-                driverController.a().whileTrue(m_intake.runAgiCommand())
+                overrideController.a().whileTrue(m_intake.runAgiCommand())
                         .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
                 
 
