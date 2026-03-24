@@ -178,8 +178,7 @@ public class Turret extends SubsystemBase {
 
             // Calculate distance to target (norm of the translation difference)
             double distanceToTarget = delta.getNorm();
-            SmartDashboard.putNumber("Turrent" + m_side.name() + "/Distance to Target",
-                distanceToTarget);
+            // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Distance to Target", distanceToTarget);
 
             // Calculate the raw difference between where the target is and where the robot
             // is facing
@@ -218,9 +217,8 @@ public class Turret extends SubsystemBase {
         // double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(encoder.getPosition().getValueAsDouble(), TargetRotations);
 
-        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
-        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
-                encoder.getPosition().getValueAsDouble());
+        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
+        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation", encoder.getPosition().getValueAsDouble());
 
         if (DriverStation.isTeleop())
             TurretMotor.set(motoroutput);
