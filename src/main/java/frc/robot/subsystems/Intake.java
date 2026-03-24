@@ -60,7 +60,7 @@ public class Intake extends SubsystemBase {
         deployConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         deployMotor.getConfigurator().apply(deployConfig);
-        deployMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        deployMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Coast);
         deployMotor.setPosition(0); // Assume starting at Retracted (0)
 
         m_position = INTAKE_POSITION.RETRACTED;
@@ -155,6 +155,7 @@ public class Intake extends SubsystemBase {
         m_deployTarget = IntakeConstants.AgiPosition;
         m_deployTimer.restart();
         deployMotor.setControl(m_DeployRequest.withPosition(IntakeConstants.AgiPosition));
+        stopIntake();
     }
 
     // Deployment Methods
@@ -258,6 +259,9 @@ public class Intake extends SubsystemBase {
         return run(() -> runIntake(speedSupplier.get())).withTimeout(6.7)
             .beforeStarting(this::deploy);     }
 
+    public Command deployIntake() {
+        return run(()->deploy());
+    }
 
     public void setSurfaceSpeed(double mps) {
         double wheelCircumferenceMeters = Units.inchesToMeters(Constants.IntakeConstants.wheelDiameter) * Math.PI;

@@ -174,6 +174,8 @@ public class Turret extends SubsystemBase {
 
             // Calculate distance to target (norm of the translation difference)
             double distanceToTarget = delta.getNorm();
+            SmartDashboard.putNumber("Turrent" + m_side.name() + "/Distance to Target",
+                distanceToTarget);
 
             // Calculate the raw difference between where the target is and where the robot
             // is facing

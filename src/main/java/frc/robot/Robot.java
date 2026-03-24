@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
             CommandScheduler.getInstance().cancel(m_autonomousCommand);
         }
 
-        //LimelightHelpers.SetIMUMode(Constants.LimeLightConstants.limelightname, 4);
+        m_robotContainer.teleInit();
     }
 
     @Override

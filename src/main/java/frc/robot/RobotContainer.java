@@ -86,6 +86,8 @@ public class RobotContainer {
         private final SendableChooser<Command> autoChooser;
 
         Command shootGroup = new frc.robot.Commands.ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection);
+        Command shootTimeout4 = new frc.robot.Commands.ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(4);
+        Command shootTimeout3half = new frc.robot.Commands.ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(3.5);
 
         public RobotContainer() {
                 configureNamedCommands();
@@ -97,8 +99,11 @@ public class RobotContainer {
 
         private void configureNamedCommands() {
                 NamedCommands.registerCommand("intake on", m_intake.runDeployImmediate(() -> drivetrain.getState().Speeds));
-                NamedCommands.registerCommand("run intake", m_intake.runIntakeWheelAuto(() -> drivetrain.getState().Speeds));
+                // NamedCommands.registerCommand("run intake", m_intake.runIntakeWheelAuto(() -> drivetrain.getState().Speeds));
                 NamedCommands.registerCommand("shoot balls", shootGroup);
+                NamedCommands.registerCommand("shoot balls 3.5", shootTimeout3half);
+                NamedCommands.registerCommand("shoot balls 4", shootTimeout4);
+                NamedCommands.registerCommand("run intake", m_intake.runDeployCommand());
         }
 
         private void configureBindings() {
@@ -144,6 +149,8 @@ public class RobotContainer {
                 //////////////////////Testing functions//////////////////////////
                 overrideController.a().whileTrue(m_intake.runAgiCommand())
                         .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
+
+                overrideController.rightTrigger(0.5).onTrue(m_hopper.reverseHopper());
                 
 
                 // ******************** OVERRIDES *****************************/
@@ -156,7 +163,12 @@ public class RobotContainer {
         }
 
         public Command getAutonomousCommand() {
+                m_zoneDetection.enableZoneDetection(false); 
                 return autoChooser.getSelected();
+        }
+
+        public void teleInit() {
+                m_zoneDetection.enableZoneDetection(true);
         }
 
 }

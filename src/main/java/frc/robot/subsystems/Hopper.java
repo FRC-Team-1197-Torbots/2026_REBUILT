@@ -127,6 +127,16 @@ public class Hopper extends SubsystemBase {
         }).finallyDo(interrupted -> stop());
     }
 
+    public Command reverseHopper() {
+        return run(() -> {
+            if (hasBall()) {
+                stop();
+            } else {
+                feed(-HopperConstants.HopperFeedSpeed, -HopperConstants.TowerFeedSpeed);
+            }
+        }).finallyDo(interrupted -> stop());
+    }
+
     public Command runShootCommand() {
         return run(() -> {
             feed(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);

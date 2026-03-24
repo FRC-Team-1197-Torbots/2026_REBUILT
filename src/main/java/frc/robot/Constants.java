@@ -52,7 +52,7 @@ public final class Constants {
         // Speeds
         public static final double IntakeDutyCycle = 0.8; // 80% Power
         public static final double Min_Surface_Speed = 4.0; // 4.0 meters/second (approx 50-60% power)
-        public static final double RobotSpeedMultiplier = 1.5d; // Surface speed = Robot Speed * 1.5
+        public static final double RobotSpeedMultiplier = 2d; // Surface speed = Robot Speed * 1.5
         public static final double OuttakeSpeed = -0.4;
 
         public static final double wheelDiameter = 0.75;

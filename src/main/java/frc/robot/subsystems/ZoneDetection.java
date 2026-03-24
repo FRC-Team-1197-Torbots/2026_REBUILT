@@ -23,6 +23,8 @@ public class ZoneDetection extends SubsystemBase {
 
     private final String[] limelightNames = { "limelight-left", "limelight-right" };
 
+    private boolean enableZoneDetection = true;
+
     public ZoneDetection(CommandSwerveDrivetrain drivetrain, Pigeon2 gyro) {
         this.drivetrain = drivetrain;
         m_gyro = gyro;
@@ -31,6 +33,11 @@ public class ZoneDetection extends SubsystemBase {
 
         // Default to Blue if unknown
         myZone = ZONE.BLUE;
+
+    }
+
+    public void autoinit() {
+        enableZoneDetection = false;
     }
 
     @Override
@@ -40,7 +47,7 @@ public class ZoneDetection extends SubsystemBase {
     }
 
     private void updatePoseEstimation() {
-        if (DriverStation.isTeleop()) {
+        if (enableZoneDetection) {
             for (String limelightName : limelightNames) {
                 processLimelight(limelightName);
             }
@@ -131,5 +138,9 @@ public class ZoneDetection extends SubsystemBase {
 
     public ZONE getZone() {
         return myZone;
+    }
+
+    public void enableZoneDetection(boolean bool) {
+        enableZoneDetection = bool;
     }
 }

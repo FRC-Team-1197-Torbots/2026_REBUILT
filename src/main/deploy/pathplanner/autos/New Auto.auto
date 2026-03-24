@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "simple 1"
+            "pathName": "code red path"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "simple 2"
+            "pathName": "code red path 2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
           }
         }
       ]
