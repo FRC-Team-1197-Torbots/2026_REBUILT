@@ -137,12 +137,14 @@ public class Turret extends SubsystemBase {
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
                     // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
-                    // if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth /
-                    // 2.0) {
-                    // targetPose = Constants.FieldConstants.BluePassingCornerRight;
-                    // } else {
-                    // targetPose = Constants.FieldConstants.BluePassingCornerLeft;
-                    // }
+                    if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
+                        targetPose = Constants.FieldConstants.BluePassingCornerRight;
+                    } else {
+                        targetPose = Constants.FieldConstants.BluePassingCornerLeft;
+                    }
+                    shouldTrack = true;
+                } else if (zone == ZoneDetection.ZONE.RED) {
+                    // Opponent Zone -> Zero turrets
                     shouldTrack = false;
                 }
             } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
@@ -152,13 +154,15 @@ public class Turret extends SubsystemBase {
 
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
-                    // if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth /
-                    // 2.0) {
-                    // targetPose = Constants.FieldConstants.RedPassingCornerRight;
-                    // } else {
-                    // targetPose = Constants.FieldConstants.RedPassingCornerLeft;
-                    // }
+                    if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
+                        targetPose = Constants.FieldConstants.RedPassingCornerRight;
+                    } else {
+                        targetPose = Constants.FieldConstants.RedPassingCornerLeft;
+                    }
 
+                    shouldTrack = true;
+                } else if (zone == ZoneDetection.ZONE.BLUE) {
+                    // Opponent Zone -> Zero turrets
                     shouldTrack = false;
                 }
             }
@@ -266,9 +270,21 @@ public class Turret extends SubsystemBase {
         var color = alliance.get();
 
         if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
-            targetPose = Constants.FieldConstants.BlueTargetPose;
+            if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
+                targetPose = (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) 
+                             ? Constants.FieldConstants.BluePassingCornerRight 
+                             : Constants.FieldConstants.BluePassingCornerLeft;
+            } else {
+                targetPose = Constants.FieldConstants.BlueTargetPose;
+            }
         } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
-            targetPose = Constants.FieldConstants.RedTargetPose;
+            if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
+                targetPose = (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) 
+                             ? Constants.FieldConstants.RedPassingCornerRight 
+                             : Constants.FieldConstants.RedPassingCornerLeft;
+            } else {
+                targetPose = Constants.FieldConstants.RedTargetPose;
+            }
         }
 
         Pose2d currentRobotPose = DriveTrain.getState().Pose;
