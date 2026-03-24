@@ -37,13 +37,13 @@ public class ShootCommand extends Command {
             m_leftShooter.Spin(40.0);
             m_rightShooter.Spin(40.0);
             // Pass functionality: dump balls immediately without waiting for max RPS
-            m_hopper.feed(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
+            m_hopper.feedWithAntiJam(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
         } else {
             m_leftShooter.Shoot();
             m_rightShooter.Shoot();
             // Shoot functionality: wait until either shooter is at speed (or timeout)
             if (m_leftShooter.isAtSpeed() || m_rightShooter.isAtSpeed() || m_timer.hasElapsed(1.0)) {
-                m_hopper.feed(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
+                m_hopper.feedWithAntiJam(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
             } else {
                 m_hopper.stop();
             }
