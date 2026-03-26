@@ -70,7 +70,7 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         super.periodic();
 
-        SmartDashboard.putNumber("Intake/Intake Position", deployMotor.getPosition().getValueAsDouble());
+        // SmartDashboard.putNumber("Intake/Intake Position", deployMotor.getPosition().getValueAsDouble());
 
         if (m_deployTarget != null) {
             double currentPos = deployMotor.getPosition().getValueAsDouble();
@@ -95,7 +95,7 @@ public class Intake extends SubsystemBase {
 
                 stopDeploy();
             } else {
-                SmartDashboard.putBoolean("Intake/Stalled", false);
+                // SmartDashboard.putBoolean("Intake/Stalled", false);
             }
         }
     }
