@@ -19,8 +19,8 @@ public class Hopper extends SubsystemBase {
     private final CANrange canRange2;
 
     private Intake m_intake;
-    private VoltageOut voltagecontrol = new VoltageOut(-12);
-    private VoltageOut negvoltagecontrol = new VoltageOut(12);
+    private VoltageOut voltagecontrol = new VoltageOut(10);
+    private VoltageOut negvoltagecontrol = new VoltageOut(-10);
     private VoltageOut voltagestop = new VoltageOut(0);
 
     // References
