@@ -40,7 +40,7 @@ public final class Constants {
         // Interior space is ~10.25 inches (260mm).
         public static final double LaserMinDistance = 200.0;
 
-        public static final double HopperFeedSpeed = 0.7;
+        public static final double HopperFeedSpeed = 0.65;
         public static final double TowerFeedSpeed = 1.0;
 
         public static final int HopperCurrentLimit = 40;
