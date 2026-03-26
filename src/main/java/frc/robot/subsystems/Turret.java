@@ -7,9 +7,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,7 +31,8 @@ public class Turret extends SubsystemBase {
     private edu.wpi.first.math.geometry.Transform2d m_turretOffsetTransform;
     private CANcoder encoder;
 
-    private PIDController turrentPID;
+    private ProfiledPIDController turrentPID;
+    private TrapezoidProfile.Constraints constraints;
     private double TargetRotations;
 
     // Cache for Alliance to reduce JNI overhead
@@ -75,13 +78,17 @@ public class Turret extends SubsystemBase {
         
 
         if (side == TURRET_SIDE.LEFT) {
-            turrentPID = new PIDController(Constants.TurretConstants.LeftTurret.kP,
-                    Constants.TurretConstants.LeftTurret.kI,
-                    Constants.TurretConstants.LeftTurret.kD);
-        } else {
-            turrentPID = new PIDController(Constants.TurretConstants.RightTurret.kP,
+            constraints = new TrapezoidProfile.Constraints(Constants.TurretConstants.LeftTurret.maxVelocity,
+                                        Constants.TurretConstants.LeftTurret.maxAcceleration);
+            turrentPID = new ProfiledPIDController(Constants.TurretConstants.LeftTurret.kP,
+            Constants.TurretConstants.LeftTurret.kI,
+            Constants.TurretConstants.LeftTurret.kD, constraints);
+            } else {
+                constraints = new TrapezoidProfile.Constraints(Constants.TurretConstants.RightTurret.maxVelocity,
+                                            Constants.TurretConstants.RightTurret.maxAcceleration);
+                turrentPID = new ProfiledPIDController(Constants.TurretConstants.RightTurret.kP,
                     Constants.TurretConstants.RightTurret.kI,
-                    Constants.TurretConstants.RightTurret.kD);
+                    Constants.TurretConstants.RightTurret.kD, constraints);
         }
 
         turrentPID.disableContinuousInput();

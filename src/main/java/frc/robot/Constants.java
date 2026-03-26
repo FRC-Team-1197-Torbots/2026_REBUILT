@@ -142,12 +142,16 @@ public final class Constants {
             public static final double kP = 0.43d;
             public static final double kI = 0.0d;
             public static final double kD = 0.0d;
+            public static final double maxVelocity = 0.0;
+            public static final double maxAcceleration = 0.0;
         }
 
         public static final class RightTurret {
             public static final double kP = 0.4d;
             public static final double kI = 0.0d;
             public static final double kD = 0.0d;
+            public static final double maxVelocity = 0.0;
+            public static final double maxAcceleration = 0.0;
         }
         // public static final double kTolerance = 0.0; // Degrees
 

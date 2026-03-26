@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "run intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "code red path mirrored"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot balls 4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "code red path new 2 mirrored"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot balls 3.5"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
