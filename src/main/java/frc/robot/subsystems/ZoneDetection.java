@@ -1,8 +1,11 @@
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
@@ -13,6 +16,8 @@ public class ZoneDetection extends SubsystemBase {
     // private final NetworkTable limelightTable; // No longer holding a single
     // table
     private final CommandSwerveDrivetrain drivetrain;
+
+    private Optional<Alliance> m_alliance;
 
     public enum ZONE {
         RED, NEUTRAL, BLUE
@@ -36,8 +41,30 @@ public class ZoneDetection extends SubsystemBase {
 
     }
 
+    public void teleinit() {
+        m_alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
+
+        if (m_alliance.isPresent()) {
+            if (m_alliance.get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
+                myZone = ZONE.RED;
+            } else {
+                myZone = ZONE.BLUE;
+            }
+        }
+    }
+
     public void autoinit() {
         enableZoneDetection = false;
+
+        m_alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
+
+        if (m_alliance.isPresent()) {
+            if (m_alliance.get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
+                myZone = ZONE.RED;
+            } else {
+                myZone = ZONE.BLUE;
+            }
+        }
     }
 
     @Override
@@ -61,16 +88,9 @@ public class ZoneDetection extends SubsystemBase {
         // Initialization Check: If we are at 0,0 (likely uninitialized), try to guess
         // based on Alliance
         if (botX == 0.0 && drivetrain.getState().Pose.getY() == 0.0) {
-            var alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
-            if (alliance.isPresent()) {
-                if (alliance.get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
-                    myZone = ZONE.RED;
-                } else {
-                    myZone = ZONE.BLUE;
-                }
-            }
+
             // Don't run the coordinate check if we are uninitialized
-            SmartDashboard.putString("Zone", myZone.toString());
+            // SmartDashboard.putString("Zone", myZone.toString());
             return;
         }
 
