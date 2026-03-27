@@ -17,7 +17,8 @@ public class ZoneDetection extends SubsystemBase {
     // table
     private final CommandSwerveDrivetrain drivetrain;
 
-    private Optional<Alliance> m_alliance;
+    private Optional<Alliance> m_alliance = Optional.empty();
+    private int m_allianceCheckDelay = 0;
 
     public enum ZONE {
         RED, NEUTRAL, BLUE
@@ -42,7 +43,7 @@ public class ZoneDetection extends SubsystemBase {
     }
 
     public void teleinit() {
-        m_alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
+        getAlliance(); // Force an update if not already cached
 
         if (m_alliance.isPresent()) {
             if (m_alliance.get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
@@ -56,7 +57,7 @@ public class ZoneDetection extends SubsystemBase {
     public void autoinit() {
         enableZoneDetection = false;
 
-        m_alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
+        getAlliance(); // Force an update
 
         if (m_alliance.isPresent()) {
             if (m_alliance.get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
@@ -65,6 +66,21 @@ public class ZoneDetection extends SubsystemBase {
                 myZone = ZONE.BLUE;
             }
         }
+    }
+
+    public Optional<Alliance> getAlliance() {
+        if (m_alliance.isPresent()) {
+            return m_alliance;
+        }
+
+        if (m_allianceCheckDelay <= 0) {
+            m_alliance = DriverStation.getAlliance();
+            m_allianceCheckDelay = 50; // Check once per second until present
+        } else {
+            m_allianceCheckDelay--;
+        }
+
+        return m_alliance;
     }
 
     @Override

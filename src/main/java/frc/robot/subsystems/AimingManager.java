@@ -91,9 +91,6 @@ public class AimingManager extends SubsystemBase {
         );
     }
 
-    // Reusable instance prevents GC spikes from 50 objects/sec
-    private final Pose2d virtualTargetPose = new Pose2d();
-
     @Override
     public void periodic() {
         Pose2d baseTargetPose = getTargetPose();
@@ -101,22 +98,17 @@ public class AimingManager extends SubsystemBase {
         if (baseTargetPose != null) {
             // 1. Get current robot state
             Pose2d currentRobotPose = drivetrain.getState().Pose;
-            
-            // Generate Virtual Target
-            // (Using the pre-allocated virtualTargetPose instance)
 
             // 2. Calculate LEFT Hood & Shooter
-            calculateAndApplyAiming(currentRobotPose, virtualTargetPose,
-                    TurretConstants.TurretOffset2, leftturret, leftShooter, "Left");
+            calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, "Left");
 
             // 3. Calculate RIGHT Hood & Shooter
-            calculateAndApplyAiming(currentRobotPose, virtualTargetPose,
-                    TurretConstants.TurretOffset1, rightturret, rightShooter, "Right");
+            calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter, "Right");
         } 
     }
 
-    private void calculateAndApplyAiming(Pose2d robotPose, Pose2d targetPose,
-            Translation2d turretOffset, Turret turret, Shooter shooter, String sideName) {
+    private void calculateAndApplyAiming(Pose2d robotPose,
+            Turret turret, Shooter shooter, String sideName) {
 
         if (turret == null && shooter == null)
             return;
@@ -153,9 +145,10 @@ public class AimingManager extends SubsystemBase {
      * ZoneDetection.
      */
     private Pose2d getTargetPose() {
-        var alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
-        if (alliance.isEmpty() || zoneDetection == null)
-            return null;
+        if (zoneDetection == null) return null;
+        
+        var alliance = zoneDetection.getAlliance();
+        if (alliance.isEmpty()) return null;
 
         var color = alliance.get();
         var zone = zoneDetection.getZone();
