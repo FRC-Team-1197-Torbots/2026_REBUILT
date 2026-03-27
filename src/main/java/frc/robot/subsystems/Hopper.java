@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANrange;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HopperConstants;
@@ -19,9 +20,14 @@ public class Hopper extends SubsystemBase {
     private final CANrange canRange2;
 
     private Intake m_intake;
-    private VoltageOut voltagecontrol = new VoltageOut(12);
-    private VoltageOut negvoltagecontrol = new VoltageOut(-12);
+    private VoltageOut voltagecontrol = new VoltageOut(11);
+    private VoltageOut negvoltagecontrol = new VoltageOut(-11);
     private VoltageOut voltagestop = new VoltageOut(0);
+
+    private final Timer m_unjamTimer = new Timer();
+    private boolean isUnjamming = false;
+    private static final double kJamCurrentThreshold = 30.0; // Amps
+    private static final double kUnjamDuration = 0.35; // Seconds
 
     // References
     // private final Intake m_intake;
@@ -51,6 +57,11 @@ public class Hopper extends SubsystemBase {
         m_intake = intake;
     }
 
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Flopper Current", flopperMotor.getStatorCurrent().getValueAsDouble());
+    }
+
     /** Sets both hopper motors to the same speed. */
     public void setSpeed(double flopperspeed, double towerspeed) {
         flopperMotor.set(-flopperspeed);
@@ -65,6 +76,9 @@ public class Hopper extends SubsystemBase {
         flopperMotor.set(0);
         leftTower.setControl(voltagestop);
         rightTower.setControl(voltagestop); 
+        
+        isUnjamming = false;
+        m_unjamTimer.stop();
     }
 
     public void feed(double flopper, double tower) {
@@ -74,6 +88,32 @@ public class Hopper extends SubsystemBase {
 
     public void reverse(double flopper, double tower) {
         setSpeed(-Math.abs(flopper), -Math.abs(tower));
+    }
+
+    /** 
+     * Feeds the shooter but temporarily reverses the flopper if a current spike (jam) is detected. 
+     */
+    public void feedWithAntiJam(double flopper, double tower) {
+        if (isUnjamming) {
+            // Unjamming: Reverse the flopper, keep tower going
+            // m_intake.setSpeed(0.4);
+            setSpeed(-Math.abs(flopper), Math.abs(tower));
+
+            if (m_unjamTimer.hasElapsed(kUnjamDuration)) {
+                isUnjamming = false;
+                m_unjamTimer.stop();
+                m_unjamTimer.reset();
+            }
+        } else {
+            // Normal feed
+            feed(flopper, tower);
+
+            // Check for current spike indicating a jam
+            if (flopperMotor.getStatorCurrent().getValueAsDouble() > kJamCurrentThreshold) {
+                isUnjamming = true;
+                m_unjamTimer.restart();
+            }
+        }
     }
 
     public Command runHopper(double flopper, double tower) {

@@ -60,7 +60,7 @@ public final class Constants {
 
         // Kraken X44 Constants
         // Free speed ~7400 RPM => ~123 RPS. kV = 12V / 123RPS ≈ 0.097
-        public static final double kP = 0.08; // Starting value for velocity control
+        public static final double kP = 0.06; // Starting value for velocity control
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kV = 0.10; // ~0.1V per RPS
@@ -131,9 +131,9 @@ public final class Constants {
         public static final int TurretCanId2 = 22; // left
 
         public static final edu.wpi.first.math.geometry.Translation2d TurretOffset1 = new edu.wpi.first.math.geometry.Translation2d(
-                Units.inchesToMeters(-8.15), Units.inchesToMeters(-6.24)); // left
+                Units.inchesToMeters(-6.24), Units.inchesToMeters(-8.15)); // left
         public static final edu.wpi.first.math.geometry.Translation2d TurretOffset2 = new edu.wpi.first.math.geometry.Translation2d(
-                Units.inchesToMeters(8.15), Units.inchesToMeters(-6.24)); // right
+                Units.inchesToMeters(-6.24), Units.inchesToMeters(8.15)); // right
 
         public static final int encoderCanID1 = 3;
         public static final int encoderCanID2 = 2;

@@ -39,6 +39,7 @@ public class AimingManager extends SubsystemBase {
     // Shoot-on-the-Move Settings
     public boolean enableShootOnTheMove = false;
     private final double AVERAGE_PIECE_SPEED_MPS = 10.0; // Needs tuning
+    private final String shooterTestRpmKey = "Test Rpm";
 
 
     public AimingManager(CommandSwerveDrivetrain drivetrain, ZoneDetection zoneDetection,
@@ -63,6 +64,7 @@ public class AimingManager extends SubsystemBase {
         shooterMap.put(1.9, 1900.0/60);
         shooterMap.put(2.4, 2500.0/60);
         shooterMap.put(4.5, 3700.0/60);
+        SmartDashboard.putNumber(shooterTestRpmKey, 0.0);
     }
 
     public void setShootOnTheMove(boolean enable) {
@@ -120,11 +122,14 @@ public class AimingManager extends SubsystemBase {
             return;
 
         // Calculate Shooter Speed using interpolation map or override for passing
+        
+
+        // double calculatedRPS = SmartDashboard.getNumber(shooterTestRpmKey, 0) / 60.0;
         double calculatedRPS;
         if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
             calculatedRPS = 2500.0 / 60.0;
         } else {
-            calculatedRPS = shooterMap.get(turret.getDistanceToTarget());
+            calculatedRPS = calculateRps(turret.getDistanceToTarget());
         }
         
         if (shooter != null) {
@@ -133,6 +138,14 @@ public class AimingManager extends SubsystemBase {
 
         // Telemetry
         // SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", turret.getDistanceToTarget());
+    }
+
+    private double calculateRps(double d) {
+        // https://docs.google.com/spreadsheets/d/12vaU1FRqllZlERNKd85nal3VIQaEh6twuFeA2sOHeNw/edit?pli=1&gid=0#gid=0
+        double a = 0.386;
+        double b = 7.64;
+        double c = 7.35;    
+        return a * d * d + b * d + c;
     }
 
     /**

@@ -21,7 +21,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "code red path"
+                        "pathName": "code red mirrored path"
                       }
                     },
                     {
@@ -53,7 +53,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "code red path new 2"
+                        "pathName": "code red mirrored path new 2"
                       }
                     },
                     {
