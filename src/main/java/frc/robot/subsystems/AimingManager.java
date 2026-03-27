@@ -91,6 +91,9 @@ public class AimingManager extends SubsystemBase {
         );
     }
 
+    // Reusable instance prevents GC spikes from 50 objects/sec
+    private final Pose2d virtualTargetPose = new Pose2d();
+
     @Override
     public void periodic() {
         Pose2d baseTargetPose = getTargetPose();
@@ -100,7 +103,7 @@ public class AimingManager extends SubsystemBase {
             Pose2d currentRobotPose = drivetrain.getState().Pose;
             
             // Generate Virtual Target
-            Pose2d virtualTargetPose = new Pose2d();
+            // (Using the pre-allocated virtualTargetPose instance)
 
             // 2. Calculate LEFT Hood & Shooter
             calculateAndApplyAiming(currentRobotPose, virtualTargetPose,
@@ -118,22 +121,6 @@ public class AimingManager extends SubsystemBase {
         if (turret == null && shooter == null)
             return;
 
-        // Where is the turret actually located on the field based on the robot's
-        // center?
-        // Pose2d turretFieldPose = robotPose.transformBy(
-        //         new edu.wpi.first.math.geometry.Transform2d(turretOffset, new Rotation2d()));
-
-        // Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
-
-        // // ------------- PITCH (HOOD) MATH & SHOOTER SPEED MATH -------------
-        // double distanceMeters = delta.getNorm();
-
-        // Calculate Hood Pitch using interpolation map
-        // double calculatedPitch = hoodMap.get(distanceMeters);
-        // if (hood != null) {
-        //     hood.setTargetAngle(calculatedPitch);
-        // }
-
         // Calculate Shooter Speed using interpolation map or override for passing
         
 
@@ -150,8 +137,7 @@ public class AimingManager extends SubsystemBase {
         }
 
         // Telemetry
-        SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", turret.getDistanceToTarget());
-        // SmartDashboard.putNumber("AimingManager/" + sideName + "/TargetPitch", calculatedPitch);
+        // SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", turret.getDistanceToTarget());
     }
 
     private double calculateRps(double d) {

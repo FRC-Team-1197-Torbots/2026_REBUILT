@@ -108,11 +108,11 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         super.periodic();
 
-        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed",
-                shooterWheel1.getEncoder().getVelocity()/60.0);
-        SmartDashboard.putBoolean("Shooter " + m_side.name() + "/Is At Speed",
-                isAtSpeed());
-        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Speed Request",
-                shooterspeed);
+        // SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed",
+        //         shooterWheel1.getEncoder().getVelocity()/60.0);
+        // SmartDashboard.putBoolean("Shooter " + m_side.name() + "/Is At Speed",
+        //         isAtSpeed());
+        // SmartDashboard.putNumber("Shooter " + m_side.name() + "/Speed Request",
+        //         shooterspeed);
     }
 }

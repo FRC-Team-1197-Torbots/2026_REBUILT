@@ -105,7 +105,7 @@ public class ZoneDetection extends SubsystemBase {
             myZone = ZONE.NEUTRAL;
         }
 
-        SmartDashboard.putString("Zone", myZone.toString());
+        // SmartDashboard.putString("Zone", myZone.toString());
     }
 
     private void processLimelight(String name) {
@@ -152,8 +152,8 @@ public class ZoneDetection extends SubsystemBase {
                 VecBuilder.fill(xyStdDev, xyStdDev, degStdDev));
 
         // Just push to dashboard for debugging
-        SmartDashboard.putNumber("Vision/" + name + "/TagCount", mt2.tagCount);
-        SmartDashboard.putNumber("Vision/" + name + "/AvgDist", mt2.avgTagDist);
+        // SmartDashboard.putNumber("Vision/" + name + "/TagCount", mt2.tagCount);
+        // SmartDashboard.putNumber("Vision/" + name + "/AvgDist", mt2.avgTagDist);
     }
 
     public ZONE getZone() {
