@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.Optional;
-
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
@@ -10,8 +8,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
@@ -72,8 +68,6 @@ public class Turret extends SubsystemBase {
 
         TurretMotor.getConfigurator().apply(turretConfig);
 
-        
-
         if (side == TURRET_SIDE.LEFT) {
             turrentPID = new PIDController(Constants.TurretConstants.LeftTurret.kP,
                     Constants.TurretConstants.LeftTurret.kI,
@@ -93,7 +87,7 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-        
+
         // --- 1. Sensors & State ---
         // Get current position in Rotations
         double currentMotorRotations = TurretMotor.getPosition().getValueAsDouble();
@@ -175,7 +169,7 @@ public class Turret extends SubsystemBase {
             // Calculate distance to target (norm of the translation difference)
             double distanceToTarget = delta.getNorm();
             SmartDashboard.putNumber("Turrent" + m_side.name() + "/Distance to Target",
-                distanceToTarget);
+                    distanceToTarget);
 
             // Calculate the raw difference between where the target is and where the robot
             // is facing
@@ -214,12 +208,11 @@ public class Turret extends SubsystemBase {
         // double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(encoder.getPosition().getValueAsDouble(), TargetRotations);
 
-        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
-        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
-                encoder.getPosition().getValueAsDouble());
+        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
+        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
+        //         encoder.getPosition().getValueAsDouble());
 
-        if (DriverStation.isTeleop())
-            TurretMotor.set(motoroutput);
+        TurretMotor.set(motoroutput);
     }
 
     /**

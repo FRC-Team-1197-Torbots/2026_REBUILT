@@ -74,11 +74,11 @@ public class ZoneDetection extends SubsystemBase {
     }
 
     private void updatePoseEstimation() {
-        if (enableZoneDetection) {
+        // if (enableZoneDetection) {
             for (String limelightName : limelightNames) {
                 processLimelight(limelightName);
             }
-        }
+        // }
     }
 
     private void updateZone() {

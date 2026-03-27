@@ -20,14 +20,14 @@ public class Hopper extends SubsystemBase {
     private final CANrange canRange2;
 
     private Intake m_intake;
-    private VoltageOut voltagecontrol = new VoltageOut(12);
-    private VoltageOut negvoltagecontrol = new VoltageOut(-12);
+    private VoltageOut voltagecontrol = new VoltageOut(11);
+    private VoltageOut negvoltagecontrol = new VoltageOut(-11);
     private VoltageOut voltagestop = new VoltageOut(0);
 
     private final Timer m_unjamTimer = new Timer();
     private boolean isUnjamming = false;
-    private static final double kJamCurrentThreshold = 40.0; // Amps
-    private static final double kUnjamDuration = 0.25; // Seconds
+    private static final double kJamCurrentThreshold = 30.0; // Amps
+    private static final double kUnjamDuration = 0.35; // Seconds
 
     // References
     // private final Intake m_intake;
@@ -55,6 +55,11 @@ public class Hopper extends SubsystemBase {
         canRange2 = new CANrange(HopperConstants.CanRangeID2);
 
         m_intake = intake;
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Flopper Current", flopperMotor.getStatorCurrent().getValueAsDouble());
     }
 
     /** Sets both hopper motors to the same speed. */
@@ -91,7 +96,7 @@ public class Hopper extends SubsystemBase {
     public void feedWithAntiJam(double flopper, double tower) {
         if (isUnjamming) {
             // Unjamming: Reverse the flopper, keep tower going
-            m_intake.setSpeed(0.4);
+            // m_intake.setSpeed(0.4);
             setSpeed(-Math.abs(flopper), Math.abs(tower));
 
             if (m_unjamTimer.hasElapsed(kUnjamDuration)) {

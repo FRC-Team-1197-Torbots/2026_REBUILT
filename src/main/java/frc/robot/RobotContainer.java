@@ -12,6 +12,9 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -82,7 +85,7 @@ public class RobotContainer {
 
         Command shootGroup = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection);
         Command shootTimeout4 = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(4);
-        Command shootTimeout3half = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(3.5);
+        Command shootTimeout2 = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(2);
 
         public RobotContainer() {
                 configureNamedCommands();
@@ -94,11 +97,10 @@ public class RobotContainer {
 
         private void configureNamedCommands() {
                 NamedCommands.registerCommand("intake on", m_intake.runDeployImmediate(() -> drivetrain.getState().Speeds));
-                // NamedCommands.registerCommand("run intake", m_intake.runIntakeWheelAuto(() -> drivetrain.getState().Speeds));
+                NamedCommands.registerCommand("run intake 1", m_intake.runIntakeWheelAuto1(() -> drivetrain.getState().Speeds));
+                NamedCommands.registerCommand("run intake 2", m_intake.runIntakeWheelAuto2(() -> drivetrain.getState().Speeds));
                 NamedCommands.registerCommand("shoot balls", shootGroup);
-                NamedCommands.registerCommand("shoot balls 3.5", shootTimeout3half);
                 NamedCommands.registerCommand("shoot balls 4", shootTimeout4);
-                NamedCommands.registerCommand("run intake", m_intake.runDeployCommand());
         }
 
         private void configureBindings() {
@@ -135,6 +137,7 @@ public class RobotContainer {
                 // Click to drop intake
                 driverController.rightBumper()
                                 .onTrue(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
+
 
                 // // Click to retract intake
                 driverController.leftBumper().onTrue(m_intake.runRetractCommand());

@@ -90,12 +90,12 @@ public class Intake extends SubsystemBase {
                 // If it stalls while retracting, it hit the home position, so zero the encoder.
                 // This ensures repeated deployments remain accurate even if skipping teeth.
                 if (isStalled && m_deployTarget == IntakeConstants.DeployPosition) {
-                    deployMotor.setPosition(30);
+                    deployMotor.setPosition(IntakeConstants.DeployPosition);
                 }
 
                 stopDeploy();
-            } else {
-                SmartDashboard.putBoolean("Intake/Stalled", false);
+            } else if(isStalled && m_deployTarget == IntakeConstants.RetractPosition) {
+                deployMotor.setPosition(IntakeConstants.RetractPosition);
             }
         }
     }
@@ -149,7 +149,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void agi() {
-        if(m_position == INTAKE_POSITION.AGI)
+        if (m_position == INTAKE_POSITION.AGI)
             return;
 
         m_deployTarget = IntakeConstants.AgiPosition;
@@ -161,7 +161,7 @@ public class Intake extends SubsystemBase {
     // Deployment Methods
     public void deploy() {
         // if (m_position == INTAKE_POSITION.DEPLOYED)
-        //     return;
+        // return;
 
         m_deployTarget = IntakeConstants.DeployPosition;
         m_deployTimer.restart();
@@ -255,12 +255,18 @@ public class Intake extends SubsystemBase {
                 .beforeStarting(this::deploy);
     }
 
-    public Command runIntakeWheelAuto(Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get())).withTimeout(6.7)
-            .beforeStarting(this::deploy);     }
+    public Command runIntakeWheelAuto1(Supplier<ChassisSpeeds> speedSupplier) {
+        return run(() -> runIntake(speedSupplier.get())).withTimeout(4.7)
+                .beforeStarting(this::deploy);
+    }
+
+        public Command runIntakeWheelAuto2(Supplier<ChassisSpeeds> speedSupplier) {
+        return run(() -> runIntake(speedSupplier.get())).withTimeout(6)
+                .beforeStarting(this::deploy);
+    }
 
     public Command deployIntake() {
-        return run(()->deploy());
+        return run(() -> deploy());
     }
 
     public void setSurfaceSpeed(double mps) {
