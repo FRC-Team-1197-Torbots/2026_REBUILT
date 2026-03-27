@@ -163,6 +163,7 @@ public class RobotContainer {
         }
 
         public void teleInit() {
+                m_zoneDetection.teleinit();
                 m_zoneDetection.enableZoneDetection(true);
         }
 
