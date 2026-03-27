@@ -93,9 +93,7 @@ public class Shooter extends SubsystemBase {
         Spin(ShooterConstants.IdleSpeed); // Keep it spinning at idle instead of full stop
     }
 
-    public Command runShooterCommand() {
-        return run(this::Shoot).finallyDo(interrupted -> Stop());
-    }
+
 
     public boolean isAtSpeed() {
         // SparkMax returns velocity in RPM

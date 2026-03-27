@@ -153,19 +153,7 @@ public class Hopper extends SubsystemBase {
         return range1HasBall || range2HasBall;
     }
 
-    /**
-     * Runs Hopper to index balls. Stops if a ball is at the top (hasBall() is
-     * true).
-     */
-    public Command runIndexCommand() {
-        return run(() -> {
-            if (hasBall()) {
-                stop();
-            } else {
-                feed(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
-            }
-        }).finallyDo(interrupted -> stop());
-    }
+
 
     public Command reverseHopper() {
         return run(() -> {

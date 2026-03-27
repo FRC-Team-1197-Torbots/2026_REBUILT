@@ -72,15 +72,7 @@ public class Climber extends SubsystemBase {
         return range.getDistance().getValueAsDouble();
     }
 
-    public Command getAlignToClimbCommand() {
-        Pose2d targetClimbPose = Constants.ClimberConstants.lowerClimbPosition;
 
-        PathConstraints constraints = new PathConstraints(3.5,
-            3.5, Units.degreesToRadians(540),
-            Units.degreesToRadians(360));
-
-        return AutoBuilder.pathfindToPose(targetClimbPose, constraints, 0.0);
-    }
 
     /** Returns true when climber is within Tolerance of the target height. */
     public boolean atHeight(double targetMeters) {

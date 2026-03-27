@@ -41,18 +41,6 @@ public class Hood extends SubsystemBase {
           
     }
 
-    public Command ManualHoodUp() {
-        return Commands.runOnce(() -> hoodMain.set(0.3));
-    }
-
-    public Command ManualHoodDown() {
-        return Commands.runOnce(() -> hoodMain.set(-0.3));
-    }
-
-    public Command ManualHoodStop() {
-        return Commands.runOnce(() -> hoodMain.set(0));
-    }
-
     //provides ticks in degrees
     public void setTargetAngle(double ticks) {
         Target = ticks;
@@ -61,7 +49,5 @@ public class Hood extends SubsystemBase {
         hoodMain.setControl(m_request.withPosition(ticks).withSlot(0));
     }
 
-    public void setPower(double power) {
-        hoodMain.set(power);
-    }
+
 }

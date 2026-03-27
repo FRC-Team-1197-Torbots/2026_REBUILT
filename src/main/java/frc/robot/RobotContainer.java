@@ -139,25 +139,25 @@ public class RobotContainer {
                                 .onTrue(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
 
 
-                // // Click to retract intake
-                driverController.leftBumper().onTrue(m_intake.runRetractCommand());
+                // Click to retract intake safely
+                driverController.leftBumper().onTrue(safeRetractCommand());
 
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup);
 
-                //////////////////////Testing functions//////////////////////////
+                //////////////////////Co Pilot functions//////////////////////////
                 overrideController.a().whileTrue(m_intake.runAgiCommand())
                         .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
 
                 overrideController.rightTrigger(0.5).onTrue(m_hopper.reverseHopper());
-                
 
-                // ******************** OVERRIDES *****************************/
-                // Manual encoder resets without touching PID voltages
-                // overrideController.povUp().onTrue(m_intake.forceRetract());
-                // overrideController.povDown().onTrue(m_intake.forceDeploy());
+        }
 
-                // // Allow the co-driver to auto-home manually or in test mode
-                // overrideController.start().onTrue(m_intake.autoHome());
+        private Command safeRetractCommand() {
+                return Commands.runOnce(() -> {
+                        m_intake.stopIntake();
+                        m_intake.m_position = Intake.INTAKE_POSITION.RETRACTING;
+                }).andThen(Commands.waitUntil(() -> leftTurret.isStraight() && rightTurret.isStraight()))
+                  .andThen(m_intake.runRetractCommand());
         }
 
         public Command getAutonomousCommand() {

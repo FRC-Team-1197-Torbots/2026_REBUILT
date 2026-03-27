@@ -3,11 +3,8 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import java.util.function.Supplier;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +25,7 @@ public class Intake extends SubsystemBase {
     private final edu.wpi.first.wpilibj.Timer m_deployTimer = new edu.wpi.first.wpilibj.Timer();
 
     public enum INTAKE_POSITION {
-        DEPLOYED, RETRACTED, AGI
+        DEPLOYED, RETRACTED, AGI, RETRACTING
     };
 
     public INTAKE_POSITION m_position;
@@ -100,8 +97,16 @@ public class Intake extends SubsystemBase {
         }
     }
 
+    public boolean isRollerLocked() {
+        return m_position == INTAKE_POSITION.AGI || (m_deployTarget != null && m_deployTarget == IntakeConstants.AgiPosition);
+    }
+
     public void setSpeed(double speed) {
-        intakeMotor.set(speed);
+        if (isRollerLocked()) {
+            intakeMotor.set(0.0);
+        } else {
+            intakeMotor.set(speed);
+        }
     }
 
     public void stopIntake() {
@@ -121,9 +126,7 @@ public class Intake extends SubsystemBase {
         setSurfaceSpeed(targetSpeed);
     }
 
-    public void runOuttake() {
-        setSpeed(IntakeConstants.OuttakeSpeed);
-    }
+
 
     public Command runIntakeCommand(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
         return run(() -> runIntake(speedSupplier.get()))
@@ -137,12 +140,7 @@ public class Intake extends SubsystemBase {
                 .finallyDo(interrupted -> stopIntake());
     }
 
-    public Command runOuttakeCommand() {
-        // Assume we want to deploy to outtake as well, to clear the robot frame
-        return run(() -> runOuttake())
-                .beforeStarting(this::deploy)
-                .finallyDo(interrupted -> stopIntake());
-    }
+
 
     public Command stopCommand() {
         return runOnce(this::stopIntake);
@@ -204,41 +202,6 @@ public class Intake extends SubsystemBase {
         return runOnce(this::agi);
     }
 
-    /**
-     * Auto-Homing Routine.
-     * Starts retracting slowly using voltage. If periodic() detects a stall
-     * condition,
-     * it zeroes the encoder and sets target back to retracted.
-     */
-    public Command autoHome() {
-        return run(() -> deployMotor.setVoltage(-5.0))
-                .until(() -> {
-                    double current = Math.abs(deployMotor.getStatorCurrent().getValueAsDouble());
-                    double velocity = deployMotor.getVelocity().getValueAsDouble();
-                    return current > (IntakeConstants.DeployCurrentLimit - 10.0) && Math.abs(velocity) < 0.1;
-                })
-                .finallyDo((interrupted) -> {
-                    deployMotor.setPosition(0);
-                    retract();
-                });
-    }
-
-    // Manual Overrides
-    public Command forceDeploy() {
-        return runOnce(() -> {
-            deployMotor.setPosition(IntakeConstants.DeployPosition);
-            m_position = INTAKE_POSITION.DEPLOYED;
-            m_deployTarget = null;
-        });
-    }
-
-    public Command forceRetract() {
-        return runOnce(() -> {
-            deployMotor.setPosition(IntakeConstants.RetractPosition);
-            m_position = INTAKE_POSITION.RETRACTED;
-            m_deployTarget = null;
-        });
-    }
 
     /**
      * Deploys the intake and runs the rollers.
@@ -270,6 +233,11 @@ public class Intake extends SubsystemBase {
     }
 
     public void setSurfaceSpeed(double mps) {
+        if (isRollerLocked()) {
+            intakeMotor.set(0.0);
+            return;
+        }
+
         double wheelCircumferenceMeters = Units.inchesToMeters(Constants.IntakeConstants.wheelDiameter) * Math.PI;
 
         double targetRPS = (mps / wheelCircumferenceMeters) * Constants.IntakeConstants.gearratio;

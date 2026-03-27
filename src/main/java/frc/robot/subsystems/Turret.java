@@ -112,7 +112,7 @@ public class Turret extends SubsystemBase {
         Pose2d targetPose = null;
         boolean shouldTrack = false;
 
-        if (m_Intake.m_position == INTAKE_POSITION.RETRACTED) {
+        if (m_Intake.m_position == INTAKE_POSITION.RETRACTED || m_Intake.m_position == INTAKE_POSITION.RETRACTING) {
             shouldTrack = false;
         } else {
             shouldTrack = true;
@@ -249,6 +249,11 @@ public class Turret extends SubsystemBase {
 
     public double getRelativeRotation() {
         return encoder.getPosition().getValueAsDouble() - TurrentRotationOffset;
+    }
+
+    public boolean isStraight() {
+        double currentDegrees = rotationsToDegrees(getRelativeRotation());
+        return Math.abs(currentDegrees) < 10.0; // Within 10 degrees of straight
     }
 
     public double getDistanceToTarget() {
