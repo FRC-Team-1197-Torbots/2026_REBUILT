@@ -20,9 +20,7 @@ public class Hopper extends SubsystemBase {
     private final CANrange canRange2;
 
     private Intake m_intake;
-    private VoltageOut voltagecontrol = new VoltageOut(11);
-    private VoltageOut negvoltagecontrol = new VoltageOut(-11);
-    private VoltageOut voltagestop = new VoltageOut(0);
+    private VoltageOut towerVoltageRequest = new VoltageOut(0);
 
     private final Timer m_unjamTimer = new Timer();
     private boolean isUnjamming = false;
@@ -65,8 +63,8 @@ public class Hopper extends SubsystemBase {
     /** Sets both hopper motors to the same speed. */
     public void setSpeed(double flopperspeed, double towerspeed) {
         flopperMotor.set(-flopperspeed);
-        leftTower.setControl(voltagecontrol);
-        rightTower.setControl(negvoltagecontrol);
+        leftTower.setControl(towerVoltageRequest.withOutput(towerspeed * 11.0));
+        rightTower.setControl(towerVoltageRequest.withOutput(-towerspeed * 11.0));
     }
 
     public void stop() {
@@ -74,8 +72,8 @@ public class Hopper extends SubsystemBase {
         //setSpeed(0.0, 0.0);
 
         flopperMotor.set(0);
-        leftTower.setControl(voltagestop);
-        rightTower.setControl(voltagestop); 
+        leftTower.setControl(towerVoltageRequest.withOutput(0));
+        rightTower.setControl(towerVoltageRequest.withOutput(0));
         
         isUnjamming = false;
         m_unjamTimer.stop();
@@ -157,11 +155,8 @@ public class Hopper extends SubsystemBase {
 
     public Command reverseHopper() {
         return run(() -> {
-            if (hasBall()) {
-                stop();
-            } else {
-                feed(-HopperConstants.HopperFeedSpeed, -HopperConstants.TowerFeedSpeed);
-            }
+            // Bypass ball check to actively force a reverse for unjamming
+            reverse(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
         }).finallyDo(interrupted -> stop());
     }
 

@@ -84,15 +84,17 @@ public class Intake extends SubsystemBase {
                     Math.abs(velocity) < 0.1;
 
             if (isAtTarget || isStalled) {
-                // If it stalls while retracting, it hit the home position, so zero the encoder.
-                // This ensures repeated deployments remain accurate even if skipping teeth.
-                if (isStalled && m_deployTarget == IntakeConstants.DeployPosition) {
-                    deployMotor.setPosition(IntakeConstants.DeployPosition);
+                // If it stalls at either end, assume it hit the physical hard stop and reset the encoder
+                // This ensures repeated deployments remain accurate even if the mechanism skips teeth.
+                if (isStalled) {
+                    if (m_deployTarget == IntakeConstants.DeployPosition) {
+                        deployMotor.setPosition(IntakeConstants.DeployPosition);
+                    } else if (m_deployTarget == IntakeConstants.RetractPosition) {
+                        deployMotor.setPosition(IntakeConstants.RetractPosition);
+                    }
                 }
 
                 stopDeploy();
-            } else if(isStalled && m_deployTarget == IntakeConstants.RetractPosition) {
-                deployMotor.setPosition(IntakeConstants.RetractPosition);
             }
         }
     }
