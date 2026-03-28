@@ -261,4 +261,8 @@ public class Turret extends SubsystemBase {
     public double getDistanceToTarget() {
         return m_distanceToTarget;
     }
+
+    public void zeroTurret() {
+        encoder.setPosition(0);
+    }
 }
