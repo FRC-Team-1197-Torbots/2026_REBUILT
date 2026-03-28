@@ -80,7 +80,7 @@ public class Hopper extends SubsystemBase {
     }
 
     public void feed(double flopper, double tower) {
-        m_intake.setSpeed(0.4);
+        // m_intake.setSpeed(0.4);
         setSpeed(Math.abs(flopper), Math.abs(tower));
     }
 

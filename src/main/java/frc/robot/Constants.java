@@ -156,8 +156,8 @@ public final class Constants {
         // Gear Ratio: 240/24 = 10:1 reduction
         public static final double TurretGearRatio = 1f / 8f;
 
-        public static final double MinAngle = -90;
-        public static final double MaxAngle = 90; // need to convert to angle and eventually use radians
+        public static final double MinAngle = -80;
+        public static final double MaxAngle = 80; // need to convert to angle and eventually use radians
 
         // Offset for the absolute CANcoder to treat its starting valid position as 0
         // degrees.

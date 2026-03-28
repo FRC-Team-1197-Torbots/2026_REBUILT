@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.706376604850214,
-        "y": 6.028716119828815
+        "x": 2.6968674698795176,
+        "y": 2.4286265060240964
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.5307275320970035,
-        "y": 4.825420827389444
+        "x": 4.521218397126307,
+        "y": 1.225331213584726
       },
       "isLocked": false,
       "linkedName": "code red end"
@@ -48,12 +48,12 @@
     },
     {
       "anchor": {
-        "x": 2.706376604850214,
-        "y": 6.028716119828815
+        "x": 2.6968674698795176,
+        "y": 2.4286265060240964
       },
       "prevControl": {
-        "x": 3.3403708987161194,
-        "y": 6.2745506419400865
+        "x": 3.330861763745423,
+        "y": 2.6744610281353682
       },
       "nextControl": null,
       "isLocked": false,
@@ -152,13 +152,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 142.53944513944305
+    "rotation": -143.6731740478797
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 142.53944513944305
+    "rotation": -143.6731740478797
   },
   "useDefaultConstraints": true
 }

@@ -148,7 +148,7 @@ public class RobotContainer {
                 overrideController.a().whileTrue(m_intake.runAgiCommand())
                         .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
 
-                overrideController.rightTrigger(0.5).onTrue(m_hopper.reverseHopper());
+                overrideController.rightTrigger(0.5).whileTrue(m_hopper.reverseHopper()).onFalse(m_hopper.stopCommand());
 
         }
 

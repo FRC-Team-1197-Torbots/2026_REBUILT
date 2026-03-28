@@ -115,8 +115,8 @@ public class Intake extends SubsystemBase {
         setSpeed(0.0);
     }
 
-    public void runIntake(ChassisSpeeds speed) {
-
+    public void runIntake(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
+        ChassisSpeeds speed = speedSupplier.get(); 
         double robotVelocity = Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond);
 
         // Calculate target speed in Meters Per Second
@@ -131,16 +131,16 @@ public class Intake extends SubsystemBase {
 
 
     public Command runIntakeCommand(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get()))
+        return run(() -> runIntake(speedSupplier))
                 .beforeStarting(this::deploy)
                 .finallyDo(interrupted -> stopIntake());
     }
 
-    public Command runIntakeCommand(ChassisSpeeds speed) {
-        return run(() -> runIntake(speed))
-                .beforeStarting(this::deploy)
-                .finallyDo(interrupted -> stopIntake());
-    }
+    // public Command runIntakeCommand(ChassisSpeeds speed) {
+    //     return run(() -> runIntake(speed))
+    //             .beforeStarting(this::deploy)
+    //             .finallyDo(interrupted -> stopIntake());
+    // }
 
 
 
@@ -162,6 +162,8 @@ public class Intake extends SubsystemBase {
     public void deploy() {
         // if (m_position == INTAKE_POSITION.DEPLOYED)
         // return;
+
+        m_position = INTAKE_POSITION.DEPLOYED;
 
         m_deployTarget = IntakeConstants.DeployPosition;
         m_deployTimer.restart();
@@ -211,22 +213,22 @@ public class Intake extends SubsystemBase {
      * intake retracts.
      */
     public Command runDeployAndIntakeCommand(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get())) // Run intake rollers indefinitely
+        return run(() -> runIntake(speedSupplier)) // Run intake rollers indefinitely
                 .beforeStarting(this::deploy);
     }
 
     public Command runDeployImmediate(Supplier<ChassisSpeeds> speedSupplier) {
-        return runOnce(() -> runIntake(speedSupplier.get())) // Run intake rollers indefinitely
+        return runOnce(() -> runIntake(speedSupplier)) // Run intake rollers indefinitely
                 .beforeStarting(this::deploy);
     }
 
     public Command runIntakeWheelAuto1(Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get())).withTimeout(4.7)
+        return run(() -> runIntake(speedSupplier)).withTimeout(4.7)
                 .beforeStarting(this::deploy);
     }
 
         public Command runIntakeWheelAuto2(Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get())).withTimeout(6)
+        return run(() -> runIntake(speedSupplier)).withTimeout(6)
                 .beforeStarting(this::deploy);
     }
 

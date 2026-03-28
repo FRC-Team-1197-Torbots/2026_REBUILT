@@ -107,12 +107,7 @@ public class Turret extends SubsystemBase {
         Pose2d targetPose = null;
         boolean shouldTrack = false;
 
-        if (m_Intake.m_position == INTAKE_POSITION.RETRACTED || m_Intake.m_position == INTAKE_POSITION.RETRACTING) {
-            shouldTrack = false;
-        } else {
-            shouldTrack = true;
-        }
-
+        
         if (alliance.isPresent() && zoneDetection != null && DriveTrain != null &&
                 m_robotOffset != null) {
             var color = alliance.get();
@@ -122,7 +117,8 @@ public class Turret extends SubsystemBase {
                 if (zone == ZoneDetection.ZONE.BLUE) {
                     // Home Zone -> Attack Hub
                     targetPose = Constants.FieldConstants.BlueTargetPose;
-
+                    shouldTrack = true;
+                    
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
                     // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
@@ -140,7 +136,8 @@ public class Turret extends SubsystemBase {
                 if (zone == ZoneDetection.ZONE.RED) {
                     // Home Zone -> Attack Hub
                     targetPose = Constants.FieldConstants.RedTargetPose;
-
+                    shouldTrack = true;
+                    
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
                     if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
@@ -148,7 +145,7 @@ public class Turret extends SubsystemBase {
                     } else {
                         targetPose = Constants.FieldConstants.RedPassingCornerLeft;
                     }
-
+                    
                     shouldTrack = true;
                 } else if (zone == ZoneDetection.ZONE.BLUE) {
                     // Opponent Zone -> Zero turrets
@@ -157,6 +154,11 @@ public class Turret extends SubsystemBase {
             }
         }
 
+        if (m_Intake.m_position == INTAKE_POSITION.RETRACTED || m_Intake.m_position == INTAKE_POSITION.RETRACTING) {
+            shouldTrack = false;
+        } 
+        SmartDashboard.putBoolean("Should track", shouldTrack);
+        SmartDashboard.putString("Intake State", m_Intake.m_position.toString());
         // --- 3. Calculate Desired Angle & Apply Control ---
         if (shouldTrack && targetPose != null) {
             Pose2d currentRobotPose = DriveTrain.getState().Pose;
@@ -183,13 +185,13 @@ public class Turret extends SubsystemBase {
             double targetRelativeDegrees;
 
             // If the robot is generally facing the hub (+/- 90 deg), reset turrets to 0
-            if (Math.abs(headingDifference) < 90.0) {
+            if (Math.abs(headingDifference) < TurretConstants.MaxAngle) {
                 targetRelativeDegrees = 0.0;
             } else {
                 // RobotHeading + TurretRelative = TargetField
                 // TurretRelative = TargetField - RobotHeading + 180 (Since the turrets are
                 // backwards)
-                targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees + 180.0;
+                targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees + 200.0;
             }
 
             // Wrap the angle to handle the -180/180 degree boundary sign flip
@@ -227,7 +229,7 @@ public class Turret extends SubsystemBase {
      * @param targetAngle The target angle in degrees relative to the robot's front
      */
     public void setTargetAngle(double targetAngle) {
-        double clampedAngle = edu.wpi.first.math.MathUtil.clamp(targetAngle, -90.0, 90.0);
+        double clampedAngle = edu.wpi.first.math.MathUtil.clamp(targetAngle, TurretConstants.MinAngle, TurretConstants.MaxAngle);
         TargetRotations = degreesToRotations(clampedAngle);
     }
 
