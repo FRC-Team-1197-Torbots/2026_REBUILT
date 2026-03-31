@@ -35,8 +35,6 @@ public class ZoneDetection extends SubsystemBase {
         this.drivetrain = drivetrain;
         m_gyro = gyro;
 
-        // No need to store NetworkTables, LimelightHelpers handles it by name
-
         // Default to Blue if unknown
         myZone = ZONE.BLUE;
 

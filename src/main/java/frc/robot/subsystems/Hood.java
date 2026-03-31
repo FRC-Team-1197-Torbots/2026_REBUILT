@@ -49,5 +49,10 @@ public class Hood extends SubsystemBase {
         hoodMain.setControl(m_request.withPosition(ticks).withSlot(0));
     }
 
+    @Override
+    public void periodic() {
+        super.periodic();
+        SmartDashboard.putNumber("Hood " + m_side.name() + "/Motor Current", hoodMain.getStatorCurrent().getValueAsDouble());
+    }
 
 }

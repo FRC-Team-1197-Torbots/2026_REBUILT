@@ -39,6 +39,7 @@ public class Climber extends SubsystemBase {
     @Override
     public void periodic() {
         super.periodic();
+        SmartDashboard.putNumber("Climber/Motor Current", climbMotor.getStatorCurrent().getValueAsDouble());
         // SmartDashboard.putNumber("Climber Height (m)", getHeight());
         // SmartDashboard.putNumber("Climber Range", getRange());
     }
