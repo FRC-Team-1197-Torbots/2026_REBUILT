@@ -213,9 +213,9 @@ public class Turret extends SubsystemBase {
         // double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(encoder.getPosition().getValueAsDouble(), TargetRotations);
 
-        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
-        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
-        //         encoder.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
+        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
+                encoder.getPosition().getValueAsDouble());
 
         TurretMotor.set(motoroutput);
     }
