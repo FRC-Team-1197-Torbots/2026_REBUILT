@@ -115,9 +115,9 @@ public class AimingManager extends SubsystemBase {
 
     private double calculateRps(double d) {
         // https://docs.google.com/spreadsheets/d/12vaU1FRqllZlERNKd85nal3VIQaEh6twuFeA2sOHeNw/edit?pli=1&gid=0#gid=0
-        double a = 0.386;
-        double b = 7.64;
-        double c = 7.35;    
+        double a = 0.3856;
+        double b = 5.5;
+        double c = 6.0;    
         return a * d * d + b * d + c;
     }
 

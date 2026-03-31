@@ -97,8 +97,12 @@ public class RobotContainer {
 
         private void configureNamedCommands() {
                 NamedCommands.registerCommand("intake on", m_intake.runDeployImmediate(() -> drivetrain.getState().Speeds));
-                NamedCommands.registerCommand("run intake 1", m_intake.runIntakeWheelAuto1(() -> drivetrain.getState().Speeds));
-                NamedCommands.registerCommand("run intake 2", m_intake.runIntakeWheelAuto2(() -> drivetrain.getState().Speeds));
+                
+                // Build the timeouts clearly in the Container to keep the subsystem clean
+                NamedCommands.registerCommand("run intake 1", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(4.7));
+                NamedCommands.registerCommand("run intake 2", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(6.0));
+                NamedCommands.registerCommand("run intake", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
+                
                 NamedCommands.registerCommand("shoot balls", shootGroup);
                 NamedCommands.registerCommand("shoot balls 4", shootTimeout4);
         }
@@ -106,24 +110,17 @@ public class RobotContainer {
         private void configureBindings() {
                 drivetrain.registerTelemetry(logger::telemeterize);
 
-                // Note that X is defined as forward according to WPILib convention,
-                // and Y is defined as to the left according to WPILib convention.
+                // Note that WPILib convention: X is forward, Y is left.
+                // Negative controller Y = drive forward (X axis).
+                // Negative controller X = drive left (Y axis).
+                // Negative right X = rotate counterclockwise.
                 drivetrain.setDefaultCommand(
-                                // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive
-                                                                                                        // forward
-                                                                                                        // with
-                                                // negative Y
-                                                // (forward)
-                                                .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left
-                                                                                                        // with negative
-                                                                                                        // X (left)
-                                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive
-                                                                                                                    // counterclockwise
-                                                                                                                    // with
-                                // negative X (left)
-                                ));
+                        drivetrain.applyRequest(() -> drive
+                                .withVelocityX(-driverController.getLeftY() * MaxSpeed)
+                                .withVelocityY(-driverController.getLeftX() * MaxSpeed)
+                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate)
+                        )
+                );
 
                 // ******************** Default Commands *****************************/
                 // Shooter idle commands (using the new closed-loop target RPM)

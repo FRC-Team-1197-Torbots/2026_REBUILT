@@ -225,15 +225,7 @@ public class Intake extends SubsystemBase {
                 .beforeStarting(this::deploy);
     }
 
-    public Command runIntakeWheelAuto1(Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier)).withTimeout(4.7)
-                .beforeStarting(this::deploy);
-    }
 
-        public Command runIntakeWheelAuto2(Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier)).withTimeout(6)
-                .beforeStarting(this::deploy);
-    }
 
     public Command deployIntake() {
         return run(() -> deploy());
