@@ -32,10 +32,6 @@ public class AimingManager extends SubsystemBase {
     private final Shooter leftShooter;
     private final Shooter rightShooter;
 
-    // Use WPILib's interpolation map for ball trajectory tuning
-    public InterpolatingDoubleTreeMap hoodMap = new InterpolatingDoubleTreeMap();
-    public InterpolatingDoubleTreeMap shooterMap = new InterpolatingDoubleTreeMap();
-
     // Shoot-on-the-Move Settings
     public boolean enableShootOnTheMove = false;
     private final double AVERAGE_PIECE_SPEED_MPS = 10.0; // Needs tuning
@@ -50,21 +46,6 @@ public class AimingManager extends SubsystemBase {
         this.rightturret = righTurret;
         this.leftShooter = leftShooter;
         this.rightShooter = rightShooter;
-
-        // Trajectory Data: Distance (m) -> Hood Angle (deg)
-        // TODO: Tune these placeholder values on the field!
-        hoodMap.put(1.78, 0.0);
-        hoodMap.put(1.97, 0.0);
-        hoodMap.put(2.76, 0.0);
-        hoodMap.put(2.58, 0.0);
-
-        // Trajectory Data: Distance (m) -> Shooter Speed (RPS - 3000 RPM is 50 RPS)
-        // TODO: Tune these placeholder values on the field!
-        shooterMap.put(1.5, 1700.0/60);
-        shooterMap.put(1.9, 1900.0/60);
-        shooterMap.put(2.4, 2500.0/60);
-        shooterMap.put(4.5, 3700.0/60);
-        SmartDashboard.putNumber(shooterTestRpmKey, 0.0);
     }
 
     public void setShootOnTheMove(boolean enable) {
