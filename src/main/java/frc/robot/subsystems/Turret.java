@@ -186,8 +186,10 @@ public class Turret extends SubsystemBase {
 
             double targetRelativeDegrees;
 
-            // If the robot is generally facing the hub (+/- 90 deg), reset turrets to 0
-            if (Math.abs(headingDifference) < TurretConstants.MaxAngle) {
+            // If the robot is generally facing the hub (+/- 90 deg), reset turrets to 0.
+            // This is geometrically fixed at 90 degrees since the turrets are mounted backward, 
+            // independent of the physical cable limits.
+            if (Math.abs(headingDifference) < 90.0) {
                 targetRelativeDegrees = 0.0;
             } else {
                 // RobotHeading + TurretRelative = TargetField
