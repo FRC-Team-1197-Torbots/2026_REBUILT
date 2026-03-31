@@ -191,7 +191,7 @@ public class Turret extends SubsystemBase {
                 // RobotHeading + TurretRelative = TargetField
                 // TurretRelative = TargetField - RobotHeading + 180 (Since the turrets are
                 // backwards)
-                targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees + 200.0;
+                targetRelativeDegrees = targetFieldDegrees - robotHeadingDegrees + 180.0;
             }
 
             // Wrap the angle to handle the -180/180 degree boundary sign flip
