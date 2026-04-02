@@ -40,7 +40,7 @@ public class Turret extends SubsystemBase {
     private Intake m_Intake;
 
     public Pose2d targetPose;
-    private final double AVERAGE_PIECE_SPEED_MPS = 1.5; // Needs tuning
+    private final double AVERAGE_PIECE_SPEED_MPS = 2.5; // Needs tuning
     public boolean enableShootOnTheMove = true;
 
     public Turret(int turretCanId, int encoderID, edu.wpi.first.math.geometry.Translation2d turretOffset,
