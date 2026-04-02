@@ -33,8 +33,8 @@ public class AimingManager extends SubsystemBase {
     private final Shooter rightShooter;
 
     // Shoot-on-the-Move Settings
-    public boolean enableShootOnTheMove = false;
-    private final double AVERAGE_PIECE_SPEED_MPS = 10.0; // Needs tuning
+    
+ 
     private final String shooterTestRpmKey = "Test Rpm";
 
 
@@ -49,31 +49,13 @@ public class AimingManager extends SubsystemBase {
     }
 
     public void setShootOnTheMove(boolean enable) {
-        this.enableShootOnTheMove = enable;
-    }
-
-    private Pose2d applyShootOnTheMove(Pose2d robotPose, Pose2d targetPose) {
-        if (!enableShootOnTheMove || targetPose == null) {
-            return targetPose;
-        }
-
-        edu.wpi.first.math.kinematics.ChassisSpeeds speeds = drivetrain.getState().Speeds;
-
-        double distance = targetPose.getTranslation().getDistance(robotPose.getTranslation());
-        double timeOfFlight = distance / AVERAGE_PIECE_SPEED_MPS;
-
-        double offsetX = speeds.vxMetersPerSecond * timeOfFlight;
-        double offsetY = speeds.vyMetersPerSecond * timeOfFlight;
-
-        return new Pose2d(
-                targetPose.getX() - offsetX,
-                targetPose.getY() - offsetY,
-                targetPose.getRotation()
-        );
-    }
+        // this.enableShootOnTheMove = enable;
+    }   
 
     @Override
     public void periodic() {
+        // SmartDashboard.putBoolean("AimingManager/Shoot On Move", enableShootOnTheMove);
+
         Pose2d baseTargetPose = getTargetPose();
 
         if (baseTargetPose != null) {
@@ -95,7 +77,7 @@ public class AimingManager extends SubsystemBase {
             return;
 
         // Calculate Shooter Speed using interpolation map or override for passing
-        
+        // applyShootOnTheMove(robotPose, turret.targetPose);
 
         // double calculatedRPS = SmartDashboard.getNumber(shooterTestRpmKey, 0) / 60.0;
         double calculatedRPS;

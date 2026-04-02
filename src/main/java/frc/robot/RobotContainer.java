@@ -144,6 +144,8 @@ public class RobotContainer {
 
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup);
 
+                // driverController.y().onTrue(Commands.runOnce(()->m_aimingManager.toggleShootOnTheMove()));
+
                 //////////////////////Co Pilot functions//////////////////////////
                 overrideController.a().whileTrue(m_intake.runAgiCommand())
                         .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));

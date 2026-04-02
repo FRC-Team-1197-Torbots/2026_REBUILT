@@ -39,6 +39,10 @@ public class Turret extends SubsystemBase {
     protected TURRET_SIDE m_side;
     private Intake m_Intake;
 
+    public Pose2d targetPose;
+    private final double AVERAGE_PIECE_SPEED_MPS = 1.5; // Needs tuning
+    public boolean enableShootOnTheMove = true;
+
     public Turret(int turretCanId, int encoderID, edu.wpi.first.math.geometry.Translation2d turretOffset,
             SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection, TURRET_SIDE side, Intake intake) {
 
@@ -106,7 +110,7 @@ public class Turret extends SubsystemBase {
         // Grab globally cached alliance
         var alliance = (zoneDetection != null) ? zoneDetection.getAlliance() : java.util.Optional.<edu.wpi.first.wpilibj.DriverStation.Alliance>empty();
 
-        Pose2d targetPose = null;
+        
         boolean shouldTrack = false;
 
         
@@ -171,18 +175,24 @@ public class Turret extends SubsystemBase {
             double turretX = currentRobotPose.getX() + (m_robotOffset.getX() * cos - m_robotOffset.getY() * sin);
             double turretY = currentRobotPose.getY() + (m_robotOffset.getX() * sin + m_robotOffset.getY() * cos);
 
-            double dX = targetPose.getX() - turretX;
-            double dY = targetPose.getY() - turretY;
+            Pose2d adjustedTarget = applyShootOnTheMove(currentRobotPose, targetPose);
+
+            double dX = adjustedTarget.getX() - turretX;
+            double dY = adjustedTarget.getY() - turretY;
+
+            double trueDx = targetPose.getX() - turretX;
+            double trueDy = targetPose.getY() - turretY;
 
             // distanceToTarget is cached physically
             m_distanceToTarget = Math.hypot(dX, dY);
             double targetFieldDegrees = Math.toDegrees(Math.atan2(dY, dX));
+            double trueTargetFieldDegrees = Math.toDegrees(Math.atan2(trueDy, trueDx));
           
-            SmartDashboard.putNumber(m_distanceLogKey, m_distanceToTarget);
+            // SmartDashboard.putNumber(m_distanceLogKey, m_distanceToTarget);
 
             // Calculate the raw difference between where the target is and where the robot
             // is facing
-            double headingDifference = MathUtil.inputModulus(targetFieldDegrees - robotHeadingDegrees, -180.0, 180.0);
+            double headingDifference = MathUtil.inputModulus(trueTargetFieldDegrees - robotHeadingDegrees, -180.0, 180.0);
 
             double targetRelativeDegrees;
 
@@ -268,5 +278,25 @@ public class Turret extends SubsystemBase {
 
     public void zeroTurret() {
         encoder.setPosition(0);
+    }
+
+    private Pose2d applyShootOnTheMove(Pose2d robotPose, Pose2d targetPose) {
+        if (!enableShootOnTheMove || targetPose == null) {
+            return targetPose;
+        }
+
+        edu.wpi.first.math.kinematics.ChassisSpeeds speeds = DriveTrain.getState().Speeds;
+
+        double distance = targetPose.getTranslation().getDistance(robotPose.getTranslation());
+        double timeOfFlight = distance / AVERAGE_PIECE_SPEED_MPS;
+
+        double offsetX = speeds.vxMetersPerSecond * timeOfFlight;
+        double offsetY = speeds.vyMetersPerSecond * timeOfFlight;
+
+        return new Pose2d(
+                targetPose.getX() - offsetX,
+                targetPose.getY() - offsetY,
+                targetPose.getRotation()
+        );
     }
 }
