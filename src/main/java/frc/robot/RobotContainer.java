@@ -12,9 +12,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -46,7 +43,7 @@ public class RobotContainer {
         private final CommandXboxController driverController = new CommandXboxController(0);
 
         
-        private final CommandXboxController overrideController = new CommandXboxController(1);
+        // private final CommandXboxController overrideController = new CommandXboxController(1);
         /***************************
          * CORE SUBSYSTEMS
          ******************************/
@@ -151,7 +148,6 @@ public class RobotContainer {
                         .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
 
                 overrideController.rightTrigger(0.5).whileTrue(m_hopper.reverseHopper()).onFalse(m_hopper.stopCommand());
-
         }
 
         private Command safeRetractCommand() {
