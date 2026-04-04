@@ -12,6 +12,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -41,6 +43,7 @@ public class RobotContainer {
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
         private final CommandXboxController driverController = new CommandXboxController(0);
+        private final CommandXboxController overrideController = new CommandXboxController(1);
 
         
         // private final CommandXboxController overrideController = new CommandXboxController(1);
@@ -140,8 +143,6 @@ public class RobotContainer {
                 driverController.leftBumper().onTrue(safeRetractCommand());
 
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup);
-
-                // driverController.y().onTrue(Commands.runOnce(()->m_aimingManager.toggleShootOnTheMove()));
 
                 //////////////////////Co Pilot functions//////////////////////////
                 overrideController.a().whileTrue(m_intake.runAgiCommand())

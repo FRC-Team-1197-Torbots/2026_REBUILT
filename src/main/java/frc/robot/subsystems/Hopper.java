@@ -55,12 +55,12 @@ public class Hopper extends SubsystemBase {
         m_intake = intake;
     }
 
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("Hopper/Flopper Current", flopperMotor.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Hopper/Left Tower Current", leftTower.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Hopper/Right Tower Current", rightTower.getStatorCurrent().getValueAsDouble());
-    }
+    // @Override
+    // public void periodic() {
+    //     SmartDashboard.putNumber("Hopper/Flopper Current", flopperMotor.getStatorCurrent().getValueAsDouble());
+    //     SmartDashboard.putNumber("Hopper/Left Tower Current", leftTower.getStatorCurrent().getValueAsDouble());
+    //     SmartDashboard.putNumber("Hopper/Right Tower Current", rightTower.getStatorCurrent().getValueAsDouble());
+    // }
 
     /** Sets both hopper motors to the same speed. */
     public void setSpeed(double flopperspeed, double towerspeed) {

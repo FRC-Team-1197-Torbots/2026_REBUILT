@@ -5,6 +5,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -17,7 +19,7 @@ public class Hood extends SubsystemBase {
     private final NeutralOut stophoodrequest = new NeutralOut();
 
     private double PIDTolerance = 0.3d;
-    private double Target = -1;
+    private double Target = 0;
 
     public enum HOOD_SIDE {
         RIGHT, LEFT
@@ -38,21 +40,38 @@ public class Hood extends SubsystemBase {
         hoodMain.setNeutralMode(NeutralModeValue.Brake);
         hoodMain.getConfigurator().apply(hoodConfig);
         hoodMain.setPosition(0);      
-          
-    }
-
-    //provides ticks in degrees
-    public void setTargetAngle(double ticks) {
-        Target = ticks;
-        //double ticks = ConvertDegreesToTicks(targetDegrees);
-        //SmartDashboard.putNumber("Hood " + m_side.name() + "/Requested Ticks", ticks);
-        hoodMain.setControl(m_request.withPosition(ticks).withSlot(0));
+        
+        SmartDashboard.putNumber("Hood" + m_side.name() + "/Hood Ticks", 0);
     }
 
     @Override
     public void periodic() {
-        super.periodic();
-        SmartDashboard.putNumber("Hood " + m_side.name() + "/Motor Current", hoodMain.getStatorCurrent().getValueAsDouble());
+        double hoodTargetTicks = SmartDashboard.getNumber("Hood" + m_side.name() + "/Hood Ticks", 0);
+
+        setTargetAngle(hoodTargetTicks);
     }
 
+    public Command ManualHoodUp() {
+        return Commands.runOnce(() -> hoodMain.set(0.3));
+    }
+
+    public Command ManualHoodDown() {
+        return Commands.runOnce(() -> hoodMain.set(-0.3));
+    }
+
+    public Command ManualHoodStop() {
+        return Commands.runOnce(() -> hoodMain.set(0));
+    }
+
+    //provides ticks in degrees
+    public void setTargetAngle(double ticks) {
+        Target = MathUtil.clamp(ticks, 0, 10);
+        //double ticks = ConvertDegreesToTicks(targetDegrees);
+        //SmartDashboard.putNumber("Hood " + m_side.name() + "/Requested Ticks", ticks);
+        hoodMain.setControl(m_request.withPosition(Target).withSlot(0));
+    }
+
+    public void setPower(double power) {
+        hoodMain.set(power);
+    }
 }
