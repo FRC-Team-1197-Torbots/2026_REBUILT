@@ -96,13 +96,10 @@ public class RobotContainer {
         }
 
         private void configureNamedCommands() {
-                NamedCommands.registerCommand("intake on", m_intake.runDeployImmediate(() -> drivetrain.getState().Speeds));
-                
-                // Build the timeouts clearly in the Container to keep the subsystem clean
+                NamedCommands.registerCommand("intake on", m_intake.runDeployImmediate(() -> drivetrain.getState().Speeds));                
                 NamedCommands.registerCommand("run intake 1", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(4.7));
                 NamedCommands.registerCommand("run intake 2", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(6.0));
-                NamedCommands.registerCommand("run intake", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
-                
+                NamedCommands.registerCommand("run intake", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));                
                 NamedCommands.registerCommand("shoot balls", shootGroup);
                 NamedCommands.registerCommand("shoot balls 4", shootTimeout4);
         }
