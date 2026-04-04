@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANrange;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,9 +14,7 @@ public class Hopper extends SubsystemBase {
     private final TalonFX flopperMotor;
     private final TalonFX leftTower, rightTower;
 
-    // Sensors
-    private final CANrange canRange1;
-    private final CANrange canRange2;
+
 
     private Intake m_intake;
     private VoltageOut towerVoltageRequest = new VoltageOut(0);
@@ -49,8 +46,7 @@ public class Hopper extends SubsystemBase {
         leftTower.getConfigurator().apply(toweConfiguration);
         rightTower.getConfigurator().apply(toweConfiguration);
 
-        canRange1 = new CANrange(HopperConstants.CanRangeID1);
-        canRange2 = new CANrange(HopperConstants.CanRangeID2);
+
 
         m_intake = intake;
     }
@@ -139,18 +135,10 @@ public class Hopper extends SubsystemBase {
         return runOnce(this::stop);
     }
 
-    /**
-     * Checks if a ball is detected by the CANrange sensors.
-     * 
-     * @return true if ball is present.
-     */
     public boolean hasBall() {
-        // LaserMinDistance is 200.0 (mm), CANrange gets distance in meters
-        boolean range1HasBall = canRange1.getDistance()
-                .getValueAsDouble() < (HopperConstants.LaserMinDistance / 1000.0);
-        boolean range2HasBall = canRange2.getDistance()
-                .getValueAsDouble() < (HopperConstants.LaserMinDistance / 1000.0);
-        return range1HasBall || range2HasBall;
+        // CANranges were removed, so we default to returning false.
+        // NOTE: Functions that wait for this to be true (like runShootFeedCommand) will never trigger their stop condition now.
+        return false;
     }
 
 

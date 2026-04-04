@@ -12,8 +12,7 @@ public final class Constants {
         public static final int LeftTowerCANID = 9;
         public static final int RightTowerCANID = 10;
 
-        public static final int CanRangeID1 = 4;
-        public static final int CanRangeID2 = 5;
+
         // Interior space is ~10.25 inches (260mm).
         public static final double LaserMinDistance = 200.0;
 
