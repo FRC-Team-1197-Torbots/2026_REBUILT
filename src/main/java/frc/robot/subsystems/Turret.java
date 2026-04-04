@@ -163,8 +163,9 @@ public class Turret extends SubsystemBase {
         if (m_Intake.m_position == INTAKE_POSITION.RETRACTED || m_Intake.m_position == INTAKE_POSITION.RETRACTING) {
             shouldTrack = false;
         } 
-        SmartDashboard.putBoolean("Should track", shouldTrack);
-        SmartDashboard.putString("Intake State", m_Intake.m_position.toString());
+        // SmartDashboard.putBoolean("Should track", shouldTrack);
+        // SmartDashboard.putString("Intake State", m_Intake.m_position.toString());
+        SmartDashboard.putNumber(m_distanceLogKey, m_distanceToTarget);
         // --- 3. Calculate Desired Angle & Apply Control ---
         if (shouldTrack && targetPose != null) {
             Pose2d currentRobotPose = DriveTrain.getState().Pose;
@@ -188,7 +189,7 @@ public class Turret extends SubsystemBase {
             double targetFieldDegrees = Math.toDegrees(Math.atan2(dY, dX));
             double trueTargetFieldDegrees = Math.toDegrees(Math.atan2(trueDy, trueDx));
           
-            // SmartDashboard.putNumber(m_distanceLogKey, m_distanceToTarget);
+            
 
             // Calculate the raw difference between where the target is and where the robot
             // is facing
@@ -229,9 +230,9 @@ public class Turret extends SubsystemBase {
         // double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(encoder.getPosition().getValueAsDouble(), TargetRotations);
 
-        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
-        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
-        //         encoder.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
+        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
+                encoder.getPosition().getValueAsDouble());
 
         TurretMotor.set(motoroutput);
     }

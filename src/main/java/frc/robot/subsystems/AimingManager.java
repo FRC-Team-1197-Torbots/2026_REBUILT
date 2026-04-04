@@ -46,6 +46,8 @@ public class AimingManager extends SubsystemBase {
         this.rightturret = righTurret;
         this.leftShooter = leftShooter;
         this.rightShooter = rightShooter;
+
+        SmartDashboard.putNumber("ShooterTestSpeed", 0);
     }
 
     public void setShootOnTheMove(boolean enable) {
@@ -54,20 +56,29 @@ public class AimingManager extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // SmartDashboard.putBoolean("AimingManager/Shoot On Move", enableShootOnTheMove);
+        double debugSpeed = SmartDashboard.getNumber("ShooterTestSpeed", 0);
 
-        Pose2d baseTargetPose = getTargetPose();
+        if(debugSpeed != 0) {
+            leftShooter.setShooterSpeed(debugSpeed);
+            rightShooter.setShooterSpeed(debugSpeed);
+            
+        } else {
+            leftShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
+            rightShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
+        }
 
-        if (baseTargetPose != null) {
-            // 1. Get current robot state
-            Pose2d currentRobotPose = drivetrain.getState().Pose;
+        // Pose2d baseTargetPose = getTargetPose();
 
-            // 2. Calculate LEFT Hood & Shooter
-            calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, "Left");
+        // if (baseTargetPose != null) {
+        //     // 1. Get current robot state
+        //     Pose2d currentRobotPose = drivetrain.getState().Pose;
 
-            // 3. Calculate RIGHT Hood & Shooter
-            calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter, "Right");
-        } 
+        //     // 2. Calculate LEFT Hood & Shooter
+        //     calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, "Left");
+
+        //     // 3. Calculate RIGHT Hood & Shooter
+        //     calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter, "Right");
+        // } 
     }
 
     private void calculateAndApplyAiming(Pose2d robotPose,
@@ -75,9 +86,6 @@ public class AimingManager extends SubsystemBase {
 
         if (turret == null && shooter == null)
             return;
-
-        // Calculate Shooter Speed using interpolation map or override for passing
-        // applyShootOnTheMove(robotPose, turret.targetPose);
 
         // double calculatedRPS = SmartDashboard.getNumber(shooterTestRpmKey, 0) / 60.0;
         double calculatedRPS;

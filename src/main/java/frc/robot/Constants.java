@@ -102,7 +102,7 @@ public final class Constants {
 
         // Target speeds in RPS (Rotations Per Second)
         public static final double IdleSpeed = 750.0 / 60.0; // 500 RPM
-        public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
+        // public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
     }
 
     /** Constants for shoot-while-moving (velocity-based lead angle). */

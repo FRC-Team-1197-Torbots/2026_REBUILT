@@ -9,7 +9,6 @@ import com.revrobotics.ResetMode;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
@@ -108,6 +107,9 @@ public class Shooter extends SubsystemBase {
 
         SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Current", shooterWheel1.getOutputCurrent());
         SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel2 Current", shooterWheel2.getOutputCurrent());
+
+        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed", shooterWheel1.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel2 Speed", shooterWheel2.getEncoder().getVelocity());
 
         // SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed",
         //         shooterWheel1.getEncoder().getVelocity()/60.0);
