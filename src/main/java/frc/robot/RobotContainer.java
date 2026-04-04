@@ -127,8 +127,19 @@ public class RobotContainer {
                 leftShooter.setDefaultCommand(leftShooter.run(() -> leftShooter.runIdle()));
                 rightShooter.setDefaultCommand(rightShooter.run(() -> rightShooter.runIdle()));
 
-                ParallelCommandGroup resetcommand = new ParallelCommandGroup(drivetrain.runOnce(drivetrain::seedFieldCentric),
-                        Commands.runOnce(()->rightTurret.zeroTurret()), Commands.runOnce(()->leftTurret.zeroTurret()));
+                Command resetcommand = Commands.sequence(
+                        Commands.runOnce(() -> {
+                                // 1. Reset Gyro
+                                drivetrain.getPigeon2().reset();
+                                // 2. Reset Robot Pose Rotation (Keep XY, zero rotation)
+                                drivetrain.resetPose(new edu.wpi.first.math.geometry.Pose2d(
+                                        drivetrain.getState().Pose.getTranslation(),
+                                        new edu.wpi.first.math.geometry.Rotation2d()
+                                ));
+                        }),
+                        Commands.runOnce(() -> rightTurret.zeroTurret()),
+                        Commands.runOnce(() -> leftTurret.zeroTurret())
+                );
 
                 // ********************WORKING FUNCTIONS *****************************/
                 // Reset the field-centric heading on start button press (right middle button)
