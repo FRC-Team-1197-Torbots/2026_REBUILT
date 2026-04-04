@@ -102,7 +102,7 @@ public final class Constants {
 
         // Target speeds in RPS (Rotations Per Second)
         public static final double IdleSpeed = 750.0 / 60.0; // 500 RPM
-        public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
+        // public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
     }
 
     /** Constants for shoot-while-moving (velocity-based lead angle). */
@@ -156,8 +156,8 @@ public final class Constants {
         // Gear Ratio: 240/24 = 10:1 reduction
         public static final double TurretGearRatio = 1f / 8f;
 
-        public static final double MinAngle = -90;
-        public static final double MaxAngle = 90; // need to convert to angle and eventually use radians
+        public static final double MinAngle = -80;
+        public static final double MaxAngle = 80; // need to convert to angle and eventually use radians
 
         // Offset for the absolute CANcoder to treat its starting valid position as 0
         // degrees.

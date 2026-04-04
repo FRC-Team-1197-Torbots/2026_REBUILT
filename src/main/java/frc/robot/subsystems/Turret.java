@@ -28,9 +28,9 @@ public class Turret extends SubsystemBase {
     private PIDController turrentPID;
     private double TargetRotations;
 
-    // Cache for Alliance to reduce JNI overhead
-    private java.util.Optional<edu.wpi.first.wpilibj.DriverStation.Alliance> m_alliance = java.util.Optional.empty();
-    private int m_allianceCheckDelay = 0;
+    // Globally cached distance and tracking state
+    private double m_distanceToTarget = 0.0;
+    private final String m_distanceLogKey;
 
     public enum TURRET_SIDE {
         RIGHT, LEFT
@@ -38,6 +38,10 @@ public class Turret extends SubsystemBase {
 
     protected TURRET_SIDE m_side;
     private Intake m_Intake;
+
+    public Pose2d targetPose;
+    private final double AVERAGE_PIECE_SPEED_MPS = 2.5; // Needs tuning
+    public boolean enableShootOnTheMove = true;
 
     public Turret(int turretCanId, int encoderID, edu.wpi.first.math.geometry.Translation2d turretOffset,
             SwerveDrivetrain<?, ?, ?> drivetrain, ZoneDetection zoneDetection, TURRET_SIDE side, Intake intake) {
@@ -82,11 +86,14 @@ public class Turret extends SubsystemBase {
 
         m_Intake = intake;
 
+        m_distanceLogKey = "Turret" + m_side.name() + "/Distance to Target";
         // setTargetAngle(0);
     }
 
     @Override
     public void periodic() {
+
+        SmartDashboard.putNumber("Turret" + m_side.name() + "/Motor Current", TurretMotor.getStatorCurrent().getValueAsDouble());
 
         // --- 1. Sensors & State ---
         // Get current position in Rotations
@@ -100,24 +107,13 @@ public class Turret extends SubsystemBase {
         double robotHeadingDegrees = (DriveTrain != null) ? DriveTrain.getState().Pose.getRotation().getDegrees() : 0.0;
 
         // --- 2. Determine Target Pose ---
-        // Cache alliance to avoid expensive JNI call every 20ms
-        if (m_allianceCheckDelay <= 0) {
-            m_alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
-            m_allianceCheckDelay = 50; // Check once per second
-        } else {
-            m_allianceCheckDelay--;
-        }
-        var alliance = m_alliance;
+        // Grab globally cached alliance
+        var alliance = (zoneDetection != null) ? zoneDetection.getAlliance() : java.util.Optional.<edu.wpi.first.wpilibj.DriverStation.Alliance>empty();
 
-        Pose2d targetPose = null;
+        
         boolean shouldTrack = false;
 
-        if (m_Intake.m_position == INTAKE_POSITION.RETRACTED) {
-            shouldTrack = false;
-        } else {
-            shouldTrack = true;
-        }
-
+        
         if (alliance.isPresent() && zoneDetection != null && DriveTrain != null &&
                 m_robotOffset != null) {
             var color = alliance.get();
@@ -127,7 +123,8 @@ public class Turret extends SubsystemBase {
                 if (zone == ZoneDetection.ZONE.BLUE) {
                     // Home Zone -> Attack Hub
                     targetPose = Constants.FieldConstants.BlueTargetPose;
-
+                    shouldTrack = true;
+                    
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
                     // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
@@ -145,7 +142,8 @@ public class Turret extends SubsystemBase {
                 if (zone == ZoneDetection.ZONE.RED) {
                     // Home Zone -> Attack Hub
                     targetPose = Constants.FieldConstants.RedTargetPose;
-
+                    shouldTrack = true;
+                    
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
                     if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
@@ -153,7 +151,7 @@ public class Turret extends SubsystemBase {
                     } else {
                         targetPose = Constants.FieldConstants.RedPassingCornerLeft;
                     }
-
+                    
                     shouldTrack = true;
                 } else if (zone == ZoneDetection.ZONE.BLUE) {
                     // Opponent Zone -> Zero turrets
@@ -162,27 +160,46 @@ public class Turret extends SubsystemBase {
             }
         }
 
+        if (m_Intake.m_position == INTAKE_POSITION.RETRACTED || m_Intake.m_position == INTAKE_POSITION.RETRACTING) {
+            shouldTrack = false;
+        } 
+        // SmartDashboard.putBoolean("Should track", shouldTrack);
+        // SmartDashboard.putString("Intake State", m_Intake.m_position.toString());
+        SmartDashboard.putNumber(m_distanceLogKey, m_distanceToTarget);
         // --- 3. Calculate Desired Angle & Apply Control ---
         if (shouldTrack && targetPose != null) {
             Pose2d currentRobotPose = DriveTrain.getState().Pose;
-            Pose2d turretFieldPose = currentRobotPose.transformBy(m_turretOffsetTransform);
 
-            Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
-            double targetFieldDegrees = delta.getAngle().getDegrees();
+            // Primitive transform math saves 4 object allocations per 20ms over .transformBy() and .minus()
+            double cos = currentRobotPose.getRotation().getCos();
+            double sin = currentRobotPose.getRotation().getSin();
+            double turretX = currentRobotPose.getX() + (m_robotOffset.getX() * cos - m_robotOffset.getY() * sin);
+            double turretY = currentRobotPose.getY() + (m_robotOffset.getX() * sin + m_robotOffset.getY() * cos);
 
-            // Calculate distance to target (norm of the translation difference)
-            double distanceToTarget = delta.getNorm();
+            Pose2d adjustedTarget = applyShootOnTheMove(currentRobotPose, targetPose);
+
+            double dX = adjustedTarget.getX() - turretX;
+            double dY = adjustedTarget.getY() - turretY;
+
+            double trueDx = targetPose.getX() - turretX;
+            double trueDy = targetPose.getY() - turretY;
+
+            // distanceToTarget is cached physically
+            m_distanceToTarget = Math.hypot(dX, dY);
+            double targetFieldDegrees = Math.toDegrees(Math.atan2(dY, dX));
+            double trueTargetFieldDegrees = Math.toDegrees(Math.atan2(trueDy, trueDx));
           
-            SmartDashboard.putNumber("Turrent" + m_side.name() + "/Distance to Target",
-                    distanceToTarget);
+            
 
             // Calculate the raw difference between where the target is and where the robot
             // is facing
-            double headingDifference = MathUtil.inputModulus(targetFieldDegrees - robotHeadingDegrees, -180.0, 180.0);
+            double headingDifference = MathUtil.inputModulus(trueTargetFieldDegrees - robotHeadingDegrees, -180.0, 180.0);
 
             double targetRelativeDegrees;
 
-            // If the robot is generally facing the hub (+/- 90 deg), reset turrets to 0
+            // If the robot is generally facing the hub (+/- 90 deg), reset turrets to 0.
+            // This is geometrically fixed at 90 degrees since the turrets are mounted backward, 
+            // independent of the physical cable limits.
             if (Math.abs(headingDifference) < 90.0) {
                 targetRelativeDegrees = 0.0;
             } else {
@@ -227,7 +244,7 @@ public class Turret extends SubsystemBase {
      * @param targetAngle The target angle in degrees relative to the robot's front
      */
     public void setTargetAngle(double targetAngle) {
-        double clampedAngle = edu.wpi.first.math.MathUtil.clamp(targetAngle, -90.0, 90.0);
+        double clampedAngle = edu.wpi.first.math.MathUtil.clamp(targetAngle, TurretConstants.MinAngle, TurretConstants.MaxAngle);
         TargetRotations = degreesToRotations(clampedAngle);
     }
 
@@ -251,45 +268,36 @@ public class Turret extends SubsystemBase {
         return encoder.getPosition().getValueAsDouble() - TurrentRotationOffset;
     }
 
+    public boolean isStraight() {
+        double currentDegrees = rotationsToDegrees(getRelativeRotation());
+        return Math.abs(currentDegrees) < 10.0; // Within 10 degrees of straight
+    }
+
     public double getDistanceToTarget() {
-        Pose2d targetPose = null;
+        return m_distanceToTarget;
+    }
 
-        if (m_allianceCheckDelay <= 0) {
-            m_alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
-            m_allianceCheckDelay = 50; // Check once per second
-        } else {
-            m_allianceCheckDelay--;
-        }
-        var alliance = m_alliance;
-        var color = alliance.get();
+    public void zeroTurret() {
+        encoder.setPosition(0);
+    }
 
-        if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
-            if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
-                targetPose = (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) 
-                             ? Constants.FieldConstants.BluePassingCornerRight 
-                             : Constants.FieldConstants.BluePassingCornerLeft;
-            } else {
-                targetPose = Constants.FieldConstants.BlueTargetPose;
-            }
-        } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
-            if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
-                targetPose = (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) 
-                             ? Constants.FieldConstants.RedPassingCornerRight 
-                             : Constants.FieldConstants.RedPassingCornerLeft;
-            } else {
-                targetPose = Constants.FieldConstants.RedTargetPose;
-            }
+    private Pose2d applyShootOnTheMove(Pose2d robotPose, Pose2d targetPose) {
+        if (!enableShootOnTheMove || targetPose == null) {
+            return targetPose;
         }
 
-        Pose2d currentRobotPose = DriveTrain.getState().Pose;
-        Pose2d turretFieldPose = currentRobotPose.transformBy(m_turretOffsetTransform);
+        edu.wpi.first.math.kinematics.ChassisSpeeds speeds = DriveTrain.getState().Speeds;
 
-        Translation2d delta = targetPose.getTranslation().minus(turretFieldPose.getTranslation());
-        double targetFieldDegrees = delta.getAngle().getDegrees();
+        double distance = targetPose.getTranslation().getDistance(robotPose.getTranslation());
+        double timeOfFlight = distance / AVERAGE_PIECE_SPEED_MPS;
 
-        // Calculate distance to target (norm of the translation difference)
-        double distanceToTarget = delta.getNorm();
+        double offsetX = speeds.vxMetersPerSecond * timeOfFlight;
+        double offsetY = speeds.vyMetersPerSecond * timeOfFlight;
 
-        return distanceToTarget;
+        return new Pose2d(
+                targetPose.getX() - offsetX,
+                targetPose.getY() - offsetY,
+                targetPose.getRotation()
+        );
     }
 }

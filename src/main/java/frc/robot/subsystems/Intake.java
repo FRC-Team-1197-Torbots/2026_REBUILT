@@ -3,11 +3,8 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import java.util.function.Supplier;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +25,7 @@ public class Intake extends SubsystemBase {
     private final edu.wpi.first.wpilibj.Timer m_deployTimer = new edu.wpi.first.wpilibj.Timer();
 
     public enum INTAKE_POSITION {
-        DEPLOYED, RETRACTED, AGI
+        DEPLOYED, RETRACTED, AGI, RETRACTING
     };
 
     public INTAKE_POSITION m_position;
@@ -70,6 +67,9 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         super.periodic();
 
+        SmartDashboard.putNumber("Intake/Intake Motor Current", intakeMotor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Intake/Deploy Motor Current", deployMotor.getStatorCurrent().getValueAsDouble());
+
         // SmartDashboard.putNumber("Intake/Intake Position", deployMotor.getPosition().getValueAsDouble());
 
         if (m_deployTarget != null) {
@@ -87,29 +87,39 @@ public class Intake extends SubsystemBase {
                     Math.abs(velocity) < 0.1;
 
             if (isAtTarget || isStalled) {
-                // If it stalls while retracting, it hit the home position, so zero the encoder.
-                // This ensures repeated deployments remain accurate even if skipping teeth.
-                if (isStalled && m_deployTarget == IntakeConstants.DeployPosition) {
-                    deployMotor.setPosition(IntakeConstants.DeployPosition);
+                // If it stalls at either end, assume it hit the physical hard stop and reset the encoder
+                // This ensures repeated deployments remain accurate even if the mechanism skips teeth.
+                if (isStalled) {
+                    if (m_deployTarget == IntakeConstants.DeployPosition) {
+                        deployMotor.setPosition(IntakeConstants.DeployPosition);
+                    } else if (m_deployTarget == IntakeConstants.RetractPosition) {
+                        deployMotor.setPosition(IntakeConstants.RetractPosition);
+                    }
                 }
 
                 stopDeploy();
-            } else if(isStalled && m_deployTarget == IntakeConstants.RetractPosition) {
-                deployMotor.setPosition(IntakeConstants.RetractPosition);
             }
         }
     }
 
+    public boolean isRollerLocked() {
+        return m_position == INTAKE_POSITION.AGI || (m_deployTarget != null && m_deployTarget == IntakeConstants.AgiPosition);
+    }
+
     public void setSpeed(double speed) {
-        intakeMotor.set(speed);
+        if (isRollerLocked()) {
+            intakeMotor.set(0.0);
+        } else {
+            intakeMotor.set(speed);
+        }
     }
 
     public void stopIntake() {
         setSpeed(0.0);
     }
 
-    public void runIntake(ChassisSpeeds speed) {
-
+    public void runIntake(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
+        ChassisSpeeds speed = speedSupplier.get(); 
         double robotVelocity = Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond);
 
         // Calculate target speed in Meters Per Second
@@ -121,28 +131,21 @@ public class Intake extends SubsystemBase {
         setSurfaceSpeed(targetSpeed);
     }
 
-    public void runOuttake() {
-        setSpeed(IntakeConstants.OuttakeSpeed);
-    }
+
 
     public Command runIntakeCommand(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get()))
+        return run(() -> runIntake(speedSupplier))
                 .beforeStarting(this::deploy)
                 .finallyDo(interrupted -> stopIntake());
     }
 
-    public Command runIntakeCommand(ChassisSpeeds speed) {
-        return run(() -> runIntake(speed))
-                .beforeStarting(this::deploy)
-                .finallyDo(interrupted -> stopIntake());
-    }
+    // public Command runIntakeCommand(ChassisSpeeds speed) {
+    //     return run(() -> runIntake(speed))
+    //             .beforeStarting(this::deploy)
+    //             .finallyDo(interrupted -> stopIntake());
+    // }
 
-    public Command runOuttakeCommand() {
-        // Assume we want to deploy to outtake as well, to clear the robot frame
-        return run(() -> runOuttake())
-                .beforeStarting(this::deploy)
-                .finallyDo(interrupted -> stopIntake());
-    }
+
 
     public Command stopCommand() {
         return runOnce(this::stopIntake);
@@ -162,6 +165,8 @@ public class Intake extends SubsystemBase {
     public void deploy() {
         // if (m_position == INTAKE_POSITION.DEPLOYED)
         // return;
+
+        m_position = INTAKE_POSITION.DEPLOYED;
 
         m_deployTarget = IntakeConstants.DeployPosition;
         m_deployTimer.restart();
@@ -204,41 +209,6 @@ public class Intake extends SubsystemBase {
         return runOnce(this::agi);
     }
 
-    /**
-     * Auto-Homing Routine.
-     * Starts retracting slowly using voltage. If periodic() detects a stall
-     * condition,
-     * it zeroes the encoder and sets target back to retracted.
-     */
-    public Command autoHome() {
-        return run(() -> deployMotor.setVoltage(-5.0))
-                .until(() -> {
-                    double current = Math.abs(deployMotor.getStatorCurrent().getValueAsDouble());
-                    double velocity = deployMotor.getVelocity().getValueAsDouble();
-                    return current > (IntakeConstants.DeployCurrentLimit - 10.0) && Math.abs(velocity) < 0.1;
-                })
-                .finallyDo((interrupted) -> {
-                    deployMotor.setPosition(0);
-                    retract();
-                });
-    }
-
-    // Manual Overrides
-    public Command forceDeploy() {
-        return runOnce(() -> {
-            deployMotor.setPosition(IntakeConstants.DeployPosition);
-            m_position = INTAKE_POSITION.DEPLOYED;
-            m_deployTarget = null;
-        });
-    }
-
-    public Command forceRetract() {
-        return runOnce(() -> {
-            deployMotor.setPosition(IntakeConstants.RetractPosition);
-            m_position = INTAKE_POSITION.RETRACTED;
-            m_deployTarget = null;
-        });
-    }
 
     /**
      * Deploys the intake and runs the rollers.
@@ -246,30 +216,27 @@ public class Intake extends SubsystemBase {
      * intake retracts.
      */
     public Command runDeployAndIntakeCommand(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get())) // Run intake rollers indefinitely
+        return run(() -> runIntake(speedSupplier)) // Run intake rollers indefinitely
                 .beforeStarting(this::deploy);
     }
 
     public Command runDeployImmediate(Supplier<ChassisSpeeds> speedSupplier) {
-        return runOnce(() -> runIntake(speedSupplier.get())) // Run intake rollers indefinitely
+        return runOnce(() -> runIntake(speedSupplier)) // Run intake rollers indefinitely
                 .beforeStarting(this::deploy);
     }
 
-    public Command runIntakeWheelAuto1(Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get())).withTimeout(4.7)
-                .beforeStarting(this::deploy);
-    }
 
-        public Command runIntakeWheelAuto2(Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier.get())).withTimeout(6)
-                .beforeStarting(this::deploy);
-    }
 
     public Command deployIntake() {
         return run(() -> deploy());
     }
 
     public void setSurfaceSpeed(double mps) {
+        if (isRollerLocked()) {
+            intakeMotor.set(0.0);
+            return;
+        }
+
         double wheelCircumferenceMeters = Units.inchesToMeters(Constants.IntakeConstants.wheelDiameter) * Math.PI;
 
         double targetRPS = (mps / wheelCircumferenceMeters) * Constants.IntakeConstants.gearratio;

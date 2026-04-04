@@ -32,13 +32,9 @@ public class AimingManager extends SubsystemBase {
     private final Shooter leftShooter;
     private final Shooter rightShooter;
 
-    // Use WPILib's interpolation map for ball trajectory tuning
-    public InterpolatingDoubleTreeMap hoodMap = new InterpolatingDoubleTreeMap();
-    public InterpolatingDoubleTreeMap shooterMap = new InterpolatingDoubleTreeMap();
-
     // Shoot-on-the-Move Settings
-    public boolean enableShootOnTheMove = false;
-    private final double AVERAGE_PIECE_SPEED_MPS = 10.0; // Needs tuning
+    
+ 
     private final String shooterTestRpmKey = "Test Rpm";
 
 
@@ -51,78 +47,45 @@ public class AimingManager extends SubsystemBase {
         this.leftShooter = leftShooter;
         this.rightShooter = rightShooter;
 
-        // Trajectory Data: Distance (m) -> Hood Angle (deg)
-        // TODO: Tune these placeholder values on the field!
-        hoodMap.put(1.78, 0.0);
-        hoodMap.put(1.97, 0.0);
-        hoodMap.put(2.76, 0.0);
-        hoodMap.put(2.58, 0.0);
-
-        // Trajectory Data: Distance (m) -> Shooter Speed (RPS - 3000 RPM is 50 RPS)
-        // TODO: Tune these placeholder values on the field!
-        shooterMap.put(1.5, 1700.0/60);
-        shooterMap.put(1.9, 1900.0/60);
-        shooterMap.put(2.4, 2500.0/60);
-        shooterMap.put(4.5, 3700.0/60);
-        SmartDashboard.putNumber(shooterTestRpmKey, 0.0);
+        SmartDashboard.putNumber("ShooterTestSpeed", 0);
     }
 
     public void setShootOnTheMove(boolean enable) {
-        this.enableShootOnTheMove = enable;
-    }
-
-    private Pose2d applyShootOnTheMove(Pose2d robotPose, Pose2d targetPose) {
-        if (!enableShootOnTheMove || targetPose == null) {
-            return targetPose;
-        }
-
-        edu.wpi.first.math.kinematics.ChassisSpeeds speeds = drivetrain.getState().Speeds;
-
-        double distance = targetPose.getTranslation().getDistance(robotPose.getTranslation());
-        double timeOfFlight = distance / AVERAGE_PIECE_SPEED_MPS;
-
-        double offsetX = speeds.vxMetersPerSecond * timeOfFlight;
-        double offsetY = speeds.vyMetersPerSecond * timeOfFlight;
-
-        return new Pose2d(
-                targetPose.getX() - offsetX,
-                targetPose.getY() - offsetY,
-                targetPose.getRotation()
-        );
-    }
-
-    // Reusable instance prevents GC spikes from 50 objects/sec
-    private final Pose2d virtualTargetPose = new Pose2d();
+        // this.enableShootOnTheMove = enable;
+    }   
 
     @Override
     public void periodic() {
-        Pose2d baseTargetPose = getTargetPose();
+        double debugSpeed = SmartDashboard.getNumber("ShooterTestSpeed", 0);
 
-        if (baseTargetPose != null) {
-            // 1. Get current robot state
-            Pose2d currentRobotPose = drivetrain.getState().Pose;
+        if(debugSpeed != 0) {
+            leftShooter.setShooterSpeed(debugSpeed);
+            rightShooter.setShooterSpeed(debugSpeed);
             
-            // Generate Virtual Target
-            // (Using the pre-allocated virtualTargetPose instance)
+        } else {
+            leftShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
+            rightShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
+        }
 
-            // 2. Calculate LEFT Hood & Shooter
-            calculateAndApplyAiming(currentRobotPose, virtualTargetPose,
-                    TurretConstants.TurretOffset2, leftturret, leftShooter, "Left");
+        // Pose2d baseTargetPose = getTargetPose();
 
-            // 3. Calculate RIGHT Hood & Shooter
-            calculateAndApplyAiming(currentRobotPose, virtualTargetPose,
-                    TurretConstants.TurretOffset1, rightturret, rightShooter, "Right");
-        } 
+        // if (baseTargetPose != null) {
+        //     // 1. Get current robot state
+        //     Pose2d currentRobotPose = drivetrain.getState().Pose;
+
+        //     // 2. Calculate LEFT Hood & Shooter
+        //     calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, "Left");
+
+        //     // 3. Calculate RIGHT Hood & Shooter
+        //     calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter, "Right");
+        // } 
     }
 
-    private void calculateAndApplyAiming(Pose2d robotPose, Pose2d targetPose,
-            Translation2d turretOffset, Turret turret, Shooter shooter, String sideName) {
+    private void calculateAndApplyAiming(Pose2d robotPose,
+            Turret turret, Shooter shooter, String sideName) {
 
         if (turret == null && shooter == null)
             return;
-
-        // Calculate Shooter Speed using interpolation map or override for passing
-        
 
         // double calculatedRPS = SmartDashboard.getNumber(shooterTestRpmKey, 0) / 60.0;
         double calculatedRPS;
@@ -153,9 +116,10 @@ public class AimingManager extends SubsystemBase {
      * ZoneDetection.
      */
     private Pose2d getTargetPose() {
-        var alliance = edu.wpi.first.wpilibj.DriverStation.getAlliance();
-        if (alliance.isEmpty() || zoneDetection == null)
-            return null;
+        if (zoneDetection == null) return null;
+        
+        var alliance = zoneDetection.getAlliance();
+        if (alliance.isEmpty()) return null;
 
         var color = alliance.get();
         var zone = zoneDetection.getZone();

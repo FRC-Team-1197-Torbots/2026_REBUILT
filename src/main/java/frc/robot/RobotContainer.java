@@ -94,8 +94,12 @@ public class RobotContainer {
 
         private void configureNamedCommands() {
                 NamedCommands.registerCommand("intake on", m_intake.runDeployImmediate(() -> drivetrain.getState().Speeds));
-                NamedCommands.registerCommand("run intake 1", m_intake.runIntakeWheelAuto1(() -> drivetrain.getState().Speeds));
-                NamedCommands.registerCommand("run intake 2", m_intake.runIntakeWheelAuto2(() -> drivetrain.getState().Speeds));
+                
+                // Build the timeouts clearly in the Container to keep the subsystem clean
+                NamedCommands.registerCommand("run intake 1", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(4.7));
+                NamedCommands.registerCommand("run intake 2", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(6.0));
+                NamedCommands.registerCommand("run intake", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
+                
                 NamedCommands.registerCommand("shoot balls", shootGroup);
                 NamedCommands.registerCommand("shoot balls 4", shootTimeout4);
         }
@@ -103,58 +107,55 @@ public class RobotContainer {
         private void configureBindings() {
                 drivetrain.registerTelemetry(logger::telemeterize);
 
-                // Note that X is defined as forward according to WPILib convention,
-                // and Y is defined as to the left according to WPILib convention.
+                // Note that WPILib convention: X is forward, Y is left.
+                // Negative controller Y = drive forward (X axis).
+                // Negative controller X = drive left (Y axis).
+                // Negative right X = rotate counterclockwise.
                 drivetrain.setDefaultCommand(
-                                // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive
-                                                                                                        // forward
-                                                                                                        // with
-                                                // negative Y
-                                                // (forward)
-                                                .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left
-                                                                                                        // with negative
-                                                                                                        // X (left)
-                                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive
-                                                                                                                    // counterclockwise
-                                                                                                                    // with
-                                // negative X (left)
-                                ));
+                        drivetrain.applyRequest(() -> drive
+                                .withVelocityX(-driverController.getLeftY() * MaxSpeed)
+                                .withVelocityY(-driverController.getLeftX() * MaxSpeed)
+                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate)
+                        )
+                );
 
                 // ******************** Default Commands *****************************/
                 // Shooter idle commands (using the new closed-loop target RPM)
                 leftShooter.setDefaultCommand(leftShooter.run(() -> leftShooter.runIdle()));
                 rightShooter.setDefaultCommand(rightShooter.run(() -> rightShooter.runIdle()));
 
+                ParallelCommandGroup resetcommand = new ParallelCommandGroup(drivetrain.runOnce(drivetrain::seedFieldCentric),
+                        Commands.runOnce(()->rightTurret.zeroTurret()), Commands.runOnce(()->leftTurret.zeroTurret()));
+
                 // ********************WORKING FUNCTIONS *****************************/
                 // Reset the field-centric heading on start button press (right middle button)
-                driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+                driverController.start().onTrue((resetcommand));
 
                 // Click to drop intake
                 driverController.rightBumper()
                                 .onTrue(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
 
 
-                // // Click to retract intake
-                driverController.leftBumper().onTrue(m_intake.runRetractCommand());
+                // Click to retract intake safely
+                driverController.leftBumper().onTrue(safeRetractCommand());
 
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup);
 
-                //////////////////////Testing functions//////////////////////////
-                // overrideController.a().whileTrue(m_intake.runAgiCommand())
-                //         .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
+                // driverController.y().onTrue(Commands.runOnce(()->m_aimingManager.toggleShootOnTheMove()));
 
-                // overrideController.rightTrigger(0.5).onTrue(m_hopper.reverseHopper());
-                
+                //////////////////////Co Pilot functions//////////////////////////
+                overrideController.a().whileTrue(m_intake.runAgiCommand())
+                        .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
 
-                // ******************** OVERRIDES *****************************/
-                // Manual encoder resets without touching PID voltages
-                // overrideController.povUp().onTrue(m_intake.forceRetract());
-                // overrideController.povDown().onTrue(m_intake.forceDeploy());
+                overrideController.rightTrigger(0.5).whileTrue(m_hopper.reverseHopper()).onFalse(m_hopper.stopCommand());
+        }
 
-                // // Allow the co-driver to auto-home manually or in test mode
-                // overrideController.start().onTrue(m_intake.autoHome());
+        private Command safeRetractCommand() {
+                return Commands.runOnce(() -> {
+                        m_intake.stopIntake();
+                        m_intake.m_position = Intake.INTAKE_POSITION.RETRACTING;
+                }).andThen(Commands.waitUntil(() -> leftTurret.isStraight() && rightTurret.isStraight()))
+                  .andThen(m_intake.runRetractCommand());
         }
 
         public Command getAutonomousCommand() {
