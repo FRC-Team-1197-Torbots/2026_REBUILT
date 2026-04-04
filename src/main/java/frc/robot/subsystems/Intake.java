@@ -67,8 +67,7 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         super.periodic();
 
-        SmartDashboard.putNumber("Intake/Intake Motor Current", intakeMotor.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Intake/Deploy Motor Current", deployMotor.getStatorCurrent().getValueAsDouble());
+
 
         // SmartDashboard.putNumber("Intake/Intake Position", deployMotor.getPosition().getValueAsDouble());
 
