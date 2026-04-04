@@ -31,6 +31,11 @@ public class AimingManager extends SubsystemBase {
     private final Turret rightturret;
     private final Shooter leftShooter;
     private final Shooter rightShooter;
+    private final Hood leftHood;
+    private final Hood rightHood;
+
+    // Linear interpolation map for Hood ticks based on distance in meters.
+    private final InterpolatingDoubleTreeMap hoodMap = new InterpolatingDoubleTreeMap();
 
     // Shoot-on-the-Move Settings
     
@@ -39,13 +44,23 @@ public class AimingManager extends SubsystemBase {
 
 
     public AimingManager(CommandSwerveDrivetrain drivetrain, ZoneDetection zoneDetection,
-            Turret leftTurret, Turret righTurret, Shooter leftShooter, Shooter rightShooter) {
+            Turret leftTurret, Turret righTurret, Shooter leftShooter, Shooter rightShooter,
+            Hood leftHood, Hood rightHood) {
         this.drivetrain = drivetrain;
         this.zoneDetection = zoneDetection;
         this.leftturret = leftTurret;
         this.rightturret = righTurret;
         this.leftShooter = leftShooter;
         this.rightShooter = rightShooter;
+        this.leftHood = leftHood;
+        this.rightHood = rightHood;
+
+        // Setup base values for the hood interpolation table (Distance in meters -> Hood Ticks 0-10)
+        // These are placeholder values that you will need to tune on the field!
+        hoodMap.put(1.0, 0.0);
+        hoodMap.put(3.0, 4.0);
+        hoodMap.put(5.0, 8.0);
+        hoodMap.put(7.0, 10.0);
 
         SmartDashboard.putNumber("ShooterTestSpeed", 0);
     }
@@ -74,33 +89,45 @@ public class AimingManager extends SubsystemBase {
         //     Pose2d currentRobotPose = drivetrain.getState().Pose;
 
         //     // 2. Calculate LEFT Hood & Shooter
-        //     calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, "Left");
+        //     calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, leftHood, "Left");
 
         //     // 3. Calculate RIGHT Hood & Shooter
-        //     calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter, "Right");
+        //     calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter, rightHood, "Right");
         // } 
     }
 
     private void calculateAndApplyAiming(Pose2d robotPose,
-            Turret turret, Shooter shooter, String sideName) {
+            Turret turret, Shooter shooter, Hood hood, String sideName) {
 
         if (turret == null && shooter == null)
             return;
 
+        double distanceMeters = turret.getDistanceToTarget();
+
         // double calculatedRPS = SmartDashboard.getNumber(shooterTestRpmKey, 0) / 60.0;
         double calculatedRPS;
+        double calculatedHoodTicks;
+
         if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
             calculatedRPS = 2500.0 / 60.0;
+            // Assuming passing shot has a fixed hood angle, e.g. 5 ticks. Adjust if needed.
+            calculatedHoodTicks = 5.0; 
         } else {
-            calculatedRPS = calculateRps(turret.getDistanceToTarget());
+            calculatedRPS = calculateRps(distanceMeters);
+            calculatedHoodTicks = hoodMap.get(distanceMeters);
         }
         
         if (shooter != null) {
             shooter.setShooterSpeed(calculatedRPS);
         }
 
+        if (hood != null) {
+            hood.setTargetAngle(calculatedHoodTicks);
+        }
+
         // Telemetry
-        // SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", turret.getDistanceToTarget());
+        // SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", distanceMeters);
+        // SmartDashboard.putNumber("AimingManager/" + sideName + "/HoodTicks", calculatedHoodTicks);
     }
 
     private double calculateRps(double d) {

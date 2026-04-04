@@ -79,7 +79,7 @@ public class RobotContainer {
         private final Hood leftHood = new Hood(Constants.HoodConstants.HoodCanId2, Hood.HOOD_SIDE.LEFT);
 
         private final frc.robot.subsystems.AimingManager m_aimingManager = new
-        frc.robot.subsystems.AimingManager(drivetrain, m_zoneDetection, leftTurret, rightTurret, leftShooter, rightShooter);
+        frc.robot.subsystems.AimingManager(drivetrain, m_zoneDetection, leftTurret, rightTurret, leftShooter, rightShooter, leftHood, rightHood);
 
         private final SendableChooser<Command> autoChooser;
 
