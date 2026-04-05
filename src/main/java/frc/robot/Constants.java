@@ -7,36 +7,12 @@ import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
-    public static final class ClimberConstants {
-        public static final Pose2d lowerClimbPosition = new Pose2d(1.066, 2.782, Rotation2d.fromDegrees(90));
-
-        public static final int ClimberCanId = 30;
-        public static final int ClimberDateId = 31; // CANrange
-
-        public static final double kP = 0.1;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-
-        // Mechanical Constants
-        public static final double ClimberGearRatio = 12.0; // Example: 12:1
-        public static final double ClimberSpoolDiameter = 0.0508; // Example: 2 inches in meters
-
-        // Climber Heights in Meters
-        public static final double L0 = 0.0;
-        public static final double L1 = 0.30; // ~1 foot
-        public static final double L2 = 0.60; // ~2 feet
-        public static final double L3 = 1.0; // ~3.3 feet
-        public static final double Tolerance = 0.02; // 2cm tolerance
-        public static final double SoftLimitBuffer = 0.05;
-    }
-
     public static final class HopperConstants {
         public static final int FlopperCanID = 8;
         public static final int LeftTowerCANID = 9;
         public static final int RightTowerCANID = 10;
 
-        public static final int CanRangeID1 = 4;
-        public static final int CanRangeID2 = 5;
+
         // Interior space is ~10.25 inches (260mm).
         public static final double LaserMinDistance = 200.0;
 
@@ -85,7 +61,7 @@ public final class Constants {
     public static final class HoodConstants {
         public static final int HoodCanId1 = 11;
         public static final int HoodCanId2 = 21;
-        public static final double kP = 1.1;
+        public static final double kP = 1.5;
         public static double kI = 0;
         public static double kD = 0;
     }

@@ -13,6 +13,7 @@ public class ShootCommand extends Command {
     private final Hopper m_hopper;
     private final ZoneDetection m_zoneDetection;
     private final Timer m_timer;
+    private boolean m_hasReachedSpeed;
 
     public ShootCommand(Shooter leftshooter, Shooter rightshooter, Hopper hopper, ZoneDetection zd) {
         m_leftShooter = leftshooter;
@@ -27,6 +28,7 @@ public class ShootCommand extends Command {
     public void initialize() {
         m_zoneDetection.enableZoneDetection(true);
         m_timer.restart();
+        m_hasReachedSpeed = false;
     }
 
     @Override
@@ -41,8 +43,14 @@ public class ShootCommand extends Command {
         } else {
             m_leftShooter.Shoot();
             m_rightShooter.Shoot();
-            // Shoot functionality: wait until either shooter is at speed (or timeout)
-            if (m_leftShooter.isAtSpeed() || m_rightShooter.isAtSpeed() || m_timer.hasElapsed(1.0)) {
+            
+            // Check if shooters have reached speed at least once
+            if (!m_hasReachedSpeed && (m_leftShooter.isAtSpeed() || m_rightShooter.isAtSpeed())) {
+                m_hasReachedSpeed = true;
+            }
+
+            // Shoot functionality: wait until either shooter is at speed (or timeout), then latch
+            if (m_hasReachedSpeed || m_timer.hasElapsed(1.0)) {
                 m_hopper.feedWithAntiJam(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
             } else {
                 m_hopper.stop();

@@ -92,9 +92,6 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        SmartDashboard.putNumber("Turret" + m_side.name() + "/Motor Current", TurretMotor.getStatorCurrent().getValueAsDouble());
-
         // --- 1. Sensors & State ---
         // Get current position in Rotations
         double currentMotorRotations = TurretMotor.getPosition().getValueAsDouble();

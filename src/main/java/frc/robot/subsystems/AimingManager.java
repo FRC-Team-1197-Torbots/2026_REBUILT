@@ -1,14 +1,12 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.MathUtil;
+import java.nio.file.DirectoryStream.Filter;
+
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.TurretConstants;
 
 /**
  * The AimingManager is responsible for taking the Robot's current drivetrain
@@ -31,83 +29,119 @@ public class AimingManager extends SubsystemBase {
     private final Turret rightturret;
     private final Shooter leftShooter;
     private final Shooter rightShooter;
+    private final Hood leftHood;
+    private final Hood rightHood;
 
     // Shoot-on-the-Move Settings
-    
- 
+
     private final String shooterTestRpmKey = "Test Rpm";
 
+    private LinearFilter filter = LinearFilter.singlePoleIIR(0.7, 0.02);
 
     public AimingManager(CommandSwerveDrivetrain drivetrain, ZoneDetection zoneDetection,
-            Turret leftTurret, Turret righTurret, Shooter leftShooter, Shooter rightShooter) {
+            Turret leftTurret, Turret righTurret, Shooter leftShooter, Shooter rightShooter,
+            Hood leftHood, Hood rightHood) {
         this.drivetrain = drivetrain;
         this.zoneDetection = zoneDetection;
         this.leftturret = leftTurret;
         this.rightturret = righTurret;
         this.leftShooter = leftShooter;
         this.rightShooter = rightShooter;
+        this.leftHood = leftHood;
+        this.rightHood = rightHood;
+
+        
 
         SmartDashboard.putNumber("ShooterTestSpeed", 0);
     }
 
     public void setShootOnTheMove(boolean enable) {
         // this.enableShootOnTheMove = enable;
-    }   
+    }
 
     @Override
     public void periodic() {
-        double debugSpeed = SmartDashboard.getNumber("ShooterTestSpeed", 0);
+        // double debugSpeed = SmartDashboard.getNumber("ShooterTestSpeed", 0);
 
-        if(debugSpeed != 0) {
-            leftShooter.setShooterSpeed(debugSpeed);
-            rightShooter.setShooterSpeed(debugSpeed);
-            
-        } else {
-            leftShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
-            rightShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
+        // if (debugSpeed != 0) {
+        //     leftShooter.setShooterSpeed(debugSpeed);
+        //     rightShooter.setShooterSpeed(debugSpeed);
+
+        // } else {
+        //     leftShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
+        //     rightShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
+        // }
+
+        Pose2d baseTargetPose = getTargetPose();
+
+        if (baseTargetPose != null) {
+        // 1. Get current robot state
+        Pose2d currentRobotPose = drivetrain.getState().Pose;
+
+        // 2. Calculate LEFT Hood & Shooter
+        calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, leftHood,
+        "Left");
+
+        // 3. Calculate RIGHT Hood & Shooter
+        calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter,
+        rightHood, "Right");
         }
-
-        // Pose2d baseTargetPose = getTargetPose();
-
-        // if (baseTargetPose != null) {
-        //     // 1. Get current robot state
-        //     Pose2d currentRobotPose = drivetrain.getState().Pose;
-
-        //     // 2. Calculate LEFT Hood & Shooter
-        //     calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, "Left");
-
-        //     // 3. Calculate RIGHT Hood & Shooter
-        //     calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter, "Right");
-        // } 
     }
 
     private void calculateAndApplyAiming(Pose2d robotPose,
-            Turret turret, Shooter shooter, String sideName) {
+            Turret turret, Shooter shooter, Hood hood, String sideName) {
 
         if (turret == null && shooter == null)
             return;
 
+        double distanceMeters = turret.getDistanceToTarget();
+
         // double calculatedRPS = SmartDashboard.getNumber(shooterTestRpmKey, 0) / 60.0;
         double calculatedRPS;
+        double calculatedHoodTicks;
+
         if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
             calculatedRPS = 2500.0 / 60.0;
+            // Assuming passing shot has a fixed hood angle, e.g. 5 ticks. Adjust if needed.
+            calculatedHoodTicks = 5.0;
         } else {
-            calculatedRPS = calculateRps(turret.getDistanceToTarget());
+            calculatedRPS = calculateRps(distanceMeters);
+            calculatedHoodTicks = calculateHoodTicks(distanceMeters);
         }
-        
+
         if (shooter != null) {
             shooter.setShooterSpeed(calculatedRPS);
         }
 
+        if (hood != null) {
+            hood.setTargetAngle(calculatedHoodTicks);
+        }
+
         // Telemetry
-        // SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m", turret.getDistanceToTarget());
+        SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m",
+        distanceMeters);
+        SmartDashboard.putNumber("AimingManager/" + sideName + "/RPS",
+        calculatedRPS);
+        SmartDashboard.putNumber("AimingManager/" + sideName + "/Hood Ticks",
+        calculatedHoodTicks);
+        SmartDashboard.putNumber("AimingManager/" + sideName + "/Hood Ticks Actual",
+        hood.getEncoderTicks());
+    }
+
+    private double calculateHoodTicks(double distanceMeters) {
+        
+        // TODO Auto-generated method stub
+        double a = 1.1917;
+        double b = -3.8555;
+        double c = 3.1307;
+        return filter.calculate(a * distanceMeters * distanceMeters + b * distanceMeters + c);
     }
 
     private double calculateRps(double d) {
         // https://docs.google.com/spreadsheets/d/12vaU1FRqllZlERNKd85nal3VIQaEh6twuFeA2sOHeNw/edit?pli=1&gid=0#gid=0
-        double a = 0.3856;
-        double b = 5.5;
-        double c = 6.0;    
+        double a = 2.4464;
+        double b = -2.0846;
+        double c = 41.182;
         return a * d * d + b * d + c;
     }
 
@@ -116,10 +150,12 @@ public class AimingManager extends SubsystemBase {
      * ZoneDetection.
      */
     private Pose2d getTargetPose() {
-        if (zoneDetection == null) return null;
-        
+        if (zoneDetection == null)
+            return null;
+
         var alliance = zoneDetection.getAlliance();
-        if (alliance.isEmpty()) return null;
+        if (alliance.isEmpty())
+            return null;
 
         var color = alliance.get();
         var zone = zoneDetection.getZone();
