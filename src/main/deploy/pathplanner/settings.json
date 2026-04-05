@@ -2,7 +2,12 @@
   "robotWidth": 0.965,
   "robotLength": 0.851,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "Code Red",
+    "Human Station Auto",
+    "V2 Double Swipe",
+    "Simple Autos"
+  ],
   "autoFolders": [],
   "defaultMaxVel": 3.5,
   "defaultMaxAccel": 3.5,
@@ -13,7 +18,7 @@
   "robotMOI": 1.65,
   "robotTrackwidth": 0.546,
   "driveWheelRadius": 0.0508,
-  "driveGearing": 6.03,
+  "driveGearing": 7.03,
   "maxDriveSpeed": 5.0,
   "driveMotorType": "krakenX60",
   "driveCurrentLimit": 60.0,
@@ -28,5 +33,7 @@
   "brModuleY": -0.305,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"Rectangle\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.53,\"y\":0.0},\"size\":{\"width\":0.952,\"length\":0.2032},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}"
+  ]
 }
