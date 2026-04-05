@@ -102,8 +102,7 @@ public class AimingManager extends SubsystemBase {
 
         if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
             calculatedRPS = 2500.0 / 60.0;
-            // Assuming passing shot has a fixed hood angle, e.g. 5 ticks. Adjust if needed.
-            calculatedHoodTicks = 5.0;
+            calculatedHoodTicks = 0.0;
         } else {
             calculatedRPS = calculateRps(distanceMeters);
             calculatedHoodTicks = calculateHoodTicks(distanceMeters);
@@ -134,7 +133,8 @@ public class AimingManager extends SubsystemBase {
         double a = 1.1917;
         double b = -3.8555;
         double c = 3.1307;
-        return filter.calculate(a * distanceMeters * distanceMeters + b * distanceMeters + c);
+        // return filter.calculate(a * distanceMeters * distanceMeters + b * distanceMeters + c);
+        return 0;
     }
 
     private double calculateRps(double d) {
