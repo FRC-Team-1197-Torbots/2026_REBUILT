@@ -36,7 +36,7 @@ public class AimingManager extends SubsystemBase {
 
     private final String shooterTestRpmKey = "Test Rpm";
 
-    private LinearFilter filter = LinearFilter.singlePoleIIR(0.3, 0.02);
+    private LinearFilter filter = LinearFilter.singlePoleIIR(0.7, 0.02);
 
     public AimingManager(CommandSwerveDrivetrain drivetrain, ZoneDetection zoneDetection,
             Turret leftTurret, Turret righTurret, Shooter leftShooter, Shooter rightShooter,
@@ -124,22 +124,24 @@ public class AimingManager extends SubsystemBase {
         calculatedRPS);
         SmartDashboard.putNumber("AimingManager/" + sideName + "/Hood Ticks",
         calculatedHoodTicks);
+        SmartDashboard.putNumber("AimingManager/" + sideName + "/Hood Ticks Actual",
+        hood.getEncoderTicks());
     }
 
     private double calculateHoodTicks(double distanceMeters) {
         
         // TODO Auto-generated method stub
-        double a = 1.2436;
-        double b = -4.0763;
-        double c = 3.2745;
+        double a = 1.1917;
+        double b = -3.8555;
+        double c = 3.1307;
         return filter.calculate(a * distanceMeters * distanceMeters + b * distanceMeters + c);
     }
 
     private double calculateRps(double d) {
         // https://docs.google.com/spreadsheets/d/12vaU1FRqllZlERNKd85nal3VIQaEh6twuFeA2sOHeNw/edit?pli=1&gid=0#gid=0
-        double a = 2.7811;
-        double b = -3.9334;
-        double c = 43.343;
+        double a = 2.4464;
+        double b = -2.0846;
+        double c = 41.182;
         return a * d * d + b * d + c;
     }
 

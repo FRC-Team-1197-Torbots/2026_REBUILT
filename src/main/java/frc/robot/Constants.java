@@ -61,7 +61,7 @@ public final class Constants {
     public static final class HoodConstants {
         public static final int HoodCanId1 = 11;
         public static final int HoodCanId2 = 21;
-        public static final double kP = 1.1;
+        public static final double kP = 1.5;
         public static double kI = 0;
         public static double kD = 0;
     }
