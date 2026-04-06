@@ -3,10 +3,10 @@ package frc.robot.subsystems;
 import java.nio.file.DirectoryStream.Filter;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.geometry.Pose2d;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+
 
 /**
  * The AimingManager is responsible for taking the Robot's current drivetrain
@@ -52,24 +52,18 @@ public class AimingManager extends SubsystemBase {
     @Override
     public void periodic() {
 
-        Pose2d baseTargetPose = getTargetPose();
-
-        if (baseTargetPose != null) {
-        // 1. Get current robot state
-        Pose2d currentRobotPose = drivetrain.getState().Pose;
-
-        // 2. Calculate LEFT Hood & Shooter
-        calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, leftHood,
-        "Left");
-
-        // 3. Calculate RIGHT Hood & Shooter
-        calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter,
-        rightHood, "Right");
+        if (zoneDetection == null || zoneDetection.getAlliance().isEmpty()) {
+            return;
         }
+
+        // 1. Calculate LEFT Hood & Shooter
+        calculateAndApplyAiming(leftturret, leftShooter, leftHood, "Left");
+
+        // 2. Calculate RIGHT Hood & Shooter
+        calculateAndApplyAiming(rightturret, rightShooter, rightHood, "Right");
     }
 
-    private void calculateAndApplyAiming(Pose2d robotPose,
-            Turret turret, Shooter shooter, Hood hood, String sideName) {
+    private void calculateAndApplyAiming(Turret turret, Shooter shooter, Hood hood, String sideName) {
 
         if (turret == null && shooter == null)
             return;
@@ -128,40 +122,6 @@ public class AimingManager extends SubsystemBase {
         double c = 41.182;
         return a * d * d + b * d + c;
     }
-
-    /**
-     * Determines which Pose to aim at based on the Alliance color and
-     * ZoneDetection.
-     */
-    private Pose2d getTargetPose() {
-        if (zoneDetection == null)
-            return null;
-
-        var alliance = zoneDetection.getAlliance();
-        if (alliance.isEmpty())
-            return null;
-
-        var color = alliance.get();
-        var zone = zoneDetection.getZone();
-        double yPos = drivetrain.getState().Pose.getY();
-
-        if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
-            if (zone == ZoneDetection.ZONE.BLUE)
-                return Constants.FieldConstants.BlueTargetPose;
-            if (zone == ZoneDetection.ZONE.NEUTRAL || zone == ZoneDetection.ZONE.RED) {
-                return (yPos < Constants.FieldConstants.FieldWidth / 2.0)
-                        ? Constants.FieldConstants.BluePassingCornerRight
-                        : Constants.FieldConstants.BluePassingCornerLeft;
-            }
-        } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
-            if (zone == ZoneDetection.ZONE.RED)
-                return Constants.FieldConstants.RedTargetPose;
-            if (zone == ZoneDetection.ZONE.NEUTRAL || zone == ZoneDetection.ZONE.BLUE) {
-                return (yPos < Constants.FieldConstants.FieldWidth / 2.0)
-                        ? Constants.FieldConstants.RedPassingCornerRight
-                        : Constants.FieldConstants.RedPassingCornerLeft;
-            }
-        }
-        return null; // Return null if unknown
-    }
 }
+
+
