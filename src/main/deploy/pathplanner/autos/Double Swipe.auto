@@ -9,6 +9,18 @@
           "data": {
             "pathName": "Double Swipe Pass 1"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Double Swipe Pass 2"
+          }
         }
       ]
     }
