@@ -34,18 +34,15 @@ public class ShootCommand extends Command {
     }
 
     @Override
-    public void execute() {
-        
+    public void execute() {       
+
+        m_leftShooter.Shoot();
+        m_rightShooter.Shoot();
 
         if (m_zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL || m_zoneDetection.isOpponentZone()) {
-            m_leftShooter.Spin(70.0);
-            m_rightShooter.Spin(70.0);
             // Pass functionality: dump balls immediately without waiting for max RPS
             m_hopper.feedWithAntiJam(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
         } else {
-            m_leftShooter.Shoot();
-            m_rightShooter.Shoot();
-            
             // Check if shooters have reached speed at least once
             if (!m_hasReachedSpeed && (m_leftShooter.isAtSpeed() || m_rightShooter.isAtSpeed())) {
                 m_hasReachedSpeed = true;
