@@ -35,20 +35,23 @@ public class ShootCommand extends Command {
 
     @Override
     public void execute() {       
-
+        // Tell the shooters to run their active spin logic.
+        // They will rely on the target speeds maintained by AimingManager in the background.
         m_leftShooter.Shoot();
         m_rightShooter.Shoot();
 
+        // If we are passing from the neutral or opponent zones, immediately feed the 
+        // ball to get rid of it fast, overriding the spool-up delay.
         if (m_zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL || m_zoneDetection.isOpponentZone()) {
-            // Pass functionality: dump balls immediately without waiting for max RPS
             m_hopper.feedWithAntiJam(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
         } else {
-            // Check if shooters have reached speed at least once
+            // Cross-distance shooting requires both shooters to be fully revved up.
+            // Check if shooters have reached speed at least once.
             if (!m_hasReachedSpeed && (m_leftShooter.isAtSpeed() || m_rightShooter.isAtSpeed())) {
                 m_hasReachedSpeed = true;
             }
 
-            // Shoot functionality: wait until either shooter is at speed (or timeout), then latch
+            // Once spooled up or if we timeout after 1 second, feed the balls.
             if (m_hasReachedSpeed || m_timer.hasElapsed(1.0)) {
                 m_hopper.feedWithAntiJam(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
             } else {

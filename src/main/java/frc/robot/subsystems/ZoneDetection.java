@@ -170,6 +170,10 @@ public class ZoneDetection extends SubsystemBase {
         // SmartDashboard.putNumber("Vision/" + name + "/AvgDist", mt2.avgTagDist);
     }
 
+    /**
+     * Checks if the robot is currently deep in the opposing alliance's zone.
+     * Often used to trigger passing/feeding behaviors rather than full shots.
+     */
     public boolean isOpponentZone() {
         var alliance = getAlliance();
         if (alliance.isEmpty()) return false;

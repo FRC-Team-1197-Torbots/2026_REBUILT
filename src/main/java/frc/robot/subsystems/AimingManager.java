@@ -34,8 +34,6 @@ public class AimingManager extends SubsystemBase {
 
     // Shoot-on-the-Move Settings
 
-    private final String shooterTestRpmKey = "Test Rpm";
-
     private LinearFilter filter = LinearFilter.singlePoleIIR(0.7, 0.02);
 
     public AimingManager(CommandSwerveDrivetrain drivetrain, ZoneDetection zoneDetection,
@@ -49,28 +47,10 @@ public class AimingManager extends SubsystemBase {
         this.rightShooter = rightShooter;
         this.leftHood = leftHood;
         this.rightHood = rightHood;
-
-        
-
-        SmartDashboard.putNumber("ShooterTestSpeed", 0);
-    }
-
-    public void setShootOnTheMove(boolean enable) {
-        // this.enableShootOnTheMove = enable;
     }
 
     @Override
     public void periodic() {
-        // double debugSpeed = SmartDashboard.getNumber("ShooterTestSpeed", 0);
-
-        // if (debugSpeed != 0) {
-        //     leftShooter.setShooterSpeed(debugSpeed);
-        //     rightShooter.setShooterSpeed(debugSpeed);
-
-        // } else {
-        //     leftShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
-        //     rightShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
-        // }
 
         Pose2d baseTargetPose = getTargetPose();
 
@@ -96,13 +76,13 @@ public class AimingManager extends SubsystemBase {
 
         double distanceMeters = turret.getDistanceToTarget();
 
-        // double calculatedRPS = SmartDashboard.getNumber(shooterTestRpmKey, 0) / 60.0;
         double calculatedRPS;
         double calculatedHoodTicks;
 
+        // If we are passing the ball (in neutral zone or opponent's zone), use hardcoded high speeds
+        // and fixed hood angles. Otherwise, dynamically calculate based on distance to speaker.
         if (zoneDetection != null && (zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL || zoneDetection.isOpponentZone())) {
             calculatedRPS = 70.0;
-            // Assuming passing shot has a fixed hood angle, e.g. 5 ticks. Adjust if needed.
             calculatedHoodTicks = 8.0;
         } else {
             calculatedRPS = calculateRps(distanceMeters);
