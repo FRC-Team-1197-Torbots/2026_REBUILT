@@ -100,10 +100,10 @@ public class AimingManager extends SubsystemBase {
         double calculatedRPS;
         double calculatedHoodTicks;
 
-        if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
-            calculatedRPS = 2500.0 / 60.0;
+        if (zoneDetection != null && (zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL || zoneDetection.isOpponentZone())) {
+            calculatedRPS = 70.0;
             // Assuming passing shot has a fixed hood angle, e.g. 5 ticks. Adjust if needed.
-            calculatedHoodTicks = 5.0;
+            calculatedHoodTicks = 8.0;
         } else {
             calculatedRPS = calculateRps(distanceMeters);
             calculatedHoodTicks = calculateHoodTicks(distanceMeters);
@@ -114,7 +114,11 @@ public class AimingManager extends SubsystemBase {
         }
 
         if (hood != null) {
-            hood.setTargetAngle(calculatedHoodTicks);
+            if (shooter != null && shooter.isShooting()) {
+                hood.setTargetAngle(calculatedHoodTicks);
+            } else {
+                hood.setTargetAngle(0.0);
+            }
         }
 
         // Telemetry
@@ -164,7 +168,7 @@ public class AimingManager extends SubsystemBase {
         if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
             if (zone == ZoneDetection.ZONE.BLUE)
                 return Constants.FieldConstants.BlueTargetPose;
-            if (zone == ZoneDetection.ZONE.NEUTRAL) {
+            if (zone == ZoneDetection.ZONE.NEUTRAL || zone == ZoneDetection.ZONE.RED) {
                 return (yPos < Constants.FieldConstants.FieldWidth / 2.0)
                         ? Constants.FieldConstants.BluePassingCornerRight
                         : Constants.FieldConstants.BluePassingCornerLeft;
@@ -172,12 +176,12 @@ public class AimingManager extends SubsystemBase {
         } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
             if (zone == ZoneDetection.ZONE.RED)
                 return Constants.FieldConstants.RedTargetPose;
-            if (zone == ZoneDetection.ZONE.NEUTRAL) {
+            if (zone == ZoneDetection.ZONE.NEUTRAL || zone == ZoneDetection.ZONE.BLUE) {
                 return (yPos < Constants.FieldConstants.FieldWidth / 2.0)
                         ? Constants.FieldConstants.RedPassingCornerRight
                         : Constants.FieldConstants.RedPassingCornerLeft;
             }
         }
-        return null; // Return null if in an enemy zone or unknown
+        return null; // Return null if unknown
     }
 }

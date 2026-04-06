@@ -29,15 +29,17 @@ public class ShootCommand extends Command {
         m_zoneDetection.enableZoneDetection(true);
         m_timer.restart();
         m_hasReachedSpeed = false;
+        m_leftShooter.setShootingFlag(true);
+        m_rightShooter.setShootingFlag(true);
     }
 
     @Override
     public void execute() {
         
 
-        if (m_zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
-            m_leftShooter.Spin(40.0);
-            m_rightShooter.Spin(40.0);
+        if (m_zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL || m_zoneDetection.isOpponentZone()) {
+            m_leftShooter.Spin(70.0);
+            m_rightShooter.Spin(70.0);
             // Pass functionality: dump balls immediately without waiting for max RPS
             m_hopper.feedWithAntiJam(HopperConstants.HopperFeedSpeed, HopperConstants.TowerFeedSpeed);
         } else {
@@ -60,6 +62,8 @@ public class ShootCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        m_leftShooter.setShootingFlag(false);
+        m_rightShooter.setShootingFlag(false);
         m_leftShooter.Stop();
         m_rightShooter.Stop();
         m_hopper.stop();

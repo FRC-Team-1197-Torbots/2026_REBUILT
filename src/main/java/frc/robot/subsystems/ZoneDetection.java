@@ -170,6 +170,15 @@ public class ZoneDetection extends SubsystemBase {
         // SmartDashboard.putNumber("Vision/" + name + "/AvgDist", mt2.avgTagDist);
     }
 
+    public boolean isOpponentZone() {
+        var alliance = getAlliance();
+        if (alliance.isEmpty()) return false;
+        var color = alliance.get();
+        if (color == Alliance.Blue && myZone == ZONE.RED) return true;
+        if (color == Alliance.Red && myZone == ZONE.BLUE) return true;
+        return false;
+    }
+
     public ZONE getZone() {
         return myZone;
     }
