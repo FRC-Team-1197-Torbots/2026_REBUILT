@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.13932530120482,
+        "x": 4.4445080645178825,
         "y": 0.6474096385542167
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.1393253012048215,
+        "x": 5.444508064517884,
         "y": 0.6474096385542167
       },
       "isLocked": false,
@@ -48,16 +48,16 @@
     },
     {
       "anchor": {
-        "x": 6.204662650602408,
-        "y": 0.7785421686746998
+        "x": 6.192677419354839,
+        "y": 0.7068951612903231
       },
       "prevControl": {
-        "x": 8.029590361445782,
-        "y": 0.8003975903614469
+        "x": 6.879688190220573,
+        "y": 0.7381229236024005
       },
       "nextControl": {
-        "x": 4.763978361830806,
-        "y": 0.7612884646175547
+        "x": 5.87083870967742,
+        "y": 0.6922661290322594
       },
       "isLocked": false,
       "linkedName": null
@@ -65,11 +65,11 @@
     {
       "anchor": {
         "x": 3.4618072289156623,
-        "y": 0.8113253012048198
+        "y": 0.7068951612903231
       },
       "prevControl": {
         "x": 4.07375903614458,
-        "y": 0.7894698795180715
+        "y": 0.6850397396035748
       },
       "nextControl": null,
       "isLocked": false,
@@ -78,8 +78,8 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.4680497925311194,
-      "rotationDegrees": 180.0
+      "waypointRelativePos": 0.6830497794580959,
+      "rotationDegrees": 90.0
     },
     {
       "waypointRelativePos": 1.7095435684647236,
@@ -113,7 +113,7 @@
   "folder": "V2 Double Swipe",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": 180.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": false
 }

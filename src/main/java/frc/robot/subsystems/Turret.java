@@ -124,11 +124,30 @@ public class Turret extends SubsystemBase {
                     
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
+                    
+                    // --- OPTIONAL SHOP TEST: Middle Field Dual-Corner Passing ---
+                    // "When our robot is in the neutral zone and in the middle of the field behind the hubs, 
+                    // aim the left turret to the left corner and the right turret to the right corner"
+                    
+                    // The 2026 REBUILT Hub funnel has a width of ~41 inches (1.0414 meters)
+                    double hubWidthMeters = 1.0414;
+                    double middleFieldYMin = (Constants.FieldConstants.FieldWidth / 2.0) - (hubWidthMeters / 2.0);
+                    double middleFieldYMax = (Constants.FieldConstants.FieldWidth / 2.0) + (hubWidthMeters / 2.0);
+                    
+                    if (DriveTrain.getState().Pose.getY() >= middleFieldYMin && DriveTrain.getState().Pose.getY() <= middleFieldYMax) {
+                        if (m_side == TURRET_SIDE.LEFT) {
+                            targetPose = Constants.FieldConstants.BluePassingCornerLeft;
+                        } else {
+                            targetPose = Constants.FieldConstants.BluePassingCornerRight;
+                        }
+                    } else {
+                    // ------------------------------------------------------------
                     // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
                     if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
                         targetPose = Constants.FieldConstants.BluePassingCornerRight;
                     } else {
                         targetPose = Constants.FieldConstants.BluePassingCornerLeft;
+                    }
                     }
                     shouldTrack = true;
                 } else if (zone == ZoneDetection.ZONE.RED) {
@@ -143,10 +162,29 @@ public class Turret extends SubsystemBase {
                     
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
+
+                    // --- OPTIONAL SHOP TEST: Middle Field Dual-Corner Passing ---
+                    // "When our robot is in the neutral zone and in the middle of the field behind the hubs, 
+                    // aim the left turret to the left corner and the right turret to the right corner"
+                    
+                    // The 2026 REBUILT Hub funnel has a width of ~41 inches (1.0414 meters)
+                    double hubWidthMeters = 1.0414;
+                    double middleFieldYMin = (Constants.FieldConstants.FieldWidth / 2.0) - (hubWidthMeters / 2.0);
+                    double middleFieldYMax = (Constants.FieldConstants.FieldWidth / 2.0) + (hubWidthMeters / 2.0);
+                    
+                    if (DriveTrain.getState().Pose.getY() >= middleFieldYMin && DriveTrain.getState().Pose.getY() <= middleFieldYMax) {
+                        if (m_side == TURRET_SIDE.LEFT) {
+                            targetPose = Constants.FieldConstants.RedPassingCornerLeft;
+                        } else {
+                            targetPose = Constants.FieldConstants.RedPassingCornerRight;
+                        }
+                    } else {
+                    // ------------------------------------------------------------
                     if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
                         targetPose = Constants.FieldConstants.RedPassingCornerRight;
                     } else {
                         targetPose = Constants.FieldConstants.RedPassingCornerLeft;
+                    }
                     }
                     
                     shouldTrack = true;
