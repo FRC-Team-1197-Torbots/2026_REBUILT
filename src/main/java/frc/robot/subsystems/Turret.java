@@ -41,7 +41,8 @@ public class Turret extends SubsystemBase {
     private Intake m_Intake;
 
     public Pose2d targetPose;
-    private final double AVERAGE_PIECE_SPEED_MPS = 2.5; // Needs tuning
+    // Legacy piece speed, replaced by calculateTimeOfFlight regression curve
+    // private final double AVERAGE_PIECE_SPEED_MPS = 10.0; // Needs tuning
     public boolean enableShootOnTheMove = true;
 
     public Turret(int turretCanId, int encoderID, edu.wpi.first.math.geometry.Translation2d turretOffset,
@@ -294,7 +295,7 @@ public class Turret extends SubsystemBase {
         edu.wpi.first.math.kinematics.ChassisSpeeds speeds = DriveTrain.getState().Speeds;
 
         double distance = targetPose.getTranslation().getDistance(robotPose.getTranslation());
-        double timeOfFlight = distance / AVERAGE_PIECE_SPEED_MPS;
+        double timeOfFlight = calculateTimeOfFlight(distance);
 
         double offsetX = speeds.vxMetersPerSecond * timeOfFlight;
         double offsetY = speeds.vyMetersPerSecond * timeOfFlight;
@@ -303,5 +304,22 @@ public class Turret extends SubsystemBase {
                 targetPose.getX() - offsetX,
                 targetPose.getY() - offsetY,
                 targetPose.getRotation());
+    }
+
+    /**
+     * Calculates the estimated Time of Flight of the game piece based on target distance.
+     * Tune a, b, c by measuring actual time of flight at different distances.
+     * 
+     * @param distance The distance to the target in meters
+     * @return Estimated Time of Flight in seconds
+     */
+    private double calculateTimeOfFlight(double distance) {
+        // Defaults to a flat ~10 m/s horizontal speed if left untuned.
+        // Replace a, b, c with your regression values when you have time to test.
+        double a = 0.0;
+        double b = 0.1; // Setting b to 0.1 perfectly mimics the old 10.0 m/s behavior (since 1 / 10 = 0.1)
+        double c = 0.0;
+
+        return (a * distance * distance) + (b * distance) + c;
     }
 }
