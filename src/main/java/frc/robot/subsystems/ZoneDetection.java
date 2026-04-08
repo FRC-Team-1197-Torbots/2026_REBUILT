@@ -119,7 +119,7 @@ public class ZoneDetection extends SubsystemBase {
             myZone = ZONE.NEUTRAL;
         }
 
-        // SmartDashboard.putString("Zone", myZone.toString());
+        SmartDashboard.putString("Zone", myZone.toString());
     }
 
     private void processLimelight(String name) {
@@ -168,6 +168,19 @@ public class ZoneDetection extends SubsystemBase {
         // Just push to dashboard for debugging
         // SmartDashboard.putNumber("Vision/" + name + "/TagCount", mt2.tagCount);
         // SmartDashboard.putNumber("Vision/" + name + "/AvgDist", mt2.avgTagDist);
+    }
+
+    /**
+     * Checks if the robot is currently deep in the opposing alliance's zone.
+     * Often used to trigger passing/feeding behaviors rather than full shots.
+     */
+    public boolean isOpponentZone() {
+        var alliance = getAlliance();
+        if (alliance.isEmpty()) return false;
+        var color = alliance.get();
+        if (color == Alliance.Blue && myZone == ZONE.RED) return true;
+        if (color == Alliance.Red && myZone == ZONE.BLUE) return true;
+        return false;
     }
 
     public ZONE getZone() {

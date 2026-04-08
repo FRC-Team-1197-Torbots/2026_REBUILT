@@ -51,17 +51,17 @@ public class Hood extends SubsystemBase {
         // setTargetAngle(hoodTargetTicks);
     }
 
-    public Command ManualHoodUp() {
-        return Commands.runOnce(() -> hoodMain.set(0.3));
-    }
+    // public Command ManualHoodUp() {
+    //     return Commands.runOnce(() -> hoodMain.set(0.3));
+    // }
 
-    public Command ManualHoodDown() {
-        return Commands.runOnce(() -> hoodMain.set(-0.3));
-    }
+    // public Command ManualHoodDown() {
+    //     return Commands.runOnce(() -> hoodMain.set(-0.3));
+    // }
 
-    public Command ManualHoodStop() {
-        return Commands.runOnce(() -> hoodMain.set(0));
-    }
+    // public Command ManualHoodStop() {
+    //     return Commands.runOnce(() -> hoodMain.set(0));
+    // }
 
     //provides ticks in degrees
     public void setTargetAngle(double ticks) {

@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
@@ -105,12 +106,11 @@ public class Turret extends SubsystemBase {
 
         // --- 2. Determine Target Pose ---
         // Grab globally cached alliance
-        var alliance = (zoneDetection != null) ? zoneDetection.getAlliance() : java.util.Optional.<edu.wpi.first.wpilibj.DriverStation.Alliance>empty();
+        var alliance = (zoneDetection != null) ? zoneDetection.getAlliance()
+                : java.util.Optional.<edu.wpi.first.wpilibj.DriverStation.Alliance>empty();
 
-        
         boolean shouldTrack = false;
 
-        
         if (alliance.isPresent() && zoneDetection != null && DriveTrain != null &&
                 m_robotOffset != null) {
             var color = alliance.get();
@@ -121,14 +121,36 @@ public class Turret extends SubsystemBase {
                     // Home Zone -> Attack Hub
                     targetPose = Constants.FieldConstants.BlueTargetPose;
                     shouldTrack = true;
-                    
+
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
-                    // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
-                    if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
-                        targetPose = Constants.FieldConstants.BluePassingCornerRight;
+
+                    // --- OPTIONAL SHOP TEST: Middle Field Dual-Corner Passing ---
+                    // "When our robot is in the neutral zone and in the middle of the field behind
+                    // the hubs,
+                    // aim the left turret to the left corner and the right turret to the right
+                    // corner"
+
+                    // The 2026 REBUILT Hub funnel has a width of ~41 inches (1.0414 meters)
+                    double hubWidthMeters = Units.inchesToMeters(47);
+                    double middleFieldYMin = (Constants.FieldConstants.FieldWidth / 2.0) - (hubWidthMeters / 2.0);
+                    double middleFieldYMax = (Constants.FieldConstants.FieldWidth / 2.0) + (hubWidthMeters / 2.0);
+
+                    if (DriveTrain.getState().Pose.getY() >= middleFieldYMin
+                            && DriveTrain.getState().Pose.getY() <= middleFieldYMax) {
+                        if (m_side == TURRET_SIDE.LEFT) {
+                            targetPose = Constants.FieldConstants.BluePassingCornerRight;
+                        } else {
+                            targetPose = Constants.FieldConstants.BluePassingCornerLeft;
+                        }
                     } else {
-                        targetPose = Constants.FieldConstants.BluePassingCornerLeft;
+                        // ------------------------------------------------------------
+                        // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
+                        if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
+                            targetPose = Constants.FieldConstants.BluePassingCornerRight;
+                        } else {
+                            targetPose = Constants.FieldConstants.BluePassingCornerLeft;
+                        }
                     }
                     shouldTrack = true;
                 } else if (zone == ZoneDetection.ZONE.RED) {
@@ -140,15 +162,37 @@ public class Turret extends SubsystemBase {
                     // Home Zone -> Attack Hub
                     targetPose = Constants.FieldConstants.RedTargetPose;
                     shouldTrack = true;
-                    
+
                 } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
                     // Neutral Zone -> Pass to Corner (Safe)
-                    if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
-                        targetPose = Constants.FieldConstants.RedPassingCornerRight;
+
+                    // --- OPTIONAL SHOP TEST: Middle Field Dual-Corner Passing ---
+                    // "When our robot is in the neutral zone and in the middle of the field behind
+                    // the hubs,
+                    // aim the left turret to the left corner and the right turret to the right
+                    // corner"
+
+                    // The 2026 REBUILT Hub funnel has a width of ~41 inches (1.0414 meters)
+                    double hubWidthMeters = Units.inchesToMeters(47);
+                    double middleFieldYMin = (Constants.FieldConstants.FieldWidth / 2.0) - (hubWidthMeters / 2.0);
+                    double middleFieldYMax = (Constants.FieldConstants.FieldWidth / 2.0) + (hubWidthMeters / 2.0);
+
+                    if (DriveTrain.getState().Pose.getY() >= middleFieldYMin
+                            && DriveTrain.getState().Pose.getY() <= middleFieldYMax) {
+                        if (m_side == TURRET_SIDE.LEFT) {
+                            targetPose = Constants.FieldConstants.RedPassingCornerRight;
+                        } else {
+                            targetPose = Constants.FieldConstants.RedPassingCornerLeft;
+                        }
                     } else {
-                        targetPose = Constants.FieldConstants.RedPassingCornerLeft;
+                        // ------------------------------------------------------------
+                        if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
+                            targetPose = Constants.FieldConstants.RedPassingCornerRight;
+                        } else {
+                            targetPose = Constants.FieldConstants.RedPassingCornerLeft;
+                        }
                     }
-                    
+
                     shouldTrack = true;
                 } else if (zone == ZoneDetection.ZONE.BLUE) {
                     // Opponent Zone -> Zero turrets
@@ -159,7 +203,7 @@ public class Turret extends SubsystemBase {
 
         if (m_Intake.m_position == INTAKE_POSITION.RETRACTED || m_Intake.m_position == INTAKE_POSITION.RETRACTING) {
             shouldTrack = false;
-        } 
+        }
         // SmartDashboard.putBoolean("Should track", shouldTrack);
         // SmartDashboard.putString("Intake State", m_Intake.m_position.toString());
         SmartDashboard.putNumber(m_distanceLogKey, m_distanceToTarget);
@@ -167,7 +211,8 @@ public class Turret extends SubsystemBase {
         if (shouldTrack && targetPose != null) {
             Pose2d currentRobotPose = DriveTrain.getState().Pose;
 
-            // Primitive transform math saves 4 object allocations per 20ms over .transformBy() and .minus()
+            // Primitive transform math saves 4 object allocations per 20ms over
+            // .transformBy() and .minus()
             double cos = currentRobotPose.getRotation().getCos();
             double sin = currentRobotPose.getRotation().getSin();
             double turretX = currentRobotPose.getX() + (m_robotOffset.getX() * cos - m_robotOffset.getY() * sin);
@@ -185,17 +230,17 @@ public class Turret extends SubsystemBase {
             m_distanceToTarget = Math.hypot(dX, dY);
             double targetFieldDegrees = Math.toDegrees(Math.atan2(dY, dX));
             double trueTargetFieldDegrees = Math.toDegrees(Math.atan2(trueDy, trueDx));
-          
-            
 
             // Calculate the raw difference between where the target is and where the robot
             // is facing
-            double headingDifference = MathUtil.inputModulus(trueTargetFieldDegrees - robotHeadingDegrees, -180.0, 180.0);
+            double headingDifference = MathUtil.inputModulus(trueTargetFieldDegrees - robotHeadingDegrees, -180.0,
+                    180.0);
 
             double targetRelativeDegrees;
 
             // If the robot is generally facing the hub (+/- 90 deg), reset turrets to 0.
-            // This is geometrically fixed at 90 degrees since the turrets are mounted backward, 
+            // This is geometrically fixed at 90 degrees since the turrets are mounted
+            // backward,
             // independent of the physical cable limits.
             if (Math.abs(headingDifference) < 90.0) {
                 targetRelativeDegrees = 0.0;
@@ -241,7 +286,8 @@ public class Turret extends SubsystemBase {
      * @param targetAngle The target angle in degrees relative to the robot's front
      */
     public void setTargetAngle(double targetAngle) {
-        double clampedAngle = edu.wpi.first.math.MathUtil.clamp(targetAngle, TurretConstants.MinAngle, TurretConstants.MaxAngle);
+        double clampedAngle = edu.wpi.first.math.MathUtil.clamp(targetAngle, TurretConstants.MinAngle,
+                TurretConstants.MaxAngle);
         TargetRotations = degreesToRotations(clampedAngle);
     }
 
@@ -294,7 +340,6 @@ public class Turret extends SubsystemBase {
         return new Pose2d(
                 targetPose.getX() - offsetX,
                 targetPose.getY() - offsetY,
-                targetPose.getRotation()
-        );
+                targetPose.getRotation());
     }
 }

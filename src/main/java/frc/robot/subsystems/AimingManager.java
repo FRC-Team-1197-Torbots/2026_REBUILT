@@ -3,10 +3,10 @@ package frc.robot.subsystems;
 import java.nio.file.DirectoryStream.Filter;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.geometry.Pose2d;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+
 
 /**
  * The AimingManager is responsible for taking the Robot's current drivetrain
@@ -34,8 +34,6 @@ public class AimingManager extends SubsystemBase {
 
     // Shoot-on-the-Move Settings
 
-    private final String shooterTestRpmKey = "Test Rpm";
-
     private LinearFilter filter = LinearFilter.singlePoleIIR(0.7, 0.02);
 
     public AimingManager(CommandSwerveDrivetrain drivetrain, ZoneDetection zoneDetection,
@@ -49,61 +47,37 @@ public class AimingManager extends SubsystemBase {
         this.rightShooter = rightShooter;
         this.leftHood = leftHood;
         this.rightHood = rightHood;
-
-        
-
-        SmartDashboard.putNumber("ShooterTestSpeed", 0);
-    }
-
-    public void setShootOnTheMove(boolean enable) {
-        // this.enableShootOnTheMove = enable;
     }
 
     @Override
     public void periodic() {
-        // double debugSpeed = SmartDashboard.getNumber("ShooterTestSpeed", 0);
 
-        // if (debugSpeed != 0) {
-        //     leftShooter.setShooterSpeed(debugSpeed);
-        //     rightShooter.setShooterSpeed(debugSpeed);
-
-        // } else {
-        //     leftShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
-        //     rightShooter.setShooterSpeed(Constants.ShooterConstants.IdleSpeed);
-        // }
-
-        Pose2d baseTargetPose = getTargetPose();
-
-        if (baseTargetPose != null) {
-        // 1. Get current robot state
-        Pose2d currentRobotPose = drivetrain.getState().Pose;
-
-        // 2. Calculate LEFT Hood & Shooter
-        calculateAndApplyAiming(currentRobotPose, leftturret, leftShooter, leftHood,
-        "Left");
-
-        // 3. Calculate RIGHT Hood & Shooter
-        calculateAndApplyAiming(currentRobotPose, rightturret, rightShooter,
-        rightHood, "Right");
+        if (zoneDetection == null || zoneDetection.getAlliance().isEmpty()) {
+            return;
         }
+
+        // 1. Calculate LEFT Hood & Shooter
+        calculateAndApplyAiming(leftturret, leftShooter, leftHood, "Left");
+
+        // 2. Calculate RIGHT Hood & Shooter
+        calculateAndApplyAiming(rightturret, rightShooter, rightHood, "Right");
     }
 
-    private void calculateAndApplyAiming(Pose2d robotPose,
-            Turret turret, Shooter shooter, Hood hood, String sideName) {
+    private void calculateAndApplyAiming(Turret turret, Shooter shooter, Hood hood, String sideName) {
 
         if (turret == null && shooter == null)
             return;
 
         double distanceMeters = turret.getDistanceToTarget();
 
-        // double calculatedRPS = SmartDashboard.getNumber(shooterTestRpmKey, 0) / 60.0;
         double calculatedRPS;
         double calculatedHoodTicks;
 
-        if (zoneDetection != null && zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL) {
-            calculatedRPS = 2500.0 / 60.0;
-            // Assuming passing shot has a fixed hood angle, e.g. 5 ticks. Adjust if needed.
-            calculatedHoodTicks = 5.0;
+        // If we are passing the ball (in neutral zone or opponent's zone), use hardcoded high speeds
+        // and fixed hood angles. Otherwise, dynamically calculate based on distance to speaker.
+        if (zoneDetection != null && (zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL || zoneDetection.isOpponentZone())) {
+            calculatedRPS = 70.0;
+            calculatedHoodTicks = 8.0;
         } else {
             calculatedRPS = calculateRps(distanceMeters);
             calculatedHoodTicks = calculateHoodTicks(distanceMeters);
@@ -114,7 +88,11 @@ public class AimingManager extends SubsystemBase {
         }
 
         if (hood != null) {
-            hood.setTargetAngle(calculatedHoodTicks);
+            if (shooter != null && shooter.isShooting()) {
+                hood.setTargetAngle(calculatedHoodTicks);
+            } else {
+                hood.setTargetAngle(0.0);
+            }
         }
 
         // Telemetry
@@ -141,43 +119,9 @@ public class AimingManager extends SubsystemBase {
         // https://docs.google.com/spreadsheets/d/12vaU1FRqllZlERNKd85nal3VIQaEh6twuFeA2sOHeNw/edit?pli=1&gid=0#gid=0
         double a = 2.4464;
         double b = -2.0846;
-        double c = 41.182;
+        double c = 50.182;
         return a * d * d + b * d + c;
     }
-
-    /**
-     * Determines which Pose to aim at based on the Alliance color and
-     * ZoneDetection.
-     */
-    private Pose2d getTargetPose() {
-        if (zoneDetection == null)
-            return null;
-
-        var alliance = zoneDetection.getAlliance();
-        if (alliance.isEmpty())
-            return null;
-
-        var color = alliance.get();
-        var zone = zoneDetection.getZone();
-        double yPos = drivetrain.getState().Pose.getY();
-
-        if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
-            if (zone == ZoneDetection.ZONE.BLUE)
-                return Constants.FieldConstants.BlueTargetPose;
-            if (zone == ZoneDetection.ZONE.NEUTRAL) {
-                return (yPos < Constants.FieldConstants.FieldWidth / 2.0)
-                        ? Constants.FieldConstants.BluePassingCornerRight
-                        : Constants.FieldConstants.BluePassingCornerLeft;
-            }
-        } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
-            if (zone == ZoneDetection.ZONE.RED)
-                return Constants.FieldConstants.RedTargetPose;
-            if (zone == ZoneDetection.ZONE.NEUTRAL) {
-                return (yPos < Constants.FieldConstants.FieldWidth / 2.0)
-                        ? Constants.FieldConstants.RedPassingCornerRight
-                        : Constants.FieldConstants.RedPassingCornerLeft;
-            }
-        }
-        return null; // Return null if in an enemy zone or unknown
-    }
 }
+
+

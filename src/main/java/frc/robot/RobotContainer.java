@@ -153,10 +153,10 @@ public class RobotContainer {
                 driverController.rightTrigger(0.5f).whileTrue(shootGroup);
 
                 //////////////////////Co Pilot functions//////////////////////////
-                overrideController.a().whileTrue(m_intake.runAgiCommand())
+                overrideController.rightBumper().whileTrue(m_intake.runAgiCommand())
                         .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
 
-                overrideController.rightTrigger(0.5).whileTrue(m_hopper.reverseHopper()).onFalse(m_hopper.stopCommand());
+                overrideController.leftBumper().whileTrue(m_hopper.reverseHopper()).onFalse(m_hopper.stopCommand());
         }
 
         private Command safeRetractCommand() {

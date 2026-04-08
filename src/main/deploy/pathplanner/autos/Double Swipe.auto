@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "code red path"
+            "pathName": "Double Swipe Pass 1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 3.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "code red path 2"
+            "pathName": "Double Swipe Pass 2"
           }
         }
       ]

@@ -25,6 +25,15 @@ public class Shooter extends SubsystemBase {
     protected SHOOTER_SIDE m_side;
 
     private double shooterspeed = 60.0; // Default to 60 RPS
+    private boolean m_isShooting = false;
+
+    public void setShootingFlag(boolean isShooting) {
+        m_isShooting = isShooting;
+    }
+
+    public boolean isShooting() {
+        return m_isShooting;
+    }
 
     public Shooter(int shooterID1, int shooterID2, SHOOTER_SIDE side) {
 
