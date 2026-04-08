@@ -111,93 +111,52 @@ public class Turret extends SubsystemBase {
 
         boolean shouldTrack = false;
 
-        if (alliance.isPresent() && zoneDetection != null && DriveTrain != null &&
-                m_robotOffset != null) {
+        if (alliance.isPresent() && zoneDetection != null && DriveTrain != null && m_robotOffset != null) {
             var color = alliance.get();
             var zone = zoneDetection.getZone();
 
-            if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
-                if (zone == ZoneDetection.ZONE.BLUE) {
-                    // Home Zone -> Attack Hub
-                    targetPose = Constants.FieldConstants.BlueTargetPose;
-                    shouldTrack = true;
+            boolean isBlue = color == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
+            boolean isRed = color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 
-                } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
-                    // Neutral Zone -> Pass to Corner (Safe)
+            if (isBlue && zone == ZoneDetection.ZONE.BLUE) {
+                // Home Zone -> Attack Hub
+                targetPose = Constants.FieldConstants.BlueTargetPose;
+                shouldTrack = true;
 
-                    // --- OPTIONAL SHOP TEST: Middle Field Dual-Corner Passing ---
-                    // "When our robot is in the neutral zone and in the middle of the field behind
-                    // the hubs,
-                    // aim the left turret to the left corner and the right turret to the right
-                    // corner"
+            } else if (isRed && zone == ZoneDetection.ZONE.RED) {
+                // Home Zone -> Attack Hub
+                targetPose = Constants.FieldConstants.RedTargetPose;
+                shouldTrack = true;
 
-                    // The 2026 REBUILT Hub funnel has a width of ~41 inches (1.0414 meters)
-                    double hubWidthMeters = Units.inchesToMeters(47);
-                    double middleFieldYMin = (Constants.FieldConstants.FieldWidth / 2.0) - (hubWidthMeters / 2.0);
-                    double middleFieldYMax = (Constants.FieldConstants.FieldWidth / 2.0) + (hubWidthMeters / 2.0);
+            } else if (zone == ZoneDetection.ZONE.NEUTRAL && (isBlue || isRed)) {
+                // Neutral Zone -> Pass to Corner (Safe)
+                Pose2d passRight = isBlue ? Constants.FieldConstants.BluePassingCornerRight : Constants.FieldConstants.RedPassingCornerRight;
+                Pose2d passLeft = isBlue ? Constants.FieldConstants.BluePassingCornerLeft : Constants.FieldConstants.RedPassingCornerLeft;
 
-                    if (DriveTrain.getState().Pose.getY() >= middleFieldYMin
-                            && DriveTrain.getState().Pose.getY() <= middleFieldYMax) {
-                        if (m_side == TURRET_SIDE.LEFT) {
-                            targetPose = Constants.FieldConstants.BluePassingCornerRight;
-                        } else {
-                            targetPose = Constants.FieldConstants.BluePassingCornerLeft;
-                        }
-                    } else {
-                        // ------------------------------------------------------------
-                        // Logic: If on Right side(Y < Width/2) -> Right Corner. Else Left Corner.
-                        if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
-                            targetPose = Constants.FieldConstants.BluePassingCornerRight;
-                        } else {
-                            targetPose = Constants.FieldConstants.BluePassingCornerLeft;
-                        }
-                    }
-                    shouldTrack = true;
-                } else if (zone == ZoneDetection.ZONE.RED) {
-                    // Opponent Zone -> Zero turrets
-                    shouldTrack = false;
+                // The 2026 REBUILT Hub funnel has a width of ~41 inches (1.0414 meters)
+                double hubWidthMeters = Units.inchesToMeters(47);
+                double centerY = Constants.FieldConstants.FieldWidth / 2.0;
+                double middleFieldYMin = centerY - (hubWidthMeters / 2.0);
+                double middleFieldYMax = centerY + (hubWidthMeters / 2.0);
+                
+                double robotY = DriveTrain.getState().Pose.getY();
+
+                if (robotY >= middleFieldYMin && robotY <= middleFieldYMax) {
+                    // Split shooting behind hubs
+                    // NOTE: Corners are "flipped" (LEFT targets Right, RIGHT targets Left) 
+                    // because the turrets are mounted on the backside of the robot.
+                    targetPose = (m_side == TURRET_SIDE.LEFT) ? passRight : passLeft;
+                } else {
+                    // Default Side Passing
+                    // If on the Y=0 side of the field, target the Y=0 corner (Right Corner for Blue).
+                    targetPose = (robotY < centerY) ? passRight : passLeft;
                 }
-            } else if (color == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
-                if (zone == ZoneDetection.ZONE.RED) {
-                    // Home Zone -> Attack Hub
-                    targetPose = Constants.FieldConstants.RedTargetPose;
-                    shouldTrack = true;
 
-                } else if (zone == ZoneDetection.ZONE.NEUTRAL) {
-                    // Neutral Zone -> Pass to Corner (Safe)
-
-                    // --- OPTIONAL SHOP TEST: Middle Field Dual-Corner Passing ---
-                    // "When our robot is in the neutral zone and in the middle of the field behind
-                    // the hubs,
-                    // aim the left turret to the left corner and the right turret to the right
-                    // corner"
-
-                    // The 2026 REBUILT Hub funnel has a width of ~41 inches (1.0414 meters)
-                    double hubWidthMeters = Units.inchesToMeters(47);
-                    double middleFieldYMin = (Constants.FieldConstants.FieldWidth / 2.0) - (hubWidthMeters / 2.0);
-                    double middleFieldYMax = (Constants.FieldConstants.FieldWidth / 2.0) + (hubWidthMeters / 2.0);
-
-                    if (DriveTrain.getState().Pose.getY() >= middleFieldYMin
-                            && DriveTrain.getState().Pose.getY() <= middleFieldYMax) {
-                        if (m_side == TURRET_SIDE.LEFT) {
-                            targetPose = Constants.FieldConstants.RedPassingCornerRight;
-                        } else {
-                            targetPose = Constants.FieldConstants.RedPassingCornerLeft;
-                        }
-                    } else {
-                        // ------------------------------------------------------------
-                        if (DriveTrain.getState().Pose.getY() < Constants.FieldConstants.FieldWidth / 2.0) {
-                            targetPose = Constants.FieldConstants.RedPassingCornerRight;
-                        } else {
-                            targetPose = Constants.FieldConstants.RedPassingCornerLeft;
-                        }
-                    }
-
-                    shouldTrack = true;
-                } else if (zone == ZoneDetection.ZONE.BLUE) {
-                    // Opponent Zone -> Zero turrets
-                    shouldTrack = false;
-                }
+                shouldTrack = true;
+                
+            } else {
+                // Opponent Zone -> Zero turrets
+                shouldTrack = false;
             }
         }
 
@@ -218,7 +177,10 @@ public class Turret extends SubsystemBase {
             double turretX = currentRobotPose.getX() + (m_robotOffset.getX() * cos - m_robotOffset.getY() * sin);
             double turretY = currentRobotPose.getY() + (m_robotOffset.getX() * sin + m_robotOffset.getY() * cos);
 
-            Pose2d adjustedTarget = applyShootOnTheMove(currentRobotPose, targetPose);
+            // To disable Shoot-On-The-Move structurally, simply comment out or delete the assignment below.
+            // The code will gracefully fall back to the stationary targetPose without any compilation errors.
+            Pose2d adjustedTarget = targetPose;
+            adjustedTarget = applyShootOnTheMove(currentRobotPose, targetPose);
 
             double dX = adjustedTarget.getX() - turretX;
             double dY = adjustedTarget.getY() - turretY;
