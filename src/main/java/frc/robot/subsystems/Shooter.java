@@ -37,6 +37,8 @@ public class Shooter extends SubsystemBase {
 
     public Shooter(int shooterID1, int shooterID2, SHOOTER_SIDE side) {
 
+        SmartDashboard.putNumber("Shoooter Speed " + side.name(), 0);
+
         m_side = side;
         shooterWheel1 = new SparkMax(shooterID1, MotorType.kBrushless);
         shooterWheel2 = new SparkMax(shooterID2, MotorType.kBrushless);
@@ -111,6 +113,8 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         super.periodic();
+
+        setShooterSpeed(SmartDashboard.getNumber("Shooter Speed" + m_side.name(), 0));
 
         SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed", shooterWheel1.getEncoder().getVelocity());
         SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel2 Speed", shooterWheel2.getEncoder().getVelocity());
