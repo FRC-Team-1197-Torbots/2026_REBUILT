@@ -61,8 +61,8 @@ public class Hopper extends SubsystemBase {
     /** Sets both hopper motors to the same speed. */
     public void setSpeed(double flopperspeed, double towerspeed) {
         flopperMotor.set(-flopperspeed);
-        leftTower.setControl(towerVoltageRequest.withOutput(towerspeed * 11.0));
-        rightTower.setControl(towerVoltageRequest.withOutput(-towerspeed * 11.0));
+        leftTower.setControl(towerVoltageRequest.withOutput(towerspeed * 12.0));
+        rightTower.setControl(towerVoltageRequest.withOutput(-towerspeed * 12.0));
     }
 
     public void stop() {

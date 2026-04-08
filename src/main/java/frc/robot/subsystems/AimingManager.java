@@ -119,7 +119,7 @@ public class AimingManager extends SubsystemBase {
         // https://docs.google.com/spreadsheets/d/12vaU1FRqllZlERNKd85nal3VIQaEh6twuFeA2sOHeNw/edit?pli=1&gid=0#gid=0
         double a = 2.4464;
         double b = -2.0846;
-        double c = 41.182;
+        double c = 50.182;
         return a * d * d + b * d + c;
     }
 }

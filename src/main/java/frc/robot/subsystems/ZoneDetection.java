@@ -6,6 +6,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
@@ -118,7 +119,7 @@ public class ZoneDetection extends SubsystemBase {
             myZone = ZONE.NEUTRAL;
         }
 
-        // SmartDashboard.putString("Zone", myZone.toString());
+        SmartDashboard.putString("Zone", myZone.toString());
     }
 
     private void processLimelight(String name) {
