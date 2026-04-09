@@ -156,6 +156,13 @@ public class RobotContainer {
                         .onFalse(m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));
 
                 overrideController.leftBumper().whileTrue(m_hopper.reverseHopper()).onFalse(m_hopper.stopCommand());
+                
+                overrideController.leftTrigger().whileTrue(
+                        Commands.parallel(
+                                m_intake.runReverseCommand(),
+                                m_hopper.reverseHopper()
+                        )
+                );
         }
 
         private Command safeRetractCommand() {

@@ -231,6 +231,12 @@ public class Intake extends SubsystemBase {
         return run(() -> deploy());
     }
 
+    public Command runReverseCommand() {
+        return run(() -> setSurfaceSpeed(-Constants.IntakeConstants.Min_Surface_Speed))
+                .beforeStarting(this::deploy)
+                .finallyDo(interrupted -> stopIntake());
+    }
+
     public void setSurfaceSpeed(double mps) {
         if (isRollerLocked()) {
             intakeMotor.set(0.0);
