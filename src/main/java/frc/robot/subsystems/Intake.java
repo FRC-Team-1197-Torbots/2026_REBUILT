@@ -14,6 +14,11 @@ import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
+
+    // ==========================================
+    // HARDWARE SETUP & CONSTANTS
+    // ==========================================
+
     private final TalonFX intakeMotor;
     private final TalonFX deployMotor;
 
@@ -63,13 +68,22 @@ public class Intake extends SubsystemBase {
         m_position = INTAKE_POSITION.RETRACTED;
     }
 
+    // ==========================================
+    // SUBSYSTEM UPDATES & HARDWARE MONITORING
+    // ==========================================
+
     @Override
     public void periodic() {
         super.periodic();
-
         SmartDashboard.putNumber("Intake Roller", intakeMotor.get());
-        // SmartDashboard.putNumber("Intake Speed", 0)
+        
+        checkDeploymentStall();
+    }
 
+    /**
+     * Checks if the deploy mechanism has reached its target tracking or stalled out on the hard stop.
+     */
+    private void checkDeploymentStall() {
         if (m_deployTarget != null) {
             double currentPos = deployMotor.getPosition().getValueAsDouble();
             double velocity = deployMotor.getVelocity().getValueAsDouble();
@@ -78,8 +92,7 @@ public class Intake extends SubsystemBase {
             boolean isAtTarget = Math.abs(currentPos - m_deployTarget) < IntakeConstants.DeployTolerance;
 
             // If the motor is trying to move for at least 0.25s, but velocity is zero and
-            // current is starting to spike,
-            // Then it has likely reached the physical hard stop and is stalling.
+            // current is starting to spike, then it has likely reached the physical hard stop and is stalling.
             boolean isStalled = m_deployTimer.hasElapsed(0.25) &&
                     current > (IntakeConstants.DeployCurrentLimit - 10.0) &&
                     Math.abs(velocity) < 0.1;
@@ -94,7 +107,6 @@ public class Intake extends SubsystemBase {
                         deployMotor.setPosition(IntakeConstants.RetractPosition);
                     }
                 }
-
                 stopDeploy();
             }
         }
@@ -104,12 +116,27 @@ public class Intake extends SubsystemBase {
         return m_position == INTAKE_POSITION.AGI || (m_deployTarget != null && m_deployTarget == IntakeConstants.AgiPosition);
     }
 
+    // ==========================================
+    // CORE HARDWARE ACTIONS: ROLLERS & DEPLOYMENT
+    // ==========================================
+
     public void setSpeed(double speed) {
         if (isRollerLocked()) {
             intakeMotor.set(0.0);
         } else {
             intakeMotor.set(speed);
         }
+    }
+
+    public void setSurfaceSpeed(double mps) {
+        if (isRollerLocked()) {
+            intakeMotor.set(0.0);
+            return;
+        }
+
+        double wheelCircumferenceMeters = Units.inchesToMeters(Constants.IntakeConstants.wheelDiameter) * Math.PI;
+        double targetRPS = (mps / wheelCircumferenceMeters) * Constants.IntakeConstants.gearratio;
+        intakeMotor.setControl(m_VelocityRequest.withVelocity(targetRPS));
     }
 
     public void stopIntake() {
@@ -130,41 +157,7 @@ public class Intake extends SubsystemBase {
         setSurfaceSpeed(targetSpeed);
     }
 
-
-
-    public Command runIntakeCommand(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier))
-                .beforeStarting(this::deploy)
-                .finallyDo(interrupted -> stopIntake());
-    }
-
-    // public Command runIntakeCommand(ChassisSpeeds speed) {
-    //     return run(() -> runIntake(speed))
-    //             .beforeStarting(this::deploy)
-    //             .finallyDo(interrupted -> stopIntake());
-    // }
-
-
-
-    public Command stopCommand() {
-        return runOnce(this::stopIntake);
-    }
-
-    public void agi() {
-        if (m_position == INTAKE_POSITION.AGI)
-            return;
-
-        m_deployTarget = IntakeConstants.AgiPosition;
-        m_deployTimer.restart();
-        deployMotor.setControl(m_DeployRequest.withPosition(IntakeConstants.AgiPosition));
-        stopIntake();
-    }
-
-    // Deployment Methods
     public void deploy() {
-        // if (m_position == INTAKE_POSITION.DEPLOYED)
-        // return;
-
         m_position = INTAKE_POSITION.DEPLOYED;
 
         m_deployTarget = IntakeConstants.DeployPosition;
@@ -185,6 +178,16 @@ public class Intake extends SubsystemBase {
         deployMotor.setControl(m_DeployRequest.withPosition(IntakeConstants.RetractPosition));
     }
 
+    public void agi() {
+        if (m_position == INTAKE_POSITION.AGI)
+            return;
+
+        m_deployTarget = IntakeConstants.AgiPosition;
+        m_deployTimer.restart();
+        deployMotor.setControl(m_DeployRequest.withPosition(IntakeConstants.AgiPosition));
+        stopIntake();
+    }
+
     public void stopDeploy() {
         if (m_deployTarget == IntakeConstants.DeployPosition)
             m_position = INTAKE_POSITION.DEPLOYED;
@@ -196,56 +199,34 @@ public class Intake extends SubsystemBase {
         deployMotor.setControl(m_StopDeployRequest);
     }
 
+    // ==========================================
+    // WPILIB COMMAND FACTORIES
+    // ==========================================
+
     public Command runRetractCommand() {
         return runOnce(this::retract);
-    }
-
-    public Command runDeployCommand() {
-        return runOnce(this::deploy);
     }
 
     public Command runAgiCommand() {
         return runOnce(this::agi);
     }
 
-
     /**
-     * Deploys the intake and runs the rollers.
-     * When the command ends (e.g., button released), the rollers stop and the
-     * intake retracts.
+     * Deploys the intake and runs the rollers indefinitely based on speed.
      */
     public Command runDeployAndIntakeCommand(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
-        return run(() -> runIntake(speedSupplier)) // Run intake rollers indefinitely
+        return run(() -> runIntake(speedSupplier)) 
                 .beforeStarting(this::deploy);
     }
 
     public Command runDeployImmediate(Supplier<ChassisSpeeds> speedSupplier) {
-        return runOnce(() -> runIntake(speedSupplier)) // Run intake rollers indefinitely
+        return runOnce(() -> runIntake(speedSupplier)) 
                 .beforeStarting(this::deploy);
-    }
-
-
-
-    public Command deployIntake() {
-        return run(() -> deploy());
     }
 
     public Command runReverseCommand() {
         return run(() -> setSurfaceSpeed(-Constants.IntakeConstants.Min_Surface_Speed))
                 .beforeStarting(this::deploy)
                 .finallyDo(interrupted -> stopIntake());
-    }
-
-    public void setSurfaceSpeed(double mps) {
-        if (isRollerLocked()) {
-            intakeMotor.set(0.0);
-            return;
-        }
-
-        double wheelCircumferenceMeters = Units.inchesToMeters(Constants.IntakeConstants.wheelDiameter) * Math.PI;
-
-        double targetRPS = (mps / wheelCircumferenceMeters) * Constants.IntakeConstants.gearratio;
-
-        intakeMotor.setControl(m_VelocityRequest.withVelocity(targetRPS));
     }
 }
