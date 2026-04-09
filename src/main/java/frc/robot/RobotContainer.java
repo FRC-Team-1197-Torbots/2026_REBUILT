@@ -83,8 +83,8 @@ public class RobotContainer {
         private final SendableChooser<Command> autoChooser;
 
         Command shootGroup = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection);
-        Command shootTimeout4 = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(4);
-        Command shootTimeout2 = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(2);
+        Command shootTimeout10 = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(10);
+
 
         public RobotContainer() {
                 configureNamedCommands();
@@ -100,6 +100,7 @@ public class RobotContainer {
                 // NamedCommands.registerCommand("run intake 2", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(6.0));
                 // NamedCommands.registerCommand("run intake", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));                
                 NamedCommands.registerCommand("shoot balls", shootGroup.withTimeout(3));
+                NamedCommands.registerCommand("shoot balls long", shootTimeout10);
         }
 
         private void configureBindings() {
