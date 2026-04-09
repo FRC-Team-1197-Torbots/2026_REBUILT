@@ -173,7 +173,7 @@ public class Turret extends SubsystemBase {
         }
         // SmartDashboard.putBoolean("Should track", shouldTrack);
         // SmartDashboard.putString("Intake State", m_Intake.m_position.toString());
-        SmartDashboard.putNumber(m_distanceLogKey, m_distanceToTarget);
+        // SmartDashboard.putNumber(m_distanceLogKey, m_distanceToTarget);
         // --- 3. Calculate Desired Angle & Apply Control ---
         if (shouldTrack && targetPose != null) {
             Pose2d currentRobotPose = DriveTrain.getState().Pose;
@@ -303,11 +303,16 @@ public class Turret extends SubsystemBase {
 
         edu.wpi.first.math.kinematics.ChassisSpeeds speeds = DriveTrain.getState().Speeds;
 
+        // Convert robot-relative speeds to field-relative speeds
+        edu.wpi.first.math.geometry.Rotation2d robotHeading = robotPose.getRotation();
+        double fieldVx = speeds.vxMetersPerSecond * robotHeading.getCos() - speeds.vyMetersPerSecond * robotHeading.getSin();
+        double fieldVy = speeds.vxMetersPerSecond * robotHeading.getSin() + speeds.vyMetersPerSecond * robotHeading.getCos();
+
         double distance = targetPose.getTranslation().getDistance(robotPose.getTranslation());
         double timeOfFlight = calculateTimeOfFlight(distance);
 
-        double offsetX = speeds.vxMetersPerSecond * timeOfFlight;
-        double offsetY = speeds.vyMetersPerSecond * timeOfFlight;
+        double offsetX = fieldVx * timeOfFlight;
+        double offsetY = fieldVy * timeOfFlight;
 
         return new Pose2d(
                 targetPose.getX() - offsetX,
@@ -327,7 +332,7 @@ public class Turret extends SubsystemBase {
         // Defaults to a flat ~10 m/s horizontal speed if left untuned.
         // Replace a, b, c with your regression values when you have time to test.
         double a = 0.0;
-        double b = 0.5; 
+        double b = 0.1; 
         double c = 0.0;
 
         return (a * distance * distance) + (b * distance) + c;
