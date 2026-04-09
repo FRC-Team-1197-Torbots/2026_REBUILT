@@ -1,0 +1,119 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.3856769201821164,
+        "y": 7.2892528279652415
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.3856769201821155,
+        "y": 7.2892528279652415
+      },
+      "isLocked": false,
+      "linkedName": "TrentchShotPosition Flipped"
+    },
+    {
+      "anchor": {
+        "x": 6.095385542168674,
+        "y": 7.2892528279652415
+      },
+      "prevControl": {
+        "x": 5.541685483870968,
+        "y": 7.325825408610402
+      },
+      "nextControl": {
+        "x": 6.81578937760294,
+        "y": 7.2416692545599854
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.630843373493977,
+        "y": 4.591253012048192
+      },
+      "prevControl": {
+        "x": 6.982523491697433,
+        "y": 4.615200155266053
+      },
+      "nextControl": {
+        "x": 5.983086513012026,
+        "y": 4.547144956160484
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.095385542168674,
+        "y": 7.2892528279652415
+      },
+      "prevControl": {
+        "x": 6.850109930669762,
+        "y": 7.2892528279652415
+      },
+      "nextControl": {
+        "x": 5.570943548387097,
+        "y": 7.2892528279652415
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.3856769201821164,
+        "y": 7.2892528279652415
+      },
+      "prevControl": {
+        "x": 4.216182944278502,
+        "y": 7.31110824965199
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "TrentchShotPosition Flipped"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.099585062240646,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 1.3568464730290257,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 2.75,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 2.95,
+      "rotationDegrees": 90.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.5,
+    "maxAcceleration": 2.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 540.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "reversed": false,
+  "folder": "V2 Double Swipe",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "useDefaultConstraints": true
+}
