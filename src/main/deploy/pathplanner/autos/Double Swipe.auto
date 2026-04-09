@@ -5,21 +5,53 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Double Swipe Pass 1"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Double Swipe Pass 1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake on"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 3.0
+            "name": "shoot balls"
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Double Swipe Pass 2"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake on"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Double Swipe Pass 2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot balls"
           }
         }
       ]

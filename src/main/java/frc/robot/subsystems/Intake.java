@@ -67,6 +67,9 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         super.periodic();
 
+        SmartDashboard.putNumber("Intake Roller", intakeMotor.get());
+        // SmartDashboard.putNumber("Intake Speed", 0)
+
         if (m_deployTarget != null) {
             double currentPos = deployMotor.getPosition().getValueAsDouble();
             double velocity = deployMotor.getVelocity().getValueAsDouble();
@@ -116,6 +119,8 @@ public class Intake extends SubsystemBase {
     public void runIntake(java.util.function.Supplier<ChassisSpeeds> speedSupplier) {
         ChassisSpeeds speed = speedSupplier.get(); 
         double robotVelocity = Math.hypot(speed.vxMetersPerSecond, speed.vyMetersPerSecond);
+
+        SmartDashboard.putNumber("Robot Velocity", robotVelocity);
 
         // Calculate target speed in Meters Per Second
         // Start at Min_Surface_Speed, bump up based on robot velocity

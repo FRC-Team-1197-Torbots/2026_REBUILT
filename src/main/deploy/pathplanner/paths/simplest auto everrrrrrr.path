@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.073759036144579,
-        "y": 0.5381325301204822
+        "x": 4.456228915662651,
+        "y": 0.505349397590362
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.046325301204819,
-        "y": 0.5272048192771093
+        "x": 5.428795180722891,
+        "y": 0.49442168674698905
       },
       "isLocked": false,
-      "linkedName": "START0"
+      "linkedName": "LowerTrentchStart"
     },
     {
       "anchor": {
-        "x": 7.537843373493976,
-        "y": 1.204722891566264
+        "x": 7.6580481927710835,
+        "y": 0.505349397590362
       },
       "prevControl": {
-        "x": 7.22873668595773,
-        "y": 0.4512753406966634
+        "x": 6.307326379128589,
+        "y": 0.4543787631132859
       },
       "nextControl": {
-        "x": 7.712686746987952,
-        "y": 1.6309036144578317
+        "x": 8.23721686746988,
+        "y": 0.5272048192771093
       },
       "isLocked": false,
       "linkedName": null
@@ -33,69 +33,65 @@
     {
       "anchor": {
         "x": 7.6580481927710835,
-        "y": 3.1498554216867465
+        "y": 3.1061445783132537
       },
       "prevControl": {
-        "x": 7.71268674698795,
-        "y": 2.4176987951807223
+        "x": 7.636192771084337,
+        "y": 2.275638554216868
       },
       "nextControl": {
-        "x": 7.6314588701075685,
-        "y": 3.506152345377856
+        "x": 7.667447246316583,
+        "y": 3.463308613042258
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.953325301204819,
-        "y": 2.526975903614458
+        "x": 6.335795180722892,
+        "y": 0.7068951612903231
       },
       "prevControl": {
-        "x": 7.09903795532955,
-        "y": 2.5930747105831924
+        "x": 7.481507834847623,
+        "y": 0.7729939682590574
       },
       "nextControl": {
-        "x": 5.385084337349396,
-        "y": 2.4941927710843377
+        "x": 5.767554216867469,
+        "y": 0.6741120287602027
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.259965986394558,
-        "y": 2.526975903614458
+        "x": 3.133975903614458,
+        "y": 0.7068951612903231
       },
       "prevControl": {
-        "x": 1.7298575526596187,
-        "y": 2.526975903614458
+        "x": 3.603867469879518,
+        "y": 0.706895161290323
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "simple end1"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.33526970954357294,
-      "rotationDegrees": 179.94262382435775
-    },
-    {
       "waypointRelativePos": 0.8995850622406745,
-      "rotationDegrees": 95.0
+      "rotationDegrees": 90.0
     },
     {
       "waypointRelativePos": 2.3,
-      "rotationDegrees": 110.0
+      "rotationDegrees": 90.0
     },
     {
       "waypointRelativePos": 3.1,
-      "rotationDegrees": -179.11384725111955
+      "rotationDegrees": 180.0
     },
     {
       "waypointRelativePos": 3.7,
-      "rotationDegrees": 179.0004121738998
+      "rotationDegrees": 180.0
     }
   ],
   "constraintZones": [
@@ -120,31 +116,25 @@
       "waypointRelativePos": 0,
       "endWaypointRelativePos": 4.0,
       "command": null
-    },
-    {
-      "name": "shoot balls",
-      "waypointRelativePos": 4.0,
-      "endWaypointRelativePos": null,
-      "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.5,
-    "maxAcceleration": 3.5,
+    "maxVelocity": 2.5,
+    "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 360.0,
+    "maxAngularAcceleration": 540.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -157.3562456904192
+    "rotation": -160.14592108307517
   },
   "reversed": false,
   "folder": "Simple Autos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": false
 }

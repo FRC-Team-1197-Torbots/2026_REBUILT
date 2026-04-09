@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -96,12 +95,11 @@ public class RobotContainer {
         }
 
         private void configureNamedCommands() {
-                NamedCommands.registerCommand("intake on", m_intake.runDeployImmediate(() -> drivetrain.getState().Speeds));                
-                NamedCommands.registerCommand("run intake 1", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(4.7));
-                NamedCommands.registerCommand("run intake 2", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(6.0));
-                NamedCommands.registerCommand("run intake", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));                
-                NamedCommands.registerCommand("shoot balls", shootGroup);
-                NamedCommands.registerCommand("shoot balls 4", shootTimeout4);
+                NamedCommands.registerCommand("intake on", m_intake.runDeployImmediate(() -> drivetrain.getState().Speeds).withTimeout(5));                
+                // NamedCommands.registerCommand("run intake 1", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(4.7));
+                // NamedCommands.registerCommand("run intake 2", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(6.0));
+                // NamedCommands.registerCommand("run intake", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));                
+                NamedCommands.registerCommand("shoot balls", shootGroup.withTimeout(3));
         }
 
         private void configureBindings() {

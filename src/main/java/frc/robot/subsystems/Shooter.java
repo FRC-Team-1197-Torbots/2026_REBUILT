@@ -118,7 +118,7 @@ public class Shooter extends SubsystemBase {
 
         // setShooterSpeed(speed);
 
-        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed", shooterWheel1.getEncoder().getVelocity());
-        SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel2 Speed", shooterWheel2.getEncoder().getVelocity());
+        // SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed", shooterWheel1.getEncoder().getVelocity());
+        // SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel2 Speed", shooterWheel2.getEncoder().getVelocity());
     }
 }

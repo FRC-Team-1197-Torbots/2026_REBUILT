@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
@@ -129,7 +130,7 @@ public class Turret extends SubsystemBase {
                 targetPose = Constants.FieldConstants.RedTargetPose;
                 shouldTrack = true;
 
-            } else if (zone == ZoneDetection.ZONE.NEUTRAL && (isBlue || isRed)) {
+            } else if (zone == ZoneDetection.ZONE.NEUTRAL && (isBlue || isRed) && DriverStation.isTeleop()) {
                 // Neutral Zone -> Pass to Corner (Safe)
                 Pose2d passRight = isBlue ? Constants.FieldConstants.BluePassingCornerLeft
                         : Constants.FieldConstants.RedPassingCornerRight;
@@ -243,9 +244,9 @@ public class Turret extends SubsystemBase {
         // double currentAbsRotations = getRelativeRotation();
         double motoroutput = turrentPID.calculate(encoder.getPosition().getValueAsDouble(), TargetRotations);
 
-        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
-        SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
-                encoder.getPosition().getValueAsDouble());
+        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Target Rotation", TargetRotations);
+        // SmartDashboard.putNumber("Turrent" + m_side.name() + "/Actual Rotation",
+        //         encoder.getPosition().getValueAsDouble());
 
         TurretMotor.set(motoroutput);
     }

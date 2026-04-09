@@ -13,8 +13,20 @@
                 "data": {
                   "pathName": "simplest auto everrrrrrr"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake on"
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot balls"
           }
         }
       ]
