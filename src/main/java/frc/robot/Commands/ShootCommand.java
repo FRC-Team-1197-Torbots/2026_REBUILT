@@ -47,7 +47,7 @@ public class ShootCommand extends Command {
         } else {
             // Cross-distance shooting requires both shooters to be fully revved up.
             // Check if shooters have reached speed at least once.
-            if (!m_hasReachedSpeed && (m_leftShooter.isAtSpeed() || m_rightShooter.isAtSpeed())) {
+            if (!m_hasReachedSpeed && (m_leftShooter.isAtSpeed() && m_rightShooter.isAtSpeed())) {
                 m_hasReachedSpeed = true;
             }
 

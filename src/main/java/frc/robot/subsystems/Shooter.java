@@ -62,7 +62,6 @@ public class Shooter extends SubsystemBase {
 
     public void Spin(double speedMeasurement) {
         // SparkMax expects RPM, so if RPS is given, convert to RPM
-        shooterspeed = speedMeasurement;
         double rpm = speedMeasurement * 60.0;
         
         // Feedforward does 90% of the work, PID just cleans up the error
@@ -98,7 +97,7 @@ public class Shooter extends SubsystemBase {
         // SparkMax returns velocity in RPM
         double currentSpeedRpm = shooterWheel1.getEncoder().getVelocity();
         double currentSpeedRps = currentSpeedRpm / 60.0;
-        return Math.abs(currentSpeedRps - (shooterspeed)) <=  1.0;
+        return Math.abs(currentSpeedRps - (shooterspeed)) <= 2.5;
     }
 
     @Override
