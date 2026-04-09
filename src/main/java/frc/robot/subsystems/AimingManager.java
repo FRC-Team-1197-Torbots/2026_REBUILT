@@ -54,10 +54,10 @@ public class AimingManager extends SubsystemBase {
         }
 
         // // 1. Calculate LEFT Hood & Shooter
-        // calculateAndApplyAiming(leftturret, leftShooter, leftHood, "Left");
+        calculateAndApplyAiming(leftturret, leftShooter, leftHood, "Left");
 
         // // 2. Calculate RIGHT Hood & Shooter
-        // calculateAndApplyAiming(rightturret, rightShooter, rightHood, "Right");
+        calculateAndApplyAiming(rightturret, rightShooter, rightHood, "Right");
     }
 
     private void calculateAndApplyAiming(Turret turret, Shooter shooter, Hood hood, String sideName) {
@@ -73,7 +73,7 @@ public class AimingManager extends SubsystemBase {
         // If we are passing the ball (in neutral zone or opponent's zone), use hardcoded high speeds
         // and fixed hood angles. Otherwise, dynamically calculate based on distance to speaker.
         if (zoneDetection != null && (zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL || zoneDetection.isOpponentZone())) {
-            calculatedRPS = 70.0;
+            calculatedRPS = 50.0;
             calculatedHoodTicks = 8.0;
         } else {
             calculatedRPS = calculateRps(distanceMeters);
@@ -103,21 +103,28 @@ public class AimingManager extends SubsystemBase {
         hood.getEncoderTicks());
     }
 
-    private double calculateHoodTicks(double distanceMeters) {
+    private double calculateHoodTicks(double d) {
         
         // TODO Auto-generated method stub
-        double a = 1.1917;
-        double b = -3.8555;
-        double c = 3.1307;
-        return filter.calculate(a * distanceMeters * distanceMeters + b * distanceMeters + c);
+        double a = 0.085;
+        double b = 0.893;
+        double c = -1.1785;
+
+        if(d < 2) {
+            return 0;
+        } else {
+
+        }
+        return filter.calculate(a * d * d + b * d + c);
     }
 
     private double calculateRps(double d) {
         // https://docs.google.com/spreadsheets/d/12vaU1FRqllZlERNKd85nal3VIQaEh6twuFeA2sOHeNw/edit?pli=1&gid=0#gid=0
-        double a = 2.4464;
+        double a = 4.8252;
         double b = -2.0846;
-        double c = 50.182;
-        return a * d * d + b * d + c;
+        double c = 38.708;
+        // return a * d * d + b * d + c;
+        return a * d + c;
     }
 }
 

@@ -131,30 +131,36 @@ public class Turret extends SubsystemBase {
 
             } else if (zone == ZoneDetection.ZONE.NEUTRAL && (isBlue || isRed)) {
                 // Neutral Zone -> Pass to Corner (Safe)
-                Pose2d passRight = isBlue ? Constants.FieldConstants.BluePassingCornerRight : Constants.FieldConstants.RedPassingCornerRight;
-                Pose2d passLeft = isBlue ? Constants.FieldConstants.BluePassingCornerLeft : Constants.FieldConstants.RedPassingCornerLeft;
+                Pose2d passRight = isBlue ? Constants.FieldConstants.BluePassingCornerLeft
+                        : Constants.FieldConstants.RedPassingCornerRight;
+                Pose2d passLeft = isBlue ? Constants.FieldConstants.BluePassingCornerRight
+                        : Constants.FieldConstants.RedPassingCornerLeft;
 
                 // The 2026 REBUILT Hub funnel has a width of ~41 inches (1.0414 meters)
                 double hubWidthMeters = Units.inchesToMeters(47);
                 double centerY = Constants.FieldConstants.FieldWidth / 2.0;
                 double middleFieldYMin = centerY - (hubWidthMeters / 2.0);
                 double middleFieldYMax = centerY + (hubWidthMeters / 2.0);
-                
+
                 double robotY = DriveTrain.getState().Pose.getY();
 
                 if (robotY >= middleFieldYMin && robotY <= middleFieldYMax) {
                     // Split shooting behind hubs
-                    // NOTE: Corners are "flipped" (LEFT targets Right, RIGHT targets Left) 
+                    // NOTE: Corners are "flipped" (LEFT targets Right, RIGHT targets Left)
                     // because the turrets are mounted on the backside of the robot.
                     targetPose = (m_side == TURRET_SIDE.LEFT) ? passRight : passLeft;
                 } else {
                     // Default Side Passing
-                    // If on the Y=0 side of the field, target the Y=0 corner (Right Corner for Blue).
-                    targetPose = (robotY < centerY) ? passRight : passLeft;
+                    // If on the Y=0 side of the field, target the Y=0 corner (Right Corner for
+                    // Blue).
+                    if (isRed)
+                        targetPose = (robotY < centerY) ? passRight : passLeft;
+                    if (isBlue)
+                        targetPose = (robotY < centerY) ? passLeft : passRight;
                 }
 
                 shouldTrack = true;
-                
+
             } else {
                 // Opponent Zone -> Zero turrets
                 shouldTrack = false;
@@ -178,8 +184,10 @@ public class Turret extends SubsystemBase {
             double turretX = currentRobotPose.getX() + (m_robotOffset.getX() * cos - m_robotOffset.getY() * sin);
             double turretY = currentRobotPose.getY() + (m_robotOffset.getX() * sin + m_robotOffset.getY() * cos);
 
-            // To disable Shoot-On-The-Move structurally, simply comment out or delete the assignment below.
-            // The code will gracefully fall back to the stationary targetPose without any compilation errors.
+            // To disable Shoot-On-The-Move structurally, simply comment out or delete the
+            // assignment below.
+            // The code will gracefully fall back to the stationary targetPose without any
+            // compilation errors.
             Pose2d adjustedTarget = targetPose;
             adjustedTarget = applyShootOnTheMove(currentRobotPose, targetPose);
 
@@ -307,7 +315,8 @@ public class Turret extends SubsystemBase {
     }
 
     /**
-     * Calculates the estimated Time of Flight of the game piece based on target distance.
+     * Calculates the estimated Time of Flight of the game piece based on target
+     * distance.
      * Tune a, b, c by measuring actual time of flight at different distances.
      * 
      * @param distance The distance to the target in meters
@@ -317,7 +326,7 @@ public class Turret extends SubsystemBase {
         // Defaults to a flat ~10 m/s horizontal speed if left untuned.
         // Replace a, b, c with your regression values when you have time to test.
         double a = 0.0;
-        double b = 0.1; // Setting b to 0.1 perfectly mimics the old 10.0 m/s behavior (since 1 / 10 = 0.1)
+        double b = 0.5; 
         double c = 0.0;
 
         return (a * distance * distance) + (b * distance) + c;

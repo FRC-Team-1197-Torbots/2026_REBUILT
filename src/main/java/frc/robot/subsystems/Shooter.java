@@ -22,7 +22,7 @@ public class Shooter extends SubsystemBase {
         RIGHT, LEFT
     };
 
-    protected SHOOTER_SIDE m_side;
+    public SHOOTER_SIDE m_side;
 
     private double shooterspeed = 60.0; // Default to 60 RPS
     private boolean m_isShooting = false;
@@ -35,9 +35,7 @@ public class Shooter extends SubsystemBase {
         return m_isShooting;
     }
 
-    public Shooter(int shooterID1, int shooterID2, SHOOTER_SIDE side) {
-
-        SmartDashboard.putNumber("Shoooter Speed " + side.name(), 0);
+    public Shooter(int shooterID1, int shooterID2, SHOOTER_SIDE side) {       
 
         m_side = side;
         shooterWheel1 = new SparkMax(shooterID1, MotorType.kBrushless);
@@ -67,6 +65,8 @@ public class Shooter extends SubsystemBase {
 
         shooterWheel1.configure(config1, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         shooterWheel2.configure(config2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        SmartDashboard.putNumber("Shooter Speed" + m_side.name(), 0);
     }
 
     public void Spin(double speedMeasurement) {
@@ -114,7 +114,9 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         super.periodic();
 
-        setShooterSpeed(SmartDashboard.getNumber("Shooter Speed" + m_side.name(), 0));
+        // double speed = SmartDashboard.getNumber("Shooter Speed" + m_side.name(), 0);
+
+        // setShooterSpeed(speed);
 
         SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed", shooterWheel1.getEncoder().getVelocity());
         SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel2 Speed", shooterWheel2.getEncoder().getVelocity());
