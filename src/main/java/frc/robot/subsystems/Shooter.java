@@ -43,8 +43,6 @@ public class Shooter extends SubsystemBase {
 
         SparkMaxConfig config1 = new SparkMaxConfig();
         config1.idleMode(IdleMode.kCoast);
-        // config1.smartCurrentLimit(70);
-
         // Invert the main motor if it's the left side
         config1.inverted(m_side == SHOOTER_SIDE.LEFT);
 
@@ -52,13 +50,6 @@ public class Shooter extends SubsystemBase {
         // kV = 12 Volts / Max RPM. Assuming ~5600 max RPM for NEOs/Vortex on flywheels.
         // Adjust Constants.ShooterConstants.kV accordingly (e.g., 0.0021).
         m_feedforward = new edu.wpi.first.math.controller.SimpleMotorFeedforward(0.0, Constants.ShooterConstants.kV);
-        // Basic PID configuration (Needs to be tuned)
-        // config1.closedLoop.pid(0.008, 0, 0);
-
-        // Velocity filtering fix for Flywheels (From Chief Delphi)
-        // Reduces phase lag from default 164ms down to ~5ms
-        // config1.encoder.uvwMeasurementPeriod(32).uvwAverageDepth(8);
-
         SparkMaxConfig config2 = new SparkMaxConfig();
         config2.apply(config1); // Inherit all limits, coastal, inverted state, etc.
         config2.follow(shooterWheel1, true); // Follow shooterWheel1 but inverted
@@ -114,11 +105,5 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         super.periodic();
 
-        // double speed = SmartDashboard.getNumber("Shooter Speed" + m_side.name(), 0);
-
-        // setShooterSpeed(speed);
-
-        // SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel1 Speed", shooterWheel1.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Shooter " + m_side.name() + "/Wheel2 Speed", shooterWheel2.getEncoder().getVelocity());
     }
 }

@@ -46,22 +46,7 @@ public class Hood extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // double hoodTargetTicks = SmartDashboard.getNumber("Hood" + m_side.name() + "/Hood Ticks", 0);
-
-        // setTargetAngle(hoodTargetTicks);
     }
-
-    // public Command ManualHoodUp() {
-    //     return Commands.runOnce(() -> hoodMain.set(0.3));
-    // }
-
-    // public Command ManualHoodDown() {
-    //     return Commands.runOnce(() -> hoodMain.set(-0.3));
-    // }
-
-    // public Command ManualHoodStop() {
-    //     return Commands.runOnce(() -> hoodMain.set(0));
-    // }
 
     //provides ticks in degrees
     public void setTargetAngle(double ticks) {

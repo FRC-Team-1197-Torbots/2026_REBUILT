@@ -51,12 +51,7 @@ public class Hopper extends SubsystemBase {
         m_intake = intake;
     }
 
-    // @Override
-    // public void periodic() {
-    //     SmartDashboard.putNumber("Hopper/Flopper Current", flopperMotor.getStatorCurrent().getValueAsDouble());
-    //     SmartDashboard.putNumber("Hopper/Left Tower Current", leftTower.getStatorCurrent().getValueAsDouble());
-    //     SmartDashboard.putNumber("Hopper/Right Tower Current", rightTower.getStatorCurrent().getValueAsDouble());
-    // }
+
 
     /** Sets both hopper motors to the same speed. */
     public void setSpeed(double flopperspeed, double towerspeed) {
@@ -67,7 +62,6 @@ public class Hopper extends SubsystemBase {
 
     public void stop() {
         m_intake.setSpeed(0);
-        //setSpeed(0.0, 0.0);
 
         flopperMotor.set(0);
         leftTower.setControl(towerVoltageRequest.withOutput(0));
@@ -78,7 +72,6 @@ public class Hopper extends SubsystemBase {
     }
 
     public void feed(double flopper, double tower) {
-        // m_intake.setSpeed(0.4);
         setSpeed(Math.abs(flopper), Math.abs(tower));
     }
 
@@ -92,7 +85,6 @@ public class Hopper extends SubsystemBase {
     public void feedWithAntiJam(double flopper, double tower) {
         if (isUnjamming) {
             // Unjamming: Reverse the flopper, keep tower going
-            // m_intake.setSpeed(0.4);
             setSpeed(-Math.abs(flopper), Math.abs(tower));
 
             if (m_unjamTimer.hasElapsed(kUnjamDuration)) {

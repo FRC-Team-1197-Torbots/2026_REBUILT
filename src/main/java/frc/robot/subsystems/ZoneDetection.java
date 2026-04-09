@@ -88,11 +88,9 @@ public class ZoneDetection extends SubsystemBase {
     }
 
     private void updatePoseEstimation() {
-        // if (enableZoneDetection) {
-            for (String limelightName : limelightNames) {
-                processLimelight(limelightName);
-            }
-        // }
+        for (String limelightName : limelightNames) {
+            processLimelight(limelightName);
+        }
     }
 
     private void updateZone() {
@@ -130,8 +128,6 @@ public class ZoneDetection extends SubsystemBase {
         LimelightHelpers.SetRobotOrientation(name, m_gyro.getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
 
         // Get the MegaTag2 estimate directly
-        // PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
-        // //megatag1 in case
         PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
 
         if (mt2 == null)
