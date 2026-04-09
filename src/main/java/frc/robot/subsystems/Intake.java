@@ -124,9 +124,8 @@ public class Intake extends SubsystemBase {
 
         // Calculate target speed in Meters Per Second
         // Start at Min_Surface_Speed, bump up based on robot velocity
-        double targetSpeed = Math.max(
-                Constants.IntakeConstants.Min_Surface_Speed,
-                robotVelocity * Constants.IntakeConstants.RobotSpeedMultiplier);
+        double targetSpeed = Constants.IntakeConstants.Min_Surface_Speed + 
+                (robotVelocity * Constants.IntakeConstants.RobotSpeedMultiplier);
 
         setSurfaceSpeed(targetSpeed);
     }
