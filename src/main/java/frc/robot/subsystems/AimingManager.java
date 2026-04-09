@@ -104,18 +104,16 @@ public class AimingManager extends SubsystemBase {
     }
 
     private double calculateHoodTicks(double d) {
-        
-        // TODO Auto-generated method stub
         double a = 0.085;
         double b = 0.893;
         double c = -1.1785;
 
-        if(d < 2) {
-            return 0;
-        } else {
-
+        // At extremely close ranges under 2 meters, keep hood safely retracted
+        if (d < 2.0) {
+            return 0.0;
         }
-        return filter.calculate(a * d * d + b * d + c);
+        
+        return filter.calculate((a * d * d) + (b * d) + c);
     }
 
     private double calculateRps(double d) {
