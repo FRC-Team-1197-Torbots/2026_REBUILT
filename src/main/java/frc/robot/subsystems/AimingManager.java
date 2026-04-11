@@ -72,10 +72,13 @@ public class AimingManager extends SubsystemBase {
 
         // If we are passing the ball (in neutral zone or opponent's zone), use hardcoded high speeds
         // and fixed hood angles. Otherwise, dynamically calculate based on distance to speaker.
-        if (zoneDetection != null && (zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL || zoneDetection.isOpponentZone())) {
+        if (zoneDetection != null && (zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL )) {
             calculatedRPS = 60.0;
             calculatedHoodTicks = 8.0;
-        } else {
+        } else if(zoneDetection != null && zoneDetection.isOpponentZone()) {
+            calculatedRPS = 70.0;
+            calculatedHoodTicks = 6.0;
+        }  else {
             calculatedRPS = calculateRps(distanceMeters);
             calculatedHoodTicks = calculateHoodTicks(distanceMeters);
         }

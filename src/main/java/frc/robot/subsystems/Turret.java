@@ -130,7 +130,7 @@ public class Turret extends SubsystemBase {
                 targetPose = Constants.FieldConstants.RedTargetPose;
                 shouldTrack = true;
 
-            } else if (zone == ZoneDetection.ZONE.NEUTRAL && (isBlue || isRed) && DriverStation.isTeleop()) {
+            } else if ((zone == ZoneDetection.ZONE.NEUTRAL || zoneDetection.isOpponentZone()) && (isBlue || isRed) && DriverStation.isTeleop()) {
                 // Neutral Zone -> Pass to Corner (Safe)
                 Pose2d passRight = isBlue ? Constants.FieldConstants.BluePassingCornerLeft
                         : Constants.FieldConstants.RedPassingCornerRight;
