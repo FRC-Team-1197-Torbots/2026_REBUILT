@@ -104,5 +104,7 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         super.periodic();
 
+        // SmartDashboard.putNumber("Shooter 1 current " + m_side.name(), shooterWheel1.getOutputCurrent());
+        // SmartDashboard.putNumber("Shooter 2 current " + m_side.name(), shooterWheel2.getOutputCurrent());
     }
 }

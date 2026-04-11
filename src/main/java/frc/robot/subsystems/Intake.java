@@ -220,7 +220,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command runDeployImmediate(Supplier<ChassisSpeeds> speedSupplier) {
-        return runOnce(() -> runIntake(speedSupplier)) 
+        return run(() -> runIntake(speedSupplier)) 
                 .beforeStarting(this::deploy);
     }
 

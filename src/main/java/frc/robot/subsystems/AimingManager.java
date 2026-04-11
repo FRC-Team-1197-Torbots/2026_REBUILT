@@ -73,7 +73,7 @@ public class AimingManager extends SubsystemBase {
         // If we are passing the ball (in neutral zone or opponent's zone), use hardcoded high speeds
         // and fixed hood angles. Otherwise, dynamically calculate based on distance to speaker.
         if (zoneDetection != null && (zoneDetection.getZone() == ZoneDetection.ZONE.NEUTRAL || zoneDetection.isOpponentZone())) {
-            calculatedRPS = 50.0;
+            calculatedRPS = 60.0;
             calculatedHoodTicks = 8.0;
         } else {
             calculatedRPS = calculateRps(distanceMeters);
@@ -93,14 +93,14 @@ public class AimingManager extends SubsystemBase {
         }
 
         // Telemetry
-        SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m",
-        distanceMeters);
-        SmartDashboard.putNumber("AimingManager/" + sideName + "/RPS",
-        calculatedRPS);
-        SmartDashboard.putNumber("AimingManager/" + sideName + "/Hood Ticks",
-        calculatedHoodTicks);
-        SmartDashboard.putNumber("AimingManager/" + sideName + "/Hood Ticks Actual",
-        hood.getEncoderTicks());
+        // SmartDashboard.putNumber("AimingManager/" + sideName + "/Distance_m",
+        // distanceMeters);
+        // SmartDashboard.putNumber("AimingManager/" + sideName + "/RPS",
+        // calculatedRPS);
+        // SmartDashboard.putNumber("AimingManager/" + sideName + "/Hood Ticks",
+        // calculatedHoodTicks);
+        // SmartDashboard.putNumber("AimingManager/" + sideName + "/Hood Ticks Actual",
+        // hood.getEncoderTicks());
     }
 
     private double calculateHoodTicks(double d) {

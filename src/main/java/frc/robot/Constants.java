@@ -77,8 +77,7 @@ public final class Constants {
         public static final double kV = 0.0025; // Volts per RPM. Roughly 12V / 5600 RPM for a NEO/Vortex
 
         // Target speeds in RPS (Rotations Per Second)
-        public static final double IdleSpeed = 750.0 / 60.0; // 500 RPM
-        // public static final double ShootSpeed = 5500.0 / 60.0; // 3000 RPM
+        public static final double IdleSpeed = 1000.0 / 60.0; 
     }
 
     /** Constants for shoot-while-moving (velocity-based lead angle). */

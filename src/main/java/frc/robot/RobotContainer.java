@@ -84,6 +84,7 @@ public class RobotContainer {
 
         Command shootGroup = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection);
         Command shootTimeout10 = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(10);
+        Command shootTimeout3 = new ShootCommand(leftShooter, rightShooter, m_hopper, m_zoneDetection).withTimeout(3);
 
 
         public RobotContainer() {
@@ -99,7 +100,7 @@ public class RobotContainer {
                 // NamedCommands.registerCommand("run intake 1", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(4.7));
                 // NamedCommands.registerCommand("run intake 2", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds).withTimeout(6.0));
                 // NamedCommands.registerCommand("run intake", m_intake.runDeployAndIntakeCommand(() -> drivetrain.getState().Speeds));                
-                NamedCommands.registerCommand("shoot balls", shootGroup.withTimeout(3));
+                NamedCommands.registerCommand("shoot balls", shootTimeout3);
                 NamedCommands.registerCommand("shoot balls long", shootTimeout10);
         }
 
